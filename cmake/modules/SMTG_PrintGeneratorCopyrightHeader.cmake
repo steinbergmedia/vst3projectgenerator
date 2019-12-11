@@ -1,3 +1,6 @@
+
+cmake_minimum_required(VERSION 3.14.0)
+
 macro(smtg_print_generator_copyright_header)
     message("")
     message("==================================================")

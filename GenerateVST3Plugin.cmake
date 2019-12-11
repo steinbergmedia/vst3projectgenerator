@@ -2,8 +2,12 @@ cmake_minimum_required(VERSION 3.14.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 include(SMTG_PrintGeneratorCopyrightHeader)
+include(SMTG_GeneratePluginUuids)
+include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
+smtg_generate_plugin_uuids()
+smtg_print_plugin_uuids()
 
 # Collect all template files
 file(GLOB_RECURSE 
