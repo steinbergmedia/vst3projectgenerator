@@ -7,6 +7,8 @@ include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
 smtg_generate_plugin_uuids()
+
+smtg_print_vendor_specifics()
 smtg_print_plugin_uuids()
 
 # Collect all template files
@@ -34,16 +36,23 @@ foreach(input_file ${template_files})
     string(REPLACE
         ${TEMPLATE_EXT}
         ""
-        output_file_2
+        output_file
+        ${output_file}
+    )
+
+    string(REPLACE
+        "plugin"
+        ${SMTG_PREFIX_FOR_FILENAMES}
+        output_file
         ${output_file}
     )
 
     configure_file(
         ${input_file}
-        ${output_file_2}
+        ${output_file}
         @ONLY
         LF
     )
 
-    message("${output_file_2}")
+    message("${output_file}")
 endforeach()

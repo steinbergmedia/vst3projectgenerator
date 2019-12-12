@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.14.0)
 
-macro(smtg_print_generator_copyright_header)
+function(smtg_print_generator_copyright_header)
     message("")
     message("==================================================")
     message("")
@@ -10,4 +10,4 @@ macro(smtg_print_generator_copyright_header)
     message("")
     message("==================================================")
     message("")
-endmacro(smtg_print_generator_copyright_header)
+endfunction()

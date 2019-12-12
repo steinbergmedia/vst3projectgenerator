@@ -1,0 +1,17 @@
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#pragma once
+
+namespace Steinberg {
+namespace Vst {
+
+// Here are defined the UIDs for the 2 processors (2 plug-ins) and 1 controller (shared by the 2 plug-ins) 
+static const FUID AGainProcessorUID (@SMTG_Processor_UUID@);
+static const FUID AGainControllerUID (@SMTG_Controller_UUID@);
+
+
+#define AGainVST3Category "Fx"
+
+//------------------------------------------------------------------------
+} // namespace Vst
+} // namespace Steinberg
