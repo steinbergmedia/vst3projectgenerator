@@ -1,9 +1,8 @@
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
 
-#include "again.h"
-#include "againcontroller.h"
-#include "againcids.h"
-#include "version.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
 
 #include "public.sdk/source/main/pluginfactory.h"
 
@@ -37,8 +36,8 @@ using namespace Steinberg::Vst;
 //------------------------------------------------------------------------
 
 BEGIN_FACTORY_DEF ("@SMTG_VENDOR_NAME@", 
-			   "@SMTG_VENDOR_HOMEPAGE@", 
-			   "mailto:@SMTG_VENDOR_EMAIL@")
+			       "@SMTG_VENDOR_HOMEPAGE@", 
+			       "mailto:@SMTG_VENDOR_EMAIL@")
 
 	//---First Plug-in included in this factory-------
 	// its kVstAudioEffectClass component
