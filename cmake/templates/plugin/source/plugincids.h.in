@@ -2,16 +2,15 @@
 
 #pragma once
 
-namespace Steinberg {
-namespace Vst {
+#include "pluginterfaces/base/funknown.h"
 
-// Here are defined the UIDs for the 2 processors (2 plug-ins) and 1 controller (shared by the 2 plug-ins) 
-static const FUID AGainProcessorUID (@SMTG_Processor_UUID@);
-static const FUID AGainControllerUID (@SMTG_Controller_UUID@);
+namespace @SMTG_VENDOR_NAMESPACE@ {
+//------------------------------------------------------------------------
+static const FUID @SMTG_PLUGIN_CLASS_NAME@ProcessorUID (@SMTG_Processor_UUID@);
+static const FUID @SMTG_PLUGIN_CLASS_NAME@ControllerUID (@SMTG_Controller_UUID@);
 
 
-#define AGainVST3Category "Fx"
+#define @SMTG_PLUGIN_CLASS_NAME@VST3Category "Fx"
 
 //------------------------------------------------------------------------
-} // namespace Vst
-} // namespace Steinberg
+} // namespace @SMTG_VENDOR_NAMESPACE@

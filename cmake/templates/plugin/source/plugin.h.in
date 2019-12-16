@@ -1,1 +1,35 @@
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#pragma once
+
+#include "public.sdk/source/vst/vstaudioeffect.h"
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+//------------------------------------------------------------------------
+//  @SMTG_PLUGIN_CLASS_NAME@
+//------------------------------------------------------------------------
+class @SMTG_PLUGIN_CLASS_NAME@ : public AudioEffect
+{
+public:
+	@SMTG_PLUGIN_CLASS_NAME@ ();
+	~@SMTG_PLUGIN_CLASS_NAME@ () SMTG_OVERRIDE;
+
+    // Create function
+	static FUnknown* createInstance (void* /*context*/) { return (IAudioProcessor*)new @SMTG_PLUGIN_CLASS_NAME@; }
+
+	// AudioEffect overrides
+	Steinberg::tresult PLUGIN_API initialize (Steinberg::FUnknown* context) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API terminate () SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API setActive (Steinberg::TBool state) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API process (Steinberg::Vst::ProcessData& data) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API setupProcessing (Steinberg::Vst::ProcessSetup& newSetup) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API canProcessSampleSize (Steinberg::int32 symbolicSampleSize) SMTG_OVERRIDE;
+
+//------------------------------------------------------------------------
+protected:
+	float gain = 0.f;
+};
+
+//------------------------------------------------------------------------
+} // namespace @SMTG_VENDOR_NAMESPACE@

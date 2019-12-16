@@ -1,0 +1,77 @@
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#include "@SMTG_PREFIX_FOR_FILENAMES@.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
+
+using namespace Steinberg;
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+//------------------------------------------------------------------------
+// @SMTG_PLUGIN_CLASS_NAME@
+//------------------------------------------------------------------------
+@SMTG_PLUGIN_CLASS_NAME@::@SMTG_PLUGIN_CLASS_NAME@ ()
+{
+	setControllerClass (@SMTG_PLUGIN_CLASS_NAME@ControllerUID);
+}
+
+//------------------------------------------------------------------------
+@SMTG_PLUGIN_CLASS_NAME@::~@SMTG_PLUGIN_CLASS_NAME@ ()
+{}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::initialize (FUnknown* context)
+{
+	//---always initialize the parent-------
+	tresult result = AudioEffect::initialize (context);
+	// if everything Ok, continue
+	if (result != kResultOk)
+	{
+		return result;
+	}
+
+	//---create Audio In/Out buses------
+	// we want a stereo Input and a Stereo Output
+	addAudioInput (STR16 ("Stereo In"), SpeakerArr::kStereo);
+	addAudioOutput (STR16 ("Stereo Out"), SpeakerArr::kStereo);
+
+	//---create Event In/Out buses (1 bus with only 1 channel)------
+	addEventInput (STR16 ("Event In"), 1);
+
+	return kResultOk;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::terminate ()
+{
+	return AudioEffect::terminate ();
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setActive (TBool state)
+{
+	return AudioEffect::setActive (state);
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::process (ProcessData& data)
+{
+	return kResultOk;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setupProcessing (ProcessSetup& newSetup)
+{
+	return AudioEffect::setupProcessing (newSetup);
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::canProcessSampleSize (int32 symbolicSampleSize)
+{
+	if (symbolicSampleSize == kSample32)
+		return kResultTrue;
+
+	return kResultFalse;
+}
+
+//------------------------------------------------------------------------
+} // namespace @SMTG_VENDOR_NAMESPACE@
