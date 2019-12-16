@@ -1,0 +1,53 @@
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#pragma once
+
+#include "public.sdk/source/vst/vsteditcontroller.h"
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+//------------------------------------------------------------------------
+//  @SMTG_PLUGIN_CLASS_NAME@Controller
+//------------------------------------------------------------------------
+class @SMTG_PLUGIN_CLASS_NAME@ : public EditControllerEx1
+{
+public:
+//------------------------------------------------------------------------
+	@SMTG_PLUGIN_CLASS_NAME@ ();
+	~@SMTG_PLUGIN_CLASS_NAME@ () SMTG_OVERRIDE;
+
+    // Create function
+	static Steinberg::FUnknown* createInstance (void* /*context*/)
+	{
+		return (IEditController*)new @SMTG_PLUGIN_CLASS_NAME@Controller;
+	}
+
+	// IPluginBase
+	Steinberg::tresult PLUGIN_API initialize (FUnknown* context) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API terminate () SMTG_OVERRIDE;
+
+	// EditController
+	Steinberg::tresult PLUGIN_API setComponentState (Steinberg::IBStream* state) SMTG_OVERRIDE;
+	Steinberg::IPlugView* PLUGIN_API createView (const char* name) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API setState (Steinberg::IBStream* state) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API getState (Steinberg::IBStream* state) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API setParamNormalized (Steinberg::Vst::ParamID tag,
+                                                      Steinberg::Vst::ParamValue value) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API getParamStringByValue (Steinberg::Vst::ParamID tag,
+                                                         Steinberg::Vst::ParamValue valueNormalized,
+                                                         Steinberg::Vst::String128 string) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API getParamValueByString (Steinberg::Vst::ParamID tag,
+                                                         Steinberg::TChar* string,
+                                                         Steinberg::Vst::ParamValue& valueNormalized) SMTG_OVERRIDE;
+
+    // FUnknown
+    Steinberg::tresult PLUGIN_API queryInterface (const char* iid, void** obj) SMTG_OVERRIDE;
+
+    DELEGATE_REFCOUNT (EditController)
+
+//------------------------------------------------------------------------
+protected:
+};
+
+//------------------------------------------------------------------------
+} // namespace @SMTG_VENDOR_NAMESPACE@

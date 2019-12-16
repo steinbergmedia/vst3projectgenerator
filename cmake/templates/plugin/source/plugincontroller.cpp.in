@@ -1,0 +1,100 @@
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
+
+using namespace Steinberg;
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+//------------------------------------------------------------------------
+// @SMTG_PLUGIN_CLASS_NAME@Controller Implementation
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* context)
+{
+	tresult result = EditControllerEx1::initialize (context);
+	if (result != kResultOk)
+	{
+		return result;
+	}
+
+	return result;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::terminate ()
+{
+	return EditControllerEx1::terminate ();
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setComponentState (IBStream* state)
+{
+	if (!state)
+		return kResultFalse;
+
+	return kResultOk;
+}
+
+//------------------------------------------------------------------------
+IPlugView* PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::createView (const char* name)
+{
+	return nullptr;
+}
+
+//------------------------------------------------------------------------
+IController* @SMTG_PLUGIN_CLASS_NAME@Controller::createSubController (UTF8StringPtr name,
+                                                   const IUIDescription* /*description*/,
+                                                   VST3Editor* /*editor*/)
+{
+	if (UTF8StringView (name) == "MessageController")
+	{
+		auto* controller = new UIMessageController (this);
+		addUIMessageController (controller);
+		return controller;
+	}
+	return nullptr;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setState (IBStream* state)
+{
+	return kResultTrue;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getState (IBStream* state)
+{
+	return kResultTrue;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setParamNormalized (ParamID tag, ParamValue value)
+{
+	// called from host to update our parameters state
+	tresult result = EditControllerEx1::setParamNormalized (tag, value);
+	return result;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamStringByValue (ParamID tag, ParamValue valueNormalized,
+                                                           String128 string)
+{
+	return EditControllerEx1::getParamStringByValue (tag, valueNormalized, string);
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamValueByString (ParamID tag, TChar* string,
+                                                           ParamValue& valueNormalized)
+{
+	return EditControllerEx1::getParamValueByString (tag, string, valueNormalized);
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::queryInterface (const char* iid, void** obj)
+{
+	QUERY_INTERFACE (iid, obj, IMidiMapping::iid, IMidiMapping)
+	return EditControllerEx1::queryInterface (iid, obj);
+}
+
+//------------------------------------------------------------------------
+} // namespace @SMTG_VENDOR_NAMESPACE@
