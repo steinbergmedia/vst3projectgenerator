@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.14.0)
 include(SMTG_GenerateUuid)
 
 macro(smtg_generate_plugin_uuids)
-    smtg_generate_uuid(Processor)
-    smtg_generate_uuid(Controller)
+    smtg_generate_uuid(Processor)   # -> SMTG_Processor_UUID
+    smtg_generate_uuid(Controller)  # -> SMTG_Controller_UUID
 endmacro()
 
 macro(smtg_print_plugin_uuids)
