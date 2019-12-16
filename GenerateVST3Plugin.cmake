@@ -34,7 +34,7 @@ foreach(input_file ${template_files})
         ${SMTG_TEMPLATE_FILES_PATH}
         ${CMAKE_SOURCE_DIR}
         output_file
-        ${input_file}
+        ${output_file}
     )
     
     # Get last extension, in this case ".in"
