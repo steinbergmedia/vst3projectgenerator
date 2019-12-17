@@ -14,6 +14,7 @@ set(SMTG_PLUGIN_CLASS_NAME "MyPlugin")
 set(SMTG_PREFIX_FOR_FILENAMES "myplugin")
 set(SMTG_PLUGIN_BUNDLE_NAME "MyPlugin")
 set(SMTG_CMAKE_PROJECT_NAME ${SMTG_PLUGIN_BUNDLE_NAME})
+set(SMTG_PLUGIN_CATEGORY "Fx")
 
 function(smtg_print_vendor_specifics)
     message(STATUS "SMTG_VENDOR_NAME            : ${SMTG_VENDOR_NAME}")
