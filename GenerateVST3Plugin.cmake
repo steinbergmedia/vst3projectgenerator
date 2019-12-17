@@ -60,5 +60,5 @@ foreach(input_file ${template_files})
         LF
     )
 
-    message("${output_file}")
+    message(STATUS "${output_file}")
 endforeach()
