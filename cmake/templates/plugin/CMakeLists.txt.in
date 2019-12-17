@@ -1,3 +1,17 @@
 cmake_minimum_required(VERSION 3.14.0)
 
-project(@SMTG_PLUGIN_NAME@)
+include(SMTG_Fetch_VST3_SDK.cmake)
+include(${vst3sdk_SOURCE_DIR}/cmake/modules/SMTG_VST3_SDK.cmake)
+
+project(@SMTG_CMAKE_PROJECT_NAME@)
+setupCoreAudioSupport()
+setupAaxSupport()
+
+smtg_add_vst3plugin(@SMTG_PLUGIN_BUNDLE_NAME@
+    source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@controller.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@controller.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp
+)
