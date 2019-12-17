@@ -9,14 +9,17 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 //  @SMTG_PLUGIN_CLASS_NAME@
 //------------------------------------------------------------------------
-class @SMTG_PLUGIN_CLASS_NAME@ : public AudioEffect
+class @SMTG_PLUGIN_CLASS_NAME@ : public Steinberg::Vst::AudioEffect
 {
 public:
 	@SMTG_PLUGIN_CLASS_NAME@ ();
 	~@SMTG_PLUGIN_CLASS_NAME@ () SMTG_OVERRIDE;
 
     // Create function
-	static FUnknown* createInstance (void* /*context*/) { return (IAudioProcessor*)new @SMTG_PLUGIN_CLASS_NAME@; }
+	static Steinberg::FUnknown* createInstance (void* /*context*/) 
+	{ 
+		return (Steinberg::Vst::IAudioProcessor*)new @SMTG_PLUGIN_CLASS_NAME@; 
+	}
 
 	// AudioEffect overrides
 	Steinberg::tresult PLUGIN_API initialize (Steinberg::FUnknown* context) SMTG_OVERRIDE;

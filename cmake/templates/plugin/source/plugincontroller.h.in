@@ -9,21 +9,21 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 //  @SMTG_PLUGIN_CLASS_NAME@Controller
 //------------------------------------------------------------------------
-class @SMTG_PLUGIN_CLASS_NAME@ : public EditControllerEx1
+class @SMTG_PLUGIN_CLASS_NAME@Controller : public Steinberg::Vst::EditControllerEx1
 {
 public:
 //------------------------------------------------------------------------
-	@SMTG_PLUGIN_CLASS_NAME@ ();
-	~@SMTG_PLUGIN_CLASS_NAME@ () SMTG_OVERRIDE;
+	@SMTG_PLUGIN_CLASS_NAME@Controller () = default;
+	~@SMTG_PLUGIN_CLASS_NAME@Controller () SMTG_OVERRIDE = default;
 
     // Create function
 	static Steinberg::FUnknown* createInstance (void* /*context*/)
 	{
-		return (IEditController*)new @SMTG_PLUGIN_CLASS_NAME@Controller;
+		return (Steinberg::Vst::IEditController*)new @SMTG_PLUGIN_CLASS_NAME@Controller;
 	}
 
 	// IPluginBase
-	Steinberg::tresult PLUGIN_API initialize (FUnknown* context) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API initialize (Steinberg::FUnknown* context) SMTG_OVERRIDE;
 	Steinberg::tresult PLUGIN_API terminate () SMTG_OVERRIDE;
 
 	// EditController
@@ -37,7 +37,7 @@ public:
                                                          Steinberg::Vst::ParamValue valueNormalized,
                                                          Steinberg::Vst::String128 string) SMTG_OVERRIDE;
 	Steinberg::tresult PLUGIN_API getParamValueByString (Steinberg::Vst::ParamID tag,
-                                                         Steinberg::TChar* string,
+                                                         Steinberg::Vst::TChar* string,
                                                          Steinberg::Vst::ParamValue& valueNormalized) SMTG_OVERRIDE;
 
     // FUnknown
