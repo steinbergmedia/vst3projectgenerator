@@ -15,6 +15,14 @@ $ cd vst3plugingenerator
 $ cmake -P GenerateVST3Plugin.cmake
 ```
 
-The script will output all variables and its current values. In order to adapt variables, edit <tt>cmake/modules/SMTG_VendorSepcifics.cmake</tt> file to your needs.
+The script will output all variables and its current values. In order to adapt variables, edit 
+```
+vst3plugingenerator/cmake/modules/SMTG_VendorSepcifics.cmake
+``` 
+file to your needs.
 
-After the script has finished you will find a <tt>myplugin</tt> folder in the directory the script was executed in.
+After the script has finished you will find a 
+```
+vst3plugingenerator/myplugin
+```
+folder in the directory the script was executed in.
