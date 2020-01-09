@@ -6,11 +6,15 @@ A cmake script for generating VST 3 plug-ins using cmake's script mode.
 
 ## Usage
 
+Execute on command line:
+
 ```
-$ git clone <url>/vst3plugingenerator.git
+$ git clone https://stash.steinberg-intra.net/scm/~rhansen/vst3plugingenerator.git
 
 $ cd vst3plugingenerator
 $ cmake -P GenerateVST3Plugin.cmake
 ```
 
-Adapt variables by editing <tt>cmake/modules/SMTG_VendorSepcifics.cmake</tt> file.
+The script will output all variables and its current values. In order to adapt variables, edit <tt>cmake/modules/SMTG_VendorSepcifics.cmake</tt> file to your needs.
+
+After the script has finished you will find a <tt>myplugin</tt> folder in the directory the script was executed in.
