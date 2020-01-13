@@ -27,7 +27,12 @@ target_link_libraries(@SMTG_PLUGIN_BUNDLE_NAME@
 )
 
 if(SMTG_MAC)
-    smtg_set_bundle(@SMTG_PLUGIN_BUNDLE_NAME@ INFOPLIST "${CMAKE_CURRENT_LIST_DIR}/mac/Info.plist" PREPROCESS)
+    smtg_set_bundle(@SMTG_PLUGIN_BUNDLE_NAME@ INFOPLIST 
+        "${CMAKE_CURRENT_LIST_DIR}/mac/Info.plist" 
+        PREPROCESS
+    )
 elseif(SMTG_WIN)
-    target_sources(${@SMTG_PLUGIN_BUNDLE_NAME@} PRIVATE resource/@SMTG_PREFIX_FOR_FILENAMES@.rc)
+    target_sources(@SMTG_PLUGIN_BUNDLE_NAME@ PRIVATE 
+        resource/@SMTG_PREFIX_FOR_FILENAMES@.rc
+    )
 endif()
