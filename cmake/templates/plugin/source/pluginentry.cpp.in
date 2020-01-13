@@ -1,6 +1,6 @@
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
 
-#include "@SMTG_PREFIX_FOR_FILENAMES@.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@component.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
 #include "version.h"
