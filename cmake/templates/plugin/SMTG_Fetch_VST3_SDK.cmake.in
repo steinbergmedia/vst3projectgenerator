@@ -24,5 +24,9 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${vst3sdk_SOURCE_DIR}/cmake/modules)
 include_directories(${vst3sdk_SOURCE_DIR} ${vst3sdk_BINARY_DIR})
+
 set(SDK_ROOT ${vst3sdk_SOURCE_DIR})
+set(public_sdk_SOURCE_DIR ${SDK_ROOT}/public.sdk)
+set(pluginterfaces_SOURCE_DIR ${SDK_ROOT}/pluginterfaces)
+
 set(VST_SDK TRUE)
