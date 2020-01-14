@@ -23,7 +23,7 @@ file(GLOB_RECURSE
 foreach(input_file ${template_files})
     # Replace "plugin" by SMTG_PREFIX_FOR_FILENAMES
     string(REPLACE
-        "plugin"
+        "vst3plugin"
         ${SMTG_PREFIX_FOR_FILENAMES}
         output_file
         ${input_file}
