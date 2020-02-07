@@ -16,9 +16,17 @@ static constexpr auto valueIdVendor = "Vendor";
 static constexpr auto valueIdEMail = "EMail";
 static constexpr auto valueIdURL = "URL";
 static constexpr auto valueIdVSTSDKPath = "VST SDK Path";
-static constexpr auto valueIdChooseVSTSDKPath = "Choose VST SDK Path";
 static constexpr auto valueIdCMakePath = "CMake Path";
+
+static constexpr auto valueIdPluginType = "PlugIn Type";
+static constexpr auto valueIdPluginPath = "PlugIn Path";
+static constexpr auto valueIdPluginName = "PlugIn Name";
+static constexpr auto valueIdPluginBundleID = "PlugIn Bundle ID";
+static constexpr auto valueIdPluginFilenamePrefix = "PlugIn Filename Prefix";
+
 static constexpr auto valueIdChooseCMakePath = "Choose CMake Path";
+static constexpr auto valueIdChooseVSTSDKPath = "Choose VST SDK Path";
+static constexpr auto valueIdChoosePluginPath = "Choose PlugIn Path";
 
 //------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::CustomizationAdapter,
@@ -40,12 +48,14 @@ private:
 	void storePreferences ();
 	void chooseVSTSDKPath ();
 	void chooseCMakePath ();
+	void choosePluginPath ();
 
 	template<typename Proc>
 	void chooseDir (const UTF8String& valueId, Proc proc) const;
 
 	bool validateVSTSDKPath (const UTF8String& path);
 	bool validateCMakePath (const UTF8String& path);
+	bool validatePluginPath (const UTF8String& path);
 
 	VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model;
 	VSTGUI::SharedPointer<CFrame> contentView;

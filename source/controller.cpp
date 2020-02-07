@@ -39,8 +39,11 @@ Controller::Controller ()
 	auto cmakePathPref = prefs.get (valueIdCMakePath);
 
 	model = UIDesc::ModelBindingCallbacks::make ();
+	/* UI only */
 	model->addValue (Value::makeStringListValue (
 	    valueIdTabBar, {"Welcome", "Create Plug-In Project", "Preferences"}));
+
+	/* Factory Infos */
 	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : "Vendor"),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 	model->addValue (Value::makeStringValue (valueIdEMail, emailPref ? *emailPref : "E-Mail"),
@@ -48,6 +51,7 @@ Controller::Controller ()
 	model->addValue (Value::makeStringValue (valueIdURL, urlPref ? *urlPref : "URL"),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 
+	/* Directories */
 	model->addValue (Value::make (valueIdChooseVSTSDKPath),
 	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
 		                 chooseVSTSDKPath ();
@@ -58,12 +62,25 @@ Controller::Controller ()
 		                 chooseCMakePath ();
 		                 v.performEdit (0.);
 	                 }));
-
 	model->addValue (
 	    Value::makeStringValue (valueIdVSTSDKPath, vstSdkPathPref ? *vstSdkPathPref : ""),
 	    UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 	model->addValue (Value::makeStringValue (valueIdCMakePath, cmakePathPref ? *cmakePathPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
+
+	/* Plug-In */
+	model->addValue (Value::makeStringValue (valueIdPluginName, ""));
+	model->addValue (
+	    Value::makeStringListValue (valueIdPluginType, {"Audio Effect", "Instrument"}));
+	model->addValue (Value::makeStringValue (valueIdPluginBundleID, ""));
+	model->addValue (Value::makeStringValue (valueIdPluginFilenamePrefix, ""));
+	model->addValue (Value::makeStringValue (valueIdPluginPath, ""));
+
+	model->addValue (Value::make (valueIdChoosePluginPath),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 choosePluginPath ();
+		                 v.performEdit (0.);
+	                 }));
 }
 
 //------------------------------------------------------------------------
@@ -117,6 +134,13 @@ void Controller::chooseCMakePath ()
 }
 
 //------------------------------------------------------------------------
+void Controller::choosePluginPath ()
+{
+	chooseDir (valueIdPluginPath,
+	           [this] (const UTF8String& path) { return validatePluginPath (path); });
+}
+
+//------------------------------------------------------------------------
 bool Controller::validateVSTSDKPath (const UTF8String& path)
 {
 	// TODO: check that the path is valid
@@ -125,6 +149,13 @@ bool Controller::validateVSTSDKPath (const UTF8String& path)
 
 //------------------------------------------------------------------------
 bool Controller::validateCMakePath (const UTF8String& path)
+{
+	// TODO: check that the path is valid
+	return true;
+}
+
+//------------------------------------------------------------------------
+bool Controller::validatePluginPath (const UTF8String& path)
 {
 	// TODO: check that the path is valid
 	return true;
