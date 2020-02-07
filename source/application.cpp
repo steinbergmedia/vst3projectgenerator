@@ -1,5 +1,7 @@
 #include "application.h"
+#include "controller.h"
 
+#include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/iapplication.h"
 #include "vstgui/standalone/include/iuidescwindow.h"
@@ -9,6 +11,7 @@ namespace Steinberg {
 namespace Vst {
 namespace ProjectCreator {
 
+using namespace VSTGUI;
 using namespace VSTGUI::Standalone;
 
 //------------------------------------------------------------------------
@@ -16,18 +19,18 @@ Application::Application ()
 : Application::DelegateAdapter (
       {"VST3 Project Generator", "1.0.0", "net.steinberg.vst3.projectgenerator"})
 {
-	model = UIDesc::ModelBindingCallbacks::make ();
-	model->addValue (
-	    Value::makeStringListValue ("TabBar", {"Welcome", "Create Plug-In Project", "Preferences"}));
 }
 
 //------------------------------------------------------------------------
 void Application::finishLaunching ()
 {
+	auto controller = std::make_shared<Controller> ();
+
 	UIDesc::Config config;
 	config.uiDescFileName = "Window.uidesc";
 	config.viewName = "Window";
-	config.modelBinding = model;
+	config.modelBinding = controller->getModel ();
+	config.customization = controller;
 	config.windowConfig.title = "VST3 Project Generator";
 	config.windowConfig.autoSaveFrameName = "MainWindow";
 	config.windowConfig.style.border ().close ().centered ();
@@ -49,7 +52,7 @@ void Application::onClosed (const IWindow& window)
 }
 
 //------------------------------------------------------------------------
-static VSTGUI::Standalone::Application::Init gAppDelegate (std::make_unique<Application> ());
+static Standalone::Application::Init gAppDelegate (std::make_unique<Application> ());
 
 //------------------------------------------------------------------------
 } // ProjectCreator

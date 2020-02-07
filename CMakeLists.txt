@@ -1,12 +1,15 @@
 ##########################################################################################
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 project(vst3_project_generator)
 
-set(VSTGUI_DISABLE_UNITTESTS YES)
-set(VSTGUI_STANDALONE_EXAMPLES NO)
-set(VSTGUI_TOOLS NO)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 
-set(VSTGUI_DIR ../vstgui/vstgui)
+set(VSTGUI_DISABLE_UNITTESTS ON)
+set(VSTGUI_STANDALONE_EXAMPLES OFF)
+set(VSTGUI_STANDALONE ON)
+set(VSTGUI_TOOLS OFF)
+set(VSTGUI_DIR "../vstgui/vstgui" CACHE PATH "VSTGUI Directory")
+
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
@@ -16,6 +19,8 @@ set(target VST3_Project_Generator)
 set(${target}_sources
   "source/application.cpp"
   "source/application.h"
+  "source/controller.cpp"
+  "source/controller.h"
 )
 
 set(${target}_resources
