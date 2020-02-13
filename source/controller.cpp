@@ -43,6 +43,12 @@ Controller::Controller ()
 	model->addValue (Value::makeStringListValue (
 	    valueIdTabBar, {"Welcome", "Create Plug-In Project", "Preferences"}));
 
+	model->addValue (Value::make (valueIdCreateProject),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 createProject ();
+		                 v.performEdit (0.);
+	                 }));
+
 	/* Factory Infos */
 	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : "Vendor"),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
@@ -159,6 +165,11 @@ bool Controller::validatePluginPath (const UTF8String& path)
 {
 	// TODO: check that the path is valid
 	return true;
+}
+
+//------------------------------------------------------------------------
+void Controller::createProject ()
+{
 }
 
 //------------------------------------------------------------------------
