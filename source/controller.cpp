@@ -64,11 +64,11 @@ Controller::Controller ()
 	                 }));
 
 	/* Factory Infos */
-	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : "Vendor"),
+	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
-	model->addValue (Value::makeStringValue (valueIdEMail, emailPref ? *emailPref : "E-Mail"),
+	model->addValue (Value::makeStringValue (valueIdEMail, emailPref ? *emailPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
-	model->addValue (Value::makeStringValue (valueIdURL, urlPref ? *urlPref : "URL"),
+	model->addValue (Value::makeStringValue (valueIdURL, urlPref ? *urlPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 
 	/* Directories */
