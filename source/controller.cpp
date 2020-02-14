@@ -3,6 +3,7 @@
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
+#include "vstgui/standalone/include/ialertbox.h"
 #include <cstdlib>
 #include <fstream>
 
@@ -142,8 +143,19 @@ void Controller::chooseDir (const UTF8String& valueId, Proc proc) const
 //------------------------------------------------------------------------
 void Controller::chooseVSTSDKPath ()
 {
-	chooseDir (valueIdVSTSDKPath,
-	           [this] (const UTF8String& path) { return validateVSTSDKPath (path); });
+	chooseDir (valueIdVSTSDKPath, [this] (const UTF8String& path) {
+		if (!validateVSTSDKPath (path))
+		{
+			AlertBoxConfig config;
+			config.headline = "Wrong VST SDK path!";
+			config.description =
+			    "The selected folder does not look like the root folder of the VST SDK.";
+			config.defaultButton = "OK";
+			IApplication::instance ().showAlertBox (config);
+			return false;
+		}
+		return true;
+	});
 }
 
 //------------------------------------------------------------------------
@@ -163,8 +175,16 @@ void Controller::choosePluginPath ()
 //------------------------------------------------------------------------
 bool Controller::validateVSTSDKPath (const UTF8String& path)
 {
-	// TODO: check that the path is valid
-	return true;
+	auto p = path.getString ();
+	if (*p.rbegin () != PlatformPathDelimiter)
+		p += PlatformPathDelimiter;
+	p += "pluginterfaces";
+	p += PlatformPathDelimiter;
+	p += "vst";
+	p += PlatformPathDelimiter;
+	p += "vsttypes.h";
+	std::ifstream stream (p);
+	return stream.is_open ();
 }
 
 //------------------------------------------------------------------------
