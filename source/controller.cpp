@@ -3,6 +3,8 @@
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
+#include <cstdlib>
+#include <fstream>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -11,6 +13,14 @@ namespace ProjectCreator {
 
 using namespace VSTGUI;
 using namespace VSTGUI::Standalone;
+
+#if WINDOWS
+static constexpr auto PlatformPathDelimiter = '\\';
+static constexpr auto CMakeExecutableName = "CMake.exe";
+#else
+static constexpr auto PlatformPathDelimiter = '/';
+static constexpr auto CMakeExecutableName = "cmake";
+#endif
 
 //------------------------------------------------------------------------
 static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
@@ -37,6 +47,10 @@ Controller::Controller ()
 	auto urlPref = prefs.get (valueIdURL);
 	auto vstSdkPathPref = prefs.get (valueIdVSTSDKPath);
 	auto cmakePathPref = prefs.get (valueIdCMakePath);
+
+	auto envPaths = getEnvPaths ();
+	if (!cmakePathPref || cmakePathPref->empty ())
+		cmakePathPref = findCMakePath (envPaths);
 
 	model = UIDesc::ModelBindingCallbacks::make ();
 	/* UI only */
@@ -114,8 +128,8 @@ void Controller::chooseDir (const UTF8String& valueId, Proc proc) const
 		return;
 
 	Preferences prefs;
-	if (auto vstSdkPathPref = prefs.get (valueId))
-		fileSelector->setInitialDirectory (*vstSdkPathPref);
+	if (auto pathPref = prefs.get (valueId))
+		fileSelector->setInitialDirectory (*pathPref);
 
 	fileSelector->run ([proc, value] (CNewFileSelector* fs) {
 		if (fs->getNumSelectedFiles () == 0)
@@ -170,6 +184,49 @@ bool Controller::validatePluginPath (const UTF8String& path)
 //------------------------------------------------------------------------
 void Controller::createProject ()
 {
+}
+
+//------------------------------------------------------------------------
+auto Controller::getEnvPaths () -> StringList
+{
+	StringList result;
+	if (auto envPath = std::getenv ("PATH"))
+	{
+		std::istringstream input;
+		input.str (envPath);
+		std::string el;
+		while (std::getline (input, el, ':'))
+		{
+			if (*el.rbegin () != PlatformPathDelimiter)
+				el += PlatformPathDelimiter;
+			result.emplace_back (std::move (el));
+		}
+	}
+	return result;
+}
+
+//------------------------------------------------------------------------
+VSTGUI::Optional<UTF8String> Controller::findCMakePath (const StringList& envPaths)
+{
+	if (!envPaths.empty ())
+	{
+		for (auto path : envPaths)
+		{
+			path += CMakeExecutableName;
+			std::ifstream stream (path);
+			if (stream.is_open ())
+			{
+				return {std::move (path)};
+			}
+		}
+	}
+#if !WINDOWS
+	std::string path = "/usr/local/bin/cmake";
+	std::ifstream stream (path);
+	if (stream.is_open ())
+		return {std::move (path)};
+#endif
+	return {};
 }
 
 //------------------------------------------------------------------------

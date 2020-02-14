@@ -62,6 +62,10 @@ private:
 	bool validateCMakePath (const UTF8String& path);
 	bool validatePluginPath (const UTF8String& path);
 
+	using StringList = std::vector<std::string>;
+	StringList getEnvPaths ();
+	VSTGUI::Optional<UTF8String> findCMakePath (const StringList& envPaths);
+	
 	VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model;
 	VSTGUI::SharedPointer<CFrame> contentView;
 };
