@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vstgui/lib/cframe.h"
+#include "vstgui/lib/cfileselector.h"
 #include "vstgui/standalone/include/helpers/uidesc/customization.h"
 #include "vstgui/standalone/include/helpers/uidesc/modelbinding.h"
 #include "vstgui/standalone/include/helpers/windowcontroller.h"
@@ -56,7 +57,8 @@ private:
 	void createProject ();
 
 	template <typename Proc>
-	void chooseDir (const UTF8String& valueId, Proc proc) const;
+	void runFileSelector (const UTF8String& valueId, VSTGUI::CNewFileSelector::Style style,
+	                      Proc proc) const;
 
 	bool validateVSTSDKPath (const UTF8String& path);
 	bool validateCMakePath (const UTF8String& path);

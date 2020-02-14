@@ -24,6 +24,16 @@ static constexpr auto CMakeExecutableName = "cmake";
 #endif
 
 //------------------------------------------------------------------------
+static void showSimpleAlert (const char* headline, const char* description)
+{
+	AlertBoxConfig config;
+	config.headline = headline;
+	config.description = description;
+	config.defaultButton = "OK";
+	IApplication::instance ().showAlertBox (config);
+}
+
+//------------------------------------------------------------------------
 static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
                                       const ValuePtr& value)
 {
@@ -117,14 +127,14 @@ void Controller::storePreferences ()
 
 //------------------------------------------------------------------------
 template <typename Proc>
-void Controller::chooseDir (const UTF8String& valueId, Proc proc) const
+void Controller::runFileSelector (const UTF8String& valueId, CNewFileSelector::Style style,
+                                  Proc proc) const
 {
 	auto value = model->getValue (valueId);
 	if (!value)
 		return;
 
-	auto fileSelector =
-	    owned (CNewFileSelector::create (contentView, CNewFileSelector::kSelectDirectory));
+	auto fileSelector = owned (CNewFileSelector::create (contentView, style));
 	if (!fileSelector)
 		return;
 
@@ -143,33 +153,38 @@ void Controller::chooseDir (const UTF8String& valueId, Proc proc) const
 //------------------------------------------------------------------------
 void Controller::chooseVSTSDKPath ()
 {
-	chooseDir (valueIdVSTSDKPath, [this] (const UTF8String& path) {
-		if (!validateVSTSDKPath (path))
-		{
-			AlertBoxConfig config;
-			config.headline = "Wrong VST SDK path!";
-			config.description =
-			    "The selected folder does not look like the root folder of the VST SDK.";
-			config.defaultButton = "OK";
-			IApplication::instance ().showAlertBox (config);
-			return false;
-		}
-		return true;
-	});
+	runFileSelector (
+	    valueIdVSTSDKPath, CNewFileSelector::kSelectDirectory, [this] (const UTF8String& path) {
+		    if (!validateVSTSDKPath (path))
+		    {
+			    showSimpleAlert (
+			        "Wrong VST SDK path!",
+			        "The selected folder does not look like the root folder of the VST SDK.");
+			    return false;
+		    }
+		    return true;
+	    });
 }
 
 //------------------------------------------------------------------------
 void Controller::chooseCMakePath ()
 {
-	chooseDir (valueIdCMakePath,
-	           [this] (const UTF8String& path) { return validateCMakePath (path); });
+	runFileSelector (
+	    valueIdCMakePath, CNewFileSelector::kSelectFile, [this] (const UTF8String& path) {
+		    if (!validateCMakePath (path))
+		    {
+			    showSimpleAlert ("Wrong CMake path!", "The selected file is not cmake.");
+			    return false;
+		    }
+		    return true;
+	    });
 }
 
 //------------------------------------------------------------------------
 void Controller::choosePluginPath ()
 {
-	chooseDir (valueIdPluginPath,
-	           [this] (const UTF8String& path) { return validatePluginPath (path); });
+	runFileSelector (valueIdPluginPath, CNewFileSelector::kSelectDirectory,
+	                 [this] (const UTF8String& path) { return validatePluginPath (path); });
 }
 
 //------------------------------------------------------------------------
