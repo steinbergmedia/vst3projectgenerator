@@ -29,13 +29,9 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::initialize (FUnknown* context)
 		return result;
 	}
 
-	//---create Audio In/Out buses------
-	// we want a stereo Input and a Stereo Output
-	addAudioInput (STR16 ("Stereo In"), Steinberg::Vst::SpeakerArr::kStereo);
-	addAudioOutput (STR16 ("Stereo Out"), Steinberg::Vst::SpeakerArr::kStereo);
+	@SMTG_EFFECT_AUDIO_BUSSES_CODE_SNIPPET@
 
-	//---create Event In/Out buses (1 bus with only 1 channel)------
-	addEventInput (STR16 ("Event In"), 1);
+	@SMTG_EFFECT_EVENT_BUSSES_CODE_SNIPPET@
 
 	return kResultOk;
 }
