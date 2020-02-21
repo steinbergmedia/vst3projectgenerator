@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.14.0)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 set(SMTG_TEMPLATE_FILES_PATH cmake/templates)
+set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+if(SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI)
+    set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI})
+endif()
+
 include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
 include(SMTG_VendorSpecifics)
@@ -32,7 +37,7 @@ foreach(input_file ${template_files})
     # Replace SMTG_TEMPLATE_FILES_PATH by CMAKE_SOURCE_DIR
     string(REPLACE
         ${SMTG_TEMPLATE_FILES_PATH}
-        ${CMAKE_SOURCE_DIR}
+        ${SMTG_GENERATOR_OUTPUT_DIRECTORY}
         output_file
         ${output_file}
     )
