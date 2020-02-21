@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.14.0)
+
+set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${SMTG_CMAKE_SCRIPT_DIR}/output)
+if(SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI)
+    set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI})
+endif()
+
+function(smtg_print_generator_specifics)
+    message(STATUS "SMTG_GENERATOR_OUTPUT_DIRECTORY : ${SMTG_GENERATOR_OUTPUT_DIRECTORY}")
+    message("")
+endfunction()

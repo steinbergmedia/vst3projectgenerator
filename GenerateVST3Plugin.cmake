@@ -1,19 +1,22 @@
 cmake_minimum_required(VERSION 3.14.0)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
-set(SMTG_TEMPLATE_FILES_PATH cmake/templates)
-set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-if(SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI)
-    set(SMTG_GENERATOR_OUTPUT_DIRECTORY ${SMTG_GENERATOR_OUTPUT_DIRECTORY_CLI})
+set(SMTG_CMAKE_SCRIPT_DIR ${CMAKE_CURRENT_LIST_DIR})
+if(SMTG_CMAKE_SCRIPT_DIR_CLI)
+    set(SMTG_CMAKE_SCRIPT_DIR ${SMTG_CMAKE_SCRIPT_DIR_CLI})
 endif()
+
+list(APPEND CMAKE_MODULE_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/modules)
+set(SMTG_TEMPLATE_FILES_PATH cmake/templates)
 
 include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
+include(SMTG_GeneratorSpecifics)
 include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
+message(STATUS "SMTG_CMAKE_SCRIPT_DIR           : ${SMTG_CMAKE_SCRIPT_DIR}")
 smtg_generate_plugin_uuids()
-
+smtg_print_generator_specifics()
 smtg_print_vendor_specifics()
 smtg_print_plugin_uuids()
 
@@ -21,7 +24,7 @@ smtg_print_plugin_uuids()
 file(GLOB_RECURSE 
     template_files 
     RELATIVE 
-    ${CMAKE_SOURCE_DIR}
+    ${SMTG_CMAKE_SCRIPT_DIR}
     *.in
 )
 
@@ -34,7 +37,7 @@ foreach(input_file ${template_files})
         ${input_file}
     )
 
-    # Replace SMTG_TEMPLATE_FILES_PATH by CMAKE_SOURCE_DIR
+    # Replace SMTG_TEMPLATE_FILES_PATH by SMTG_CMAKE_SCRIPT_DIR
     string(REPLACE
         ${SMTG_TEMPLATE_FILES_PATH}
         ${SMTG_GENERATOR_OUTPUT_DIRECTORY}
