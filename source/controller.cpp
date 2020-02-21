@@ -44,7 +44,7 @@ static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
 }
     
 //------------------------------------------------------------------------
-static UTF8String makeArg (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model, const UTF8String& key)
+static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model, const UTF8String& key)
 {
     auto value = model->getValue (key);
     if (auto strValue = value->dynamicCast<IStringValue> ())
@@ -52,7 +52,7 @@ static UTF8String makeArg (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr 
         return strValue->getString ();
     }
     
-    return nullptr;
+    return {};
 }
     
 //------------------------------------------------------------------------
@@ -234,12 +234,12 @@ void Controller::createProject ()
     UTF8String command;
     command += findCMakePath (getEnvPaths ()).value ();
     
-    command += UTF8String (" -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=") + makeArg (model, valueIdPluginPath);
-    command += UTF8String (" -DSMTG_VENDOR_NAME_CLI=") + makeArg (model, valueIdVendor);
-    command += UTF8String (" -DSMTG_VENDOR_EMAIL_CLI=") + makeArg (model, valueIdEMail);
-    command += UTF8String (" -DSMTG_PLUGIN_NAME_CLI=") + makeArg (model, valueIdPluginName);
-    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES=") + makeArg (model, valueIdPluginFilenamePrefix);
-    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER=") + makeArg (model, valueIdPluginBundleID);
+    command += UTF8String (" -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=") + getModelValueString (model, valueIdPluginPath);
+    command += UTF8String (" -DSMTG_VENDOR_NAME_CLI=") + getModelValueString (model, valueIdVendor);
+    command += UTF8String (" -DSMTG_VENDOR_EMAIL_CLI=") + getModelValueString (model, valueIdEMail);
+    command += UTF8String (" -DSMTG_PLUGIN_NAME_CLI=") + getModelValueString (model, valueIdPluginName);
+    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES=") + getModelValueString (model, valueIdPluginFilenamePrefix);
+    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER=") + getModelValueString (model, valueIdPluginBundleID);
 
     // TODO: The path to the "GenerateVST3Plugin.cmake" script needs to be defined somewhere.
     static const UTF8String kPathToScript = " -P ~/VST3/vst3plugingenerator/GenerateVST3Plugin.cmake";
