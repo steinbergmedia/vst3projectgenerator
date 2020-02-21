@@ -238,8 +238,8 @@ void Controller::createProject ()
     command += UTF8String (" -DSMTG_VENDOR_NAME_CLI=") + getModelValueString (model, valueIdVendor);
     command += UTF8String (" -DSMTG_VENDOR_EMAIL_CLI=") + getModelValueString (model, valueIdEMail);
     command += UTF8String (" -DSMTG_PLUGIN_NAME_CLI=") + getModelValueString (model, valueIdPluginName);
-    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES=") + getModelValueString (model, valueIdPluginFilenamePrefix);
-    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER=") + getModelValueString (model, valueIdPluginBundleID);
+    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES_CLI=") + getModelValueString (model, valueIdPluginFilenamePrefix);
+    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER_CLI=") + getModelValueString (model, valueIdPluginBundleID);
 
     // TODO: The path to the "GenerateVST3Plugin.cmake" script needs to be defined somewhere.
     static const UTF8String kPathToScript = " -P ~/VST3/vst3plugingenerator/GenerateVST3Plugin.cmake";
