@@ -6,7 +6,6 @@ if(SMTG_CMAKE_SCRIPT_DIR_CLI)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/modules)
-set(SMTG_TEMPLATE_FILES_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/templates)
 
 include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
@@ -15,7 +14,6 @@ include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
 message(STATUS "SMTG_CMAKE_SCRIPT_DIR           : ${SMTG_CMAKE_SCRIPT_DIR}")
-message(STATUS "SMTG_TEMPLATE_FILES_PATH       : ${SMTG_TEMPLATE_FILES_PATH}")
 smtg_generate_plugin_uuids()
 smtg_print_generator_specifics()
 smtg_print_vendor_specifics()
