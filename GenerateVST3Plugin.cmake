@@ -6,7 +6,7 @@ if(SMTG_CMAKE_SCRIPT_DIR_CLI)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/modules)
-set(SMTG_TEMPLATE_FILES_PATH cmake/templates)
+set(SMTG_TEMPLATE_FILES_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/templates)
 
 include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
@@ -15,6 +15,7 @@ include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
 message(STATUS "SMTG_CMAKE_SCRIPT_DIR           : ${SMTG_CMAKE_SCRIPT_DIR}")
+message(STATUS "SMTG_TEMPLATE_FILES_PATH       : ${SMTG_TEMPLATE_FILES_PATH}")
 smtg_generate_plugin_uuids()
 smtg_print_generator_specifics()
 smtg_print_vendor_specifics()
@@ -24,31 +25,23 @@ smtg_print_plugin_uuids()
 file(GLOB_RECURSE 
     template_files 
     RELATIVE 
-    ${SMTG_CMAKE_SCRIPT_DIR}
-    *.in
+        ${SMTG_TEMPLATE_FILES_PATH}
+    ${SMTG_TEMPLATE_FILES_PATH}/*.in
 )
 
-foreach(input_file ${template_files})
+foreach(rel_input_file ${template_files})
     # Replace "plugin" by SMTG_PREFIX_FOR_FILENAMES
     string(REPLACE
         "vst3plugin"
         ${SMTG_PREFIX_FOR_FILENAMES}
-        output_file
-        ${input_file}
-    )
-
-    # Replace SMTG_TEMPLATE_FILES_PATH by SMTG_CMAKE_SCRIPT_DIR
-    string(REPLACE
-        ${SMTG_TEMPLATE_FILES_PATH}
-        ${SMTG_GENERATOR_OUTPUT_DIRECTORY}
-        output_file
-        ${output_file}
+        rel_output_file
+        ${rel_input_file}
     )
     
     # Get last extension, in this case ".in"
     get_filename_component(
         TEMPLATE_EXT
-        ${output_file}
+        ${rel_output_file}
         LAST_EXT
     )
    
@@ -56,17 +49,21 @@ foreach(input_file ${template_files})
     string(REPLACE
         ${TEMPLATE_EXT}
         ""
-        output_file
-        ${output_file}
+        rel_output_file
+        ${rel_output_file}
     )
+
+    # Create absolute paths from relative paths
+    set(abs_input_file ${SMTG_TEMPLATE_FILES_PATH}/${rel_input_file})
+    set(abs_output_file ${SMTG_GENERATOR_OUTPUT_DIRECTORY}/${rel_output_file})
 
     # Write file to HD
     configure_file(
-        ${input_file}
-        ${output_file}
+        ${abs_input_file}
+        ${abs_output_file}
         @ONLY
         LF
     )
 
-    message(STATUS "${output_file}")
+    message(STATUS "${abs_output_file}")
 endforeach()
