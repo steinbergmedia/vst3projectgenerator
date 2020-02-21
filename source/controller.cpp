@@ -42,7 +42,19 @@ static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
 	if (auto strValue = value->dynamicCast<IStringValue> ())
 		prefs.set (key, strValue->getString ());
 }
-
+    
+//------------------------------------------------------------------------
+static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model, const UTF8String& key)
+{
+    auto value = model->getValue (key);
+    if (auto strValue = value->dynamicCast<IStringValue> ())
+    {
+        return strValue->getString ();
+    }
+    
+    return {};
+}
+    
 //------------------------------------------------------------------------
 void Controller::onSetContentView (IWindow& window, const VSTGUI::SharedPointer<CFrame>& view)
 {
@@ -219,6 +231,21 @@ bool Controller::validatePluginPath (const UTF8String& path)
 //------------------------------------------------------------------------
 void Controller::createProject ()
 {
+    UTF8String command;
+    command += findCMakePath (getEnvPaths ()).value ();
+    
+    command += UTF8String (" -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=") + getModelValueString (model, valueIdPluginPath);
+    command += UTF8String (" -DSMTG_VENDOR_NAME_CLI=") + getModelValueString (model, valueIdVendor);
+    command += UTF8String (" -DSMTG_VENDOR_EMAIL_CLI=") + getModelValueString (model, valueIdEMail);
+    command += UTF8String (" -DSMTG_PLUGIN_NAME_CLI=") + getModelValueString (model, valueIdPluginName);
+    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES_CLI=") + getModelValueString (model, valueIdPluginFilenamePrefix);
+    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER_CLI=") + getModelValueString (model, valueIdPluginBundleID);
+
+    // TODO: The path to the "GenerateVST3Plugin.cmake" script needs to be defined somewhere.
+    static const UTF8String kPathToScript = " -P ~/VST3/vst3plugingenerator/GenerateVST3Plugin.cmake";
+    command += kPathToScript;
+
+    std::system (command);
 }
 
 //------------------------------------------------------------------------
