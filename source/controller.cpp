@@ -4,6 +4,7 @@
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
+#include "vstgui/standalone/include/icommondirectories.h"
 #include <cstdlib>
 #include <fstream>
 
@@ -42,19 +43,20 @@ static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
 	if (auto strValue = value->dynamicCast<IStringValue> ())
 		prefs.set (key, strValue->getString ());
 }
-    
+
 //------------------------------------------------------------------------
-static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model, const UTF8String& key)
+static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model,
+                                       const UTF8String& key)
 {
-    auto value = model->getValue (key);
-    if (auto strValue = value->dynamicCast<IStringValue> ())
-    {
-        return strValue->getString ();
-    }
-    
-    return {};
+	auto value = model->getValue (key);
+	if (auto strValue = value->dynamicCast<IStringValue> ())
+	{
+		return strValue->getString ();
+	}
+
+	return {};
 }
-    
+
 //------------------------------------------------------------------------
 void Controller::onSetContentView (IWindow& window, const VSTGUI::SharedPointer<CFrame>& view)
 {
@@ -231,21 +233,53 @@ bool Controller::validatePluginPath (const UTF8String& path)
 //------------------------------------------------------------------------
 void Controller::createProject ()
 {
-    UTF8String command;
-    command += findCMakePath (getEnvPaths ()).value ();
-    
-    command += UTF8String (" -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=") + getModelValueString (model, valueIdPluginPath);
-    command += UTF8String (" -DSMTG_VENDOR_NAME_CLI=") + getModelValueString (model, valueIdVendor);
-    command += UTF8String (" -DSMTG_VENDOR_EMAIL_CLI=") + getModelValueString (model, valueIdEMail);
-    command += UTF8String (" -DSMTG_PLUGIN_NAME_CLI=") + getModelValueString (model, valueIdPluginName);
-    command += UTF8String (" -DSMTG_PREFIX_FOR_FILENAMES_CLI=") + getModelValueString (model, valueIdPluginFilenamePrefix);
-    command += UTF8String (" -DSMTG_PLUGIN_IDENTIFIER_CLI=") + getModelValueString (model, valueIdPluginBundleID);
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
+	auto vendorStr = getModelValueString (model, valueIdVendor);
+	auto emailStr = getModelValueString (model, valueIdEMail);
+	auto pluginNameStr = getModelValueString (model, valueIdPluginName);
+	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
+	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID);
 
-    // TODO: The path to the "GenerateVST3Plugin.cmake" script needs to be defined somewhere.
-    static const UTF8String kPathToScript = " -P ~/VST3/vst3plugingenerator/GenerateVST3Plugin.cmake";
-    command += kPathToScript;
+	if (cmakePathStr.empty ())
+	{
+		showSimpleAlert ("Cannot create Project", "The CMake path is empty.");
+		return;
+	}
+	if (pluginOutputPathStr.empty ())
+	{
+		showSimpleAlert ("Cannot create Project", "You need to specify an output directory.");
+		return;
+	}
+	if (pluginNameStr.empty ())
+	{
+		showSimpleAlert ("Cannot create Project", "You need to specify a name for your plugin.");
+		return;
+	}
+	if (pluginBundleIDStr.empty ())
+	{
+		showSimpleAlert ("Cannot create Project", "You need to specify a bundle ID.");
+		return;
+	}
 
-    std::system (command);
+
+	if (auto scriptPath = IApplication::instance ().getCommonDirectories ().get (
+	        CommonDirectoryLocation::AppResourcesPath))
+	{
+		*scriptPath += "GenerateVST3Plugin.cmake";
+
+		auto command = cmakePathStr;
+		command += " -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"";
+		command += " -DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"";
+		command += " -DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"";
+		command += " -DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"";
+		command += " -DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"";
+		command += " -DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"";
+
+		command += " -P " + *scriptPath;
+
+		std::system (command);
+	}
 }
 
 //------------------------------------------------------------------------
