@@ -21,9 +21,11 @@ using namespace VSTGUI::Standalone;
 
 #if WINDOWS
 static constexpr auto PlatformPathDelimiter = '\\';
+static constexpr auto EnvPathSeparator = ';';
 static constexpr auto CMakeExecutableName = "CMake.exe";
 #else
 static constexpr auto PlatformPathDelimiter = '/';
+static constexpr auto EnvPathSeparator = ':';
 static constexpr auto CMakeExecutableName = "cmake";
 #endif
 
@@ -347,7 +349,7 @@ auto Controller::getEnvPaths () -> StringList
 		std::istringstream input;
 		input.str (envPath);
 		std::string el;
-		while (std::getline (input, el, ':'))
+		while (std::getline (input, el, EnvPathSeparator))
 		{
 			if (*el.rbegin () != PlatformPathDelimiter)
 				el += PlatformPathDelimiter;

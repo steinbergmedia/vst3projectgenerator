@@ -7,24 +7,26 @@
 //------------------------------------------------------------------------
 
 #include "../../process.h"
-#include "VST3/include/common/StringConvert.h"
-#include "VST3/include/common/Timer.h"
+#include "vstgui/lib/cvstguitimer.h"
+#include "vstgui/lib/platform/win32/win32support.h"
 #include <Windows.h>
 #include <algorithm>
 #include <array>
 
 //------------------------------------------------------------------------
-namespace VST3 {
-namespace Hosting {
+namespace Steinberg {
+namespace Vst {
+
+using namespace VSTGUI;
 
 //------------------------------------------------------------------------
-struct ExternalProcess::Impl
+struct Process::Impl
 {
 	HANDLE readPipe {nullptr};
 	HANDLE writePipe {nullptr};
 	PROCESS_INFORMATION procInfo {};
 	CallbackFunction callback;
-	Timer::Ptr timer;
+	SharedPointer<CVSTGUITimer> timer;
 	std::string appPathUTF8Str;
 
 	~Impl () noexcept
@@ -73,7 +75,7 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	startupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	startupInfo.wShowWindow = 0;
 
-	auto appPath = StringConvert::convert (appPathUTF8Str);
+	UTF8StringHelper appPath (pImpl->appPathUTF8Str.data ());
 
 	std::string commandLine;
 	auto it = arguments.begin ();
@@ -82,10 +84,10 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	while (++it != arguments.end ())
 		commandLine += " \"" + *it + "\"";
 
-	auto commandLineUTF16 = StringConvert::convert (commandLine);
+	UTF8StringHelper commandLineUTF16 (commandLine.data ());
 	auto success = CreateProcess (
-	    reinterpret_cast<const TCHAR*> (appPath.data ()),
-	    const_cast<LPWSTR> (reinterpret_cast<const TCHAR*> (commandLineUTF16.data ())),
+	    reinterpret_cast<const TCHAR*> (appPath.getWideString ()),
+	    const_cast<LPWSTR> (reinterpret_cast<const TCHAR*> (commandLineUTF16.getWideString ())),
 	    NULL, // process security attributes
 	    NULL, // primary thread security attributes
 	    TRUE, // handles are inherited
@@ -99,16 +101,9 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 		return false;
 	}
 
-	pImpl->timer = Timer::create (16, [pImpl] () {
+	pImpl->timer = makeOwned<CVSTGUITimer> ([this] (CVSTGUITimer* timer) {
 		Process::CallbackParams params;
-		if (WaitForSingleObject (pImpl->procInfo.hProcess, 0) == WAIT_OBJECT_0)
-		{
-			DWORD exitCode {};
-			GetExitCodeProcess (pImpl->procInfo.hProcess, &exitCode);
-			params.isEOF = true;
-			params.resultCode = exitCode;
-		}
-		else if (WaitForSingleObject (pImpl->readPipe, 0) == WAIT_OBJECT_0)
+		if (WaitForSingleObject (pImpl->readPipe, 0) == WAIT_OBJECT_0)
 		{
 			DWORD bytesAvailable {};
 			PeekNamedPipe (pImpl->readPipe, NULL, 0, nullptr, &bytesAvailable, nullptr);
@@ -120,11 +115,19 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 				          nullptr);
 			}
 		}
+		if (WaitForSingleObject (pImpl->procInfo.hProcess, 0) == WAIT_OBJECT_0)
+		{
+			DWORD exitCode {};
+			GetExitCodeProcess (pImpl->procInfo.hProcess, &exitCode);
+			params.isEOF = true;
+			params.resultCode = exitCode;
+		}
 		if (!params.buffer.empty () || params.isEOF)
 			pImpl->callback (params);
 		if (params.isEOF)
-			return false;
-		return true;
+		{
+			timer->stop ();
+		}
 	});
 
 	return true;
@@ -134,5 +137,5 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 Process::~Process () noexcept = default;
 
 //------------------------------------------------------------------------
-} // Hosting
-} // VST3
+} // Steinberg
+} // Vst

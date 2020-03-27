@@ -6,6 +6,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <memory>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
