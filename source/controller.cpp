@@ -1,11 +1,14 @@
+// Flags       : clang-format SMTGSequencer
+
 #include "controller.h"
+#include "process.h"
 
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/icommondirectories.h"
-#include <cstdlib>
+
 #include <fstream>
 
 //------------------------------------------------------------------------
@@ -88,6 +91,12 @@ Controller::Controller ()
 		                 v.performEdit (0.);
 	                 }));
 
+	model->addValue (Value::makeStringValue (valueIdScriptOutput, ""));
+	model->addValue (Value::make (valueIdScriptRunning),
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue& v) {
+		                 onScriptRunning (v.getValue () > 0.5 ? true : false);
+	                 }));
+
 	/* Factory Infos */
 	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
@@ -137,6 +146,31 @@ void Controller::storePreferences ()
 	setPreferenceStringValue (prefs, valueIdURL, model->getValue (valueIdURL));
 	setPreferenceStringValue (prefs, valueIdVSTSDKPath, model->getValue (valueIdVSTSDKPath));
 	setPreferenceStringValue (prefs, valueIdCMakePath, model->getValue (valueIdCMakePath));
+}
+
+//------------------------------------------------------------------------
+void Controller::onScriptRunning (bool state)
+{
+	static constexpr auto valuesToDisable = {valueIdTabBar,
+	                                         valueIdVendor,
+	                                         valueIdEMail,
+	                                         valueIdURL,
+	                                         valueIdVSTSDKPath,
+	                                         valueIdCMakePath,
+	                                         valueIdPluginType,
+	                                         valueIdPluginPath,
+	                                         valueIdPluginName,
+	                                         valueIdPluginBundleID,
+	                                         valueIdPluginFilenamePrefix,
+	                                         valueIdChooseCMakePath,
+	                                         valueIdChooseVSTSDKPath,
+	                                         valueIdChoosePluginPath,
+	                                         valueIdCreateProject};
+	for (const auto& valueID : valuesToDisable)
+	{
+		if (auto value = model->getValue (valueID))
+			value->setActive (!state);
+	}
 }
 
 //------------------------------------------------------------------------
@@ -262,23 +296,45 @@ void Controller::createProject ()
 		return;
 	}
 
-
 	if (auto scriptPath = IApplication::instance ().getCommonDirectories ().get (
 	        CommonDirectoryLocation::AppResourcesPath))
 	{
 		*scriptPath += "GenerateVST3Plugin.cmake";
 
-		auto command = cmakePathStr;
-		command += " -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"";
-		command += " -DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"";
-		command += " -DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"";
-		command += " -DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"";
-		command += " -DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"";
-		command += " -DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"";
+		Process::ArgumentList args;
+		args.emplace_back ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
+		args.emplace_back ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
+		args.emplace_back ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");
+		args.emplace_back ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"");
+		args.emplace_back ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"");
+		args.emplace_back ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"");
+		args.emplace_back ("-P");
+		args.emplace_back (scriptPath->getString ());
 
-		command += " -P " + *scriptPath;
+		if (auto process = Process::create (cmakePathStr.getString ()))
+		{
+			auto scriptRunningValue = model->getValue (valueIdScriptRunning);
+			if (scriptRunningValue)
+				Value::performSingleEdit (*scriptRunningValue, 1.);
+			auto scriptOutputValue = model->getValue (valueIdScriptOutput);
+			if (scriptOutputValue)
+				Value::performStringValueEdit (*scriptOutputValue, "");
 
-		std::system (command);
+			process->run (args, [scriptRunningValue, scriptOutputValue,
+			                     process] (Process::CallbackParams& p) mutable {
+				if (p.isEOF)
+				{
+					if (scriptRunningValue)
+						Value::performSingleEdit (*scriptRunningValue, 0.);
+					process.reset ();
+				}
+				else if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
+				{
+					Value::performStringValueEdit (*scriptOutputValue,
+					                               v->getString () + p.buffer.data ());
+				}
+			});
+		}
 	}
 }
 

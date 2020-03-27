@@ -23,11 +23,29 @@ set(${target}_sources
   "source/application.h"
   "source/controller.cpp"
   "source/controller.h"
+  "source/process.h"
 )
 
 set(${target}_resources
   "resource/Window.uidesc"
 )
+
+##########################################################################################
+## Platform Specific
+##########################################################################################
+if(CMAKE_HOST_APPLE)
+  set(${target}_sources 
+    ${${target}_sources}
+    "source/platform/mac/process.mm"
+    "source/platform/win32"
+  )
+elseif(MSVC)
+  set(${target}_sources 
+    ${${target}_sources}
+    "source/platform/win32/process.cpp"
+    "source/platform/mac"
+  )
+endif()
 
 ##########################################################################################
 vstgui_add_executable(${target} "${${target}_sources}" )

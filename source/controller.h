@@ -1,7 +1,9 @@
+// Flags       : clang-format SMTGSequencer
+
 #pragma once
 
-#include "vstgui/lib/cframe.h"
 #include "vstgui/lib/cfileselector.h"
+#include "vstgui/lib/cframe.h"
 #include "vstgui/standalone/include/helpers/uidesc/customization.h"
 #include "vstgui/standalone/include/helpers/uidesc/modelbinding.h"
 #include "vstgui/standalone/include/helpers/windowcontroller.h"
@@ -29,6 +31,9 @@ static constexpr auto valueIdChooseCMakePath = "Choose CMake Path";
 static constexpr auto valueIdChooseVSTSDKPath = "Choose VST SDK Path";
 static constexpr auto valueIdChoosePluginPath = "Choose PlugIn Path";
 static constexpr auto valueIdCreateProject = "Create Project";
+
+static constexpr auto valueIdScriptOutput = "Script Output";
+static constexpr auto valueIdScriptRunning = "Script Running";
 
 //------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::CustomizationAdapter,
@@ -64,10 +69,12 @@ private:
 	bool validateCMakePath (const UTF8String& path);
 	bool validatePluginPath (const UTF8String& path);
 
+	void onScriptRunning (bool state);
+
 	using StringList = std::vector<std::string>;
 	StringList getEnvPaths ();
 	VSTGUI::Optional<UTF8String> findCMakePath (const StringList& envPaths);
-	
+
 	VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model;
 	VSTGUI::SharedPointer<CFrame> contentView;
 };

@@ -1,3 +1,5 @@
+// Flags       : clang-format SMTGSequencer
+
 #include "application.h"
 #include "controller.h"
 

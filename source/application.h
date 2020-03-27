@@ -1,3 +1,5 @@
+// Flags       : clang-format SMTGSequencer
+
 #pragma once
 
 #include "vstgui/standalone/include/helpers/appdelegate.h"
