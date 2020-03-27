@@ -2,7 +2,7 @@
 <vstgui-ui-description version="1">
 	<fonts>
 		<font font-name="Arial" name="control" size="12"/>
-		<font font-name="Menlo" name="scriptoutput" size="10"/>
+		<font font-name="Menlo" name="scriptoutput" size="10" alternative-font-names="Courier New"/>
 		<font font-name="Arial" name="welcome" size="20"/>
 	</fonts>
 	<colors>

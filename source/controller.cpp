@@ -324,16 +324,19 @@ void Controller::createProject ()
 
 			process->run (args, [scriptRunningValue, scriptOutputValue,
 			                     process] (Process::CallbackParams& p) mutable {
+				if (!p.buffer.empty ())
+				{
+					if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
+					{
+						Value::performStringValueEdit (*scriptOutputValue,
+						                               v->getString () + p.buffer.data ());
+					}
+				}
 				if (p.isEOF)
 				{
 					if (scriptRunningValue)
 						Value::performSingleEdit (*scriptRunningValue, 0.);
 					process.reset ();
-				}
-				else if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
-				{
-					Value::performStringValueEdit (*scriptOutputValue,
-					                               v->getString () + p.buffer.data ());
 				}
 			});
 		}

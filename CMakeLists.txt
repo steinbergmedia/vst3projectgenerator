@@ -21,7 +21,6 @@ set(VSTGUI_TOOLS OFF)
 
 set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI path")
 set(PLUGINGENERATOR_DIR "../vst3plugingenerator" CACHE PATH "PluginGenerator path")
-message(${PLUGINGENERATOR_DIR})
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
