@@ -2,6 +2,16 @@
 cmake_minimum_required(VERSION 3.12)
 project(vst3_project_generator)
 
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/>
+    )
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs/>
+    )
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs>
+    )
+
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 
 set(VSTGUI_DISABLE_UNITTESTS ON)
@@ -10,8 +20,8 @@ set(VSTGUI_STANDALONE ON)
 set(VSTGUI_TOOLS OFF)
 
 set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI path")
-set(PLUGINGENERATOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vst3plugingenerator" CACHE PATH "PluginGenerator path")
-
+set(PLUGINGENERATOR_DIR "../vst3plugingenerator" CACHE PATH "PluginGenerator path")
+message(${PLUGINGENERATOR_DIR})
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
