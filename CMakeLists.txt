@@ -8,7 +8,9 @@ set(VSTGUI_DISABLE_UNITTESTS ON)
 set(VSTGUI_STANDALONE_EXAMPLES OFF)
 set(VSTGUI_STANDALONE ON)
 set(VSTGUI_TOOLS OFF)
-set(VSTGUI_DIR "../vstgui/vstgui" CACHE PATH "VSTGUI Directory")
+
+set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI path")
+set(PLUGINGENERATOR_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vst3plugingenerator" CACHE PATH "PluginGenerator path")
 
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
@@ -35,3 +37,8 @@ vstgui_set_target_rcfile(${target} "resource/win32_resources.rc")
 vstgui_set_cxx_version(${target} 14)
 
 target_include_directories(${target} PUBLIC ../vstgui)
+
+## cmake script
+vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/GenerateVST3Plugin.cmake")
+vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/cmake/modules" cmake/)
+vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/cmake/templates" cmake/)
