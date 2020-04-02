@@ -77,6 +77,7 @@ Controller::Controller ()
 	auto urlPref = prefs.get (valueIdURL);
 	auto vstSdkPathPref = prefs.get (valueIdVSTSDKPath);
 	auto cmakePathPref = prefs.get (valueIdCMakePath);
+	auto pluginPathPref = prefs.get (valueIdPluginPath);
 
 	auto envPaths = getEnvPaths ();
 	if (!cmakePathPref || cmakePathPref->empty ())
@@ -130,7 +131,9 @@ Controller::Controller ()
 	    Value::makeStringListValue (valueIdPluginType, {"Audio Effect", "Instrument"}));
 	model->addValue (Value::makeStringValue (valueIdPluginBundleID, ""));
 	model->addValue (Value::makeStringValue (valueIdPluginFilenamePrefix, ""));
-	model->addValue (Value::makeStringValue (valueIdPluginPath, ""));
+	model->addValue (
+	    Value::makeStringValue (valueIdPluginPath, pluginPathPref ? *pluginPathPref : ""),
+	    UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 
 	model->addValue (Value::make (valueIdChoosePluginPath),
 	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
@@ -148,6 +151,7 @@ void Controller::storePreferences ()
 	setPreferenceStringValue (prefs, valueIdURL, model->getValue (valueIdURL));
 	setPreferenceStringValue (prefs, valueIdVSTSDKPath, model->getValue (valueIdVSTSDKPath));
 	setPreferenceStringValue (prefs, valueIdCMakePath, model->getValue (valueIdCMakePath));
+	setPreferenceStringValue (prefs, valueIdPluginPath, model->getValue (valueIdPluginPath));
 }
 
 //------------------------------------------------------------------------
