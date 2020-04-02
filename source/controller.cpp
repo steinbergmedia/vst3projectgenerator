@@ -278,7 +278,8 @@ bool Controller::validateVSTSDKPath (const UTF8String& path)
 bool Controller::validateCMakePath (const UTF8String& path)
 {
 	// TODO: check that the path is valid
-	return true;
+	std::ifstream stream (path.getString ());
+	return stream.is_open ();
 }
 
 //------------------------------------------------------------------------
