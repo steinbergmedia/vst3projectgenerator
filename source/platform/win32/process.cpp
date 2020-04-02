@@ -81,9 +81,9 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	std::string commandLine;
 	auto it = arguments.begin ();
 	if (it != arguments.end ())
-		commandLine = "\"" + *it + "\"";
+		commandLine = *it;
 	while (++it != arguments.end ())
-		commandLine += " \"" + *it + "\"";
+		commandLine += " " + *it;
 
 	UTF8StringHelper commandLineUTF16 (commandLine.data ());
 	auto success = CreateProcess (
