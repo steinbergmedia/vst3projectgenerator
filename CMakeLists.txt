@@ -19,8 +19,8 @@ set(VSTGUI_STANDALONE_EXAMPLES OFF)
 set(VSTGUI_STANDALONE ON)
 set(VSTGUI_TOOLS OFF)
 
-set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI path")
-set(PLUGINGENERATOR_DIR "../vst3plugingenerator" CACHE PATH "PluginGenerator path")
+set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI Path")
+set(PROJECTGENERATOR_SCRIPT_DIR "../vst3_project_generator_script" CACHE PATH "Project Generator Script Path")
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
@@ -66,6 +66,6 @@ vstgui_set_cxx_version(${target} 14)
 target_include_directories(${target} PUBLIC ../vstgui)
 
 ## cmake script
-vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/GenerateVST3Plugin.cmake")
-vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/cmake/modules" cmake/)
-vstgui_add_resources(${target} "${PLUGINGENERATOR_DIR}/cmake/templates" cmake/)
+vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/GenerateVST3Plugin.cmake")
+vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/modules" cmake/)
+vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/templates" cmake/)
