@@ -30,6 +30,9 @@ static constexpr auto CMakeExecutableName = "cmake";
 #endif
 
 //------------------------------------------------------------------------
+static constexpr auto CMakeWebPageURL = "https://cmake.org";
+
+//------------------------------------------------------------------------
 static void showSimpleAlert (const char* headline, const char* description)
 {
 	AlertBoxConfig config;
@@ -242,6 +245,21 @@ void Controller::choosePluginPath ()
 }
 
 //------------------------------------------------------------------------
+void Controller::showCMakeNotInstalledWarning ()
+{
+	AlertBoxConfig config;
+	config.headline = "CMake not found!";
+	config.description = "You need to install CMake for your platform to use this application.";
+	config.defaultButton = "OK";
+	config.secondButton = "Open the CMake homepage";
+	auto result = IApplication::instance ().showAlertBox (config);
+	if (result == AlertResult::SecondButton)
+	{
+		openURL (CMakeWebPageURL);
+	}
+}
+
+//------------------------------------------------------------------------
 bool Controller::validateVSTSDKPath (const UTF8String& path)
 {
 	auto p = path.getString ();
@@ -281,9 +299,9 @@ void Controller::createProject ()
 	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID);
 
-	if (cmakePathStr.empty ())
+	if (cmakePathStr.empty () || !validateCMakePath (cmakePathStr))
 	{
-		showSimpleAlert ("Cannot create Project", "The CMake path is empty.");
+		showCMakeNotInstalledWarning ();
 		return;
 	}
 	if (pluginOutputPathStr.empty ())
