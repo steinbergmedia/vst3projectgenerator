@@ -351,23 +351,26 @@ void Controller::createProject ()
 			if (scriptOutputValue)
 				Value::performStringValueEdit (*scriptOutputValue, "");
 
-			process->run (args, [scriptRunningValue, scriptOutputValue,
-			                     process] (Process::CallbackParams& p) mutable {
-				if (!p.buffer.empty ())
-				{
-					if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
-					{
-						Value::performStringValueEdit (*scriptOutputValue,
-						                               v->getString () + p.buffer.data ());
-					}
-				}
-				if (p.isEOF)
-				{
-					if (scriptRunningValue)
-						Value::performSingleEdit (*scriptRunningValue, 0.);
-					process.reset ();
-				}
-			});
+			if (!process->run (args, [scriptRunningValue, scriptOutputValue,
+			                          process] (Process::CallbackParams& p) mutable {
+				    if (!p.buffer.empty ())
+				    {
+					    if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
+					    {
+						    Value::performStringValueEdit (*scriptOutputValue,
+						                                   v->getString () + p.buffer.data ());
+					    }
+				    }
+				    if (p.isEOF)
+				    {
+					    if (scriptRunningValue)
+						    Value::performSingleEdit (*scriptRunningValue, 0.);
+					    process.reset ();
+				    }
+			    }))
+			{
+				showSimpleAlert ("Could not execute CMake", "Please verify your path to CMake!");
+			}
 		}
 	}
 }
