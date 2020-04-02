@@ -293,6 +293,7 @@ bool Controller::validatePluginPath (const UTF8String& path)
 void Controller::createProject ()
 {
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	auto sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
 	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
 	auto vendorStr = getModelValueString (model, valueIdVendor);
 	auto emailStr = getModelValueString (model, valueIdEMail);
@@ -303,6 +304,11 @@ void Controller::createProject ()
 	if (cmakePathStr.empty () || !validateCMakePath (cmakePathStr))
 	{
 		showCMakeNotInstalledWarning ();
+		return;
+	}
+	if (sdkPathStr.empty () || !validateVSTSDKPath (sdkPathStr))
+	{
+		showSimpleAlert ("Cannot create Project", "The VST3 SDK Path is not correct.");
 		return;
 	}
 	if (pluginOutputPathStr.empty ())
