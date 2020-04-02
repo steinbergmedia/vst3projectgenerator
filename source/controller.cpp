@@ -357,8 +357,9 @@ void Controller::createProject ()
 				    {
 					    if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
 					    {
-						    Value::performStringValueEdit (*scriptOutputValue,
-						                                   v->getString () + p.buffer.data ());
+						    Value::performStringValueEdit (
+						        *scriptOutputValue,
+						        v->getString () + std::string (p.buffer.data (), p.buffer.size ()));
 					    }
 				    }
 				    if (p.isEOF)
