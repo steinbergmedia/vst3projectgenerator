@@ -58,6 +58,7 @@ private:
 	void chooseVSTSDKPath ();
 	void chooseCMakePath ();
 	void choosePluginPath ();
+	void showCMakeNotInstalledWarning ();
 
 	void createProject ();
 
