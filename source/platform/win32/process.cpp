@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <algorithm>
 #include <array>
+#include <cassert>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -135,6 +136,13 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 
 //------------------------------------------------------------------------
 Process::~Process () noexcept = default;
+
+//------------------------------------------------------------------------
+bool openURL (const std::string& url)
+{
+	assert (false && "Implement me");
+	return false;
+}
 
 //------------------------------------------------------------------------
 } // Steinberg

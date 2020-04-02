@@ -139,5 +139,12 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 Process::~Process () noexcept = default;
 
 //------------------------------------------------------------------------
+bool openURL (const std::string& url)
+{
+	NSURL* nsUrl = [NSURL URLWithString:[NSString stringWithUTF8String:url.data ()]];
+	return [[NSWorkspace sharedWorkspace] openURL:nsUrl];
+}
+
+//------------------------------------------------------------------------
 } // Steinberg
 } // Vst

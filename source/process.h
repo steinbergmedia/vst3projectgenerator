@@ -4,9 +4,9 @@
 
 #include "vstgui/lib/optional.h"
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -36,6 +36,9 @@ private:
 	struct Impl;
 	std::unique_ptr<Impl> pImpl {nullptr};
 };
+
+//------------------------------------------------------------------------
+bool openURL (const std::string& url);
 
 //------------------------------------------------------------------------
 } // Steinberg
