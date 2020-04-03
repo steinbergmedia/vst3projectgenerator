@@ -35,11 +35,12 @@ static constexpr auto CMakeWebPageURL = "https://cmake.org";
 //------------------------------------------------------------------------
 static void showSimpleAlert (const char* headline, const char* description)
 {
-	AlertBoxConfig config;
+	AlertBoxForWindowConfig config;
 	config.headline = headline;
 	config.description = description;
 	config.defaultButton = "OK";
-	IApplication::instance ().showAlertBox (config);
+	config.window = IApplication::instance ().getWindows ().front ();
+	IApplication::instance ().showAlertBoxForWindow (config);
 }
 
 //------------------------------------------------------------------------
@@ -247,16 +248,17 @@ void Controller::choosePluginPath ()
 //------------------------------------------------------------------------
 void Controller::showCMakeNotInstalledWarning ()
 {
-	AlertBoxConfig config;
+	AlertBoxForWindowConfig config;
 	config.headline = "CMake not found!";
 	config.description = "You need to install CMake for your platform to use this application.";
 	config.defaultButton = "OK";
 	config.secondButton = "Open the CMake homepage";
-	auto result = IApplication::instance ().showAlertBox (config);
-	if (result == AlertResult::SecondButton)
-	{
-		openURL (CMakeWebPageURL);
-	}
+	config.window = IApplication::instance ().getWindows ().front ();
+	config.callback = [] (AlertResult result) {
+		if (result == AlertResult::SecondButton)
+			openURL (CMakeWebPageURL);
+	};
+	IApplication::instance ().showAlertBoxForWindow (config);
 }
 
 //------------------------------------------------------------------------
