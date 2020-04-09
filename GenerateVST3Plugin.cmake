@@ -46,6 +46,13 @@ foreach(rel_input_file ${template_files})
             rel_output_file
             ${rel_output_file}
         )
+    else()
+        string(REPLACE
+            "vst3plugin"
+            ""
+            rel_output_file
+            ${rel_output_file}
+        )
     endif()
     
     # Get last extension, in this case ".in"
