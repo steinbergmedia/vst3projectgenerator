@@ -30,6 +30,8 @@ set(target VST3_Project_Generator)
 set(${target}_sources
   "source/application.cpp"
   "source/application.h"
+  "source/cmakecapabilities.cpp"
+  "source/cmakecapabilities.h"
   "source/controller.cpp"
   "source/controller.h"
   "source/process.h"

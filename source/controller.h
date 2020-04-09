@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "cmakecapabilities.h"
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/lib/cframe.h"
-#include "vstgui/lib/optional.h"
 #include "vstgui/standalone/include/helpers/uidesc/customization.h"
 #include "vstgui/standalone/include/helpers/uidesc/modelbinding.h"
 #include "vstgui/standalone/include/helpers/windowcontroller.h"
@@ -40,16 +40,6 @@ static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
 
 //------------------------------------------------------------------------
-struct CMakeCapabilites
-{
-	int32_t versionMajor {0};
-	int32_t versionMinor {0};
-	int32_t versionPatch {0};
-
-	std::vector<VSTGUI::UTF8String> generators;
-};
-
-//------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::CustomizationAdapter,
                    public VSTGUI::Standalone::WindowControllerAdapter
 {
@@ -78,7 +68,6 @@ private:
 	bool verifyCMakeInstallation ();
 	void showCMakeNotInstalledWarning ();
 	void gatherCMakeInformation ();
-	VSTGUI::Optional<CMakeCapabilites> parseCMakeCapabilities (const std::string& capabilitesJSON);
 
 	void createProject ();
 
