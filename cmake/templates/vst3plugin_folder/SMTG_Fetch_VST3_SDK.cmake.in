@@ -1,26 +1,11 @@
 cmake_minimum_required(VERSION 3.14.0)
 
-include(FetchContent)
-
-FetchContent_Declare(
-    vst3sdk_git
-    GIT_REPOSITORY https://github.com/steinbergmedia/vst3sdk.git
-    GIT_TAG        0908f475f52af56682321192d800ef25d1823dd2
-)
-
-FetchContent_Declare(
-    vst3sdk
-    SVN_REPOSITORY http://srv-pulse/svn/steinberg/dev/pluginset/_pulse_modules/sdkbuild/
-    SVN_REVISION   -rHEAD
-)
-
-# FetchContent_MakeAvailable(vst3sdk)
-
-FetchContent_GetProperties(vst3sdk)
-if(NOT vst3sdk_POPULATED)
-  FetchContent_Populate(vst3sdk)
-  # add_subdirectory(${vst3sdk_SOURCE_DIR} ${vst3sdk_BINARY_DIR})
+set(vst3sdk_SOURCE_DIR @SMTG_VST3_SDK_SOURCE_DIR@)
+if(NOT vst3sdk_SOURCE_DIR)
+    message(FATAL_ERROR "Path to VST3 SDK is empty!")
 endif()
+
+set(vst3sdk_BINARY_DIR ${PROJECT_BINARY_DIR}/vst3sdk)
 
 list(APPEND CMAKE_MODULE_PATH ${vst3sdk_SOURCE_DIR}/cmake/modules)
 include_directories(${vst3sdk_SOURCE_DIR} ${vst3sdk_BINARY_DIR})
