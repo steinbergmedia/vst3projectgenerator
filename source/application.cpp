@@ -19,7 +19,7 @@ using namespace VSTGUI::Standalone;
 //------------------------------------------------------------------------
 Application::Application ()
 : Application::DelegateAdapter (
-      {"VST3 Project Generator", "1.0.0", "net.steinberg.vst3.projectgenerator"})
+      {"VST3 Project Generator", "1.0.0", "com.steinberg.vst3sdk.projectgenerator"})
 {
 }
 
