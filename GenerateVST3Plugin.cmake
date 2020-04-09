@@ -28,12 +28,20 @@ file(GLOB_RECURSE
 )
 
 foreach(rel_input_file ${template_files})
-    # Replace "plugin" by SMTG_PREFIX_FOR_FILENAMES
+    # Set the plug-in folder name which should be the plug-in's name
+    string(REPLACE
+        "vst3plugin_folder"
+        ${SMTG_PLUGIN_NAME}
+        rel_output_file
+        ${rel_input_file}
+    )
+
+    # Set the plug-in's file prefix
     string(REPLACE
         "vst3plugin"
         ${SMTG_PREFIX_FOR_FILENAMES}
         rel_output_file
-        ${rel_input_file}
+        ${rel_output_file}
     )
     
     # Get last extension, in this case ".in"
