@@ -7,12 +7,14 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/modules)
 
+include(SMTG_SystemCheck)
 include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
 include(SMTG_GeneratorSpecifics)
 include(SMTG_VendorSpecifics)
 
 smtg_print_generator_copyright_header()
+smtg_check_system()
 message(STATUS "SMTG_CMAKE_SCRIPT_DIR           : ${SMTG_CMAKE_SCRIPT_DIR}")
 smtg_generate_plugin_uuids()
 smtg_print_generator_specifics()
