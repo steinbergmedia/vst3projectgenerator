@@ -4,10 +4,13 @@
 #include "process.h"
 
 #include "vstgui/lib/cfileselector.h"
+#include "vstgui/lib/cscrollview.h"
+#include "vstgui/lib/iviewlistener.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/icommondirectories.h"
+#include "vstgui/uidescription/delegationcontroller.h"
 
 #include <fstream>
 
@@ -19,21 +22,24 @@ namespace ProjectCreator {
 using namespace VSTGUI;
 using namespace VSTGUI::Standalone;
 
+//------------------------------------------------------------------------
+namespace {
+
 #if WINDOWS
-static constexpr auto PlatformPathDelimiter = '\\';
-static constexpr auto EnvPathSeparator = ';';
-static constexpr auto CMakeExecutableName = "CMake.exe";
+constexpr auto PlatformPathDelimiter = '\\';
+constexpr auto EnvPathSeparator = ';';
+constexpr auto CMakeExecutableName = "CMake.exe";
 #else
-static constexpr auto PlatformPathDelimiter = '/';
-static constexpr auto EnvPathSeparator = ':';
-static constexpr auto CMakeExecutableName = "cmake";
+constexpr auto PlatformPathDelimiter = '/';
+constexpr auto EnvPathSeparator = ':';
+constexpr auto CMakeExecutableName = "cmake";
 #endif
 
 //------------------------------------------------------------------------
-static constexpr auto CMakeWebPageURL = "https://cmake.org";
+constexpr auto CMakeWebPageURL = "https://cmake.org";
 
 //------------------------------------------------------------------------
-static void showSimpleAlert (const char* headline, const char* description)
+void showSimpleAlert (const char* headline, const char* description)
 {
 	AlertBoxForWindowConfig config;
 	config.headline = headline;
@@ -44,8 +50,7 @@ static void showSimpleAlert (const char* headline, const char* description)
 }
 
 //------------------------------------------------------------------------
-static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
-                                      const ValuePtr& value)
+void setPreferenceStringValue (Preferences& prefs, const UTF8String& key, const ValuePtr& value)
 {
 	if (!value)
 		return;
@@ -56,8 +61,8 @@ static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
 }
 
 //------------------------------------------------------------------------
-static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model,
-                                       const UTF8String& key)
+UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model,
+                                const UTF8String& key)
 {
 	auto value = model->getValue (key);
 	if (auto strValue = value->dynamicCast<IStringValue> ())
@@ -67,6 +72,41 @@ static UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingC
 
 	return {};
 }
+
+//------------------------------------------------------------------------
+class ScriptScrollViewController : public DelegationController, public ValueListenerAdapter
+{
+public:
+	ScriptScrollViewController (IController* parent, ValuePtr value)
+	: DelegationController (parent), value (value)
+	{
+		value->registerListener (this);
+	}
+	~ScriptScrollViewController () noexcept { value->unregisterListener (this); }
+
+	CView* verifyView (CView* view, const UIAttributes& attributes,
+	                   const IUIDescription* description) override
+	{
+		if (auto sv = dynamic_cast<CScrollView*> (view))
+			scrollView = sv;
+		return controller->verifyView (view, attributes, description);
+	}
+
+	void onEndEdit (IValue&) override
+	{
+		if (!scrollView)
+			return;
+		auto containerSize = scrollView->getContainerSize ();
+		containerSize.top = containerSize.bottom - 10;
+		scrollView->makeRectVisible (containerSize);
+	}
+
+	CScrollView* scrollView {nullptr};
+	ValuePtr value {nullptr};
+};
+
+//------------------------------------------------------------------------
+} // anonymous
 
 //------------------------------------------------------------------------
 void Controller::onSetContentView (IWindow& window, const VSTGUI::SharedPointer<CFrame>& view)
@@ -100,7 +140,8 @@ Controller::Controller ()
 		                 v.performEdit (0.);
 	                 }));
 
-	model->addValue (Value::makeStringValue (valueIdScriptOutput, ""));
+	model->addValue (Value::makeStringValue (valueIdScriptOutput, ""),
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue& v) { onScriptOutput (); }));
 	model->addValue (Value::make (valueIdScriptRunning),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue& v) {
 		                 onScriptRunning (v.getValue () > 0.5 ? true : false);
@@ -150,6 +191,13 @@ Controller::Controller ()
 	/* CMake */
 	model->addValue (Value::makeStringListValue (valueIdCMakeGenerators, {"", ""}),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
+
+	// sub controllers
+	addCreateViewControllerFunc (
+	    "ScriptOutputController",
+	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
+		    return new ScriptScrollViewController (parent, model->getValue (valueIdScriptOutput));
+	    });
 }
 
 //------------------------------------------------------------------------
@@ -436,35 +484,90 @@ void Controller::createProject ()
 		if (auto process = Process::create (cmakePathStr.getString ()))
 		{
 			auto scriptRunningValue = model->getValue (valueIdScriptRunning);
-			if (scriptRunningValue)
-				Value::performSingleEdit (*scriptRunningValue, 1.);
+			assert (scriptRunningValue);
+			Value::performSingleEdit (*scriptRunningValue, 1.);
 			auto scriptOutputValue = model->getValue (valueIdScriptOutput);
-			if (scriptOutputValue)
-				Value::performStringValueEdit (*scriptOutputValue, "");
+			assert (scriptOutputValue);
+			Value::performStringValueEdit (*scriptOutputValue, "");
 
-			if (!process->run (args, [scriptRunningValue, scriptOutputValue,
-			                          process] (Process::CallbackParams& p) mutable {
+			auto projectPath = pluginOutputPathStr + PlatformPathDelimiter + pluginNameStr;
+			if (!process->run (args, [this, scriptRunningValue, scriptOutputValue, process,
+			                          projectPath] (Process::CallbackParams& p) mutable {
 				    if (!p.buffer.empty ())
 				    {
-					    if (auto v = dynamicPtrCast<IStringValue> (scriptOutputValue))
-					    {
-						    Value::performStringValueEdit (
-						        *scriptOutputValue,
-						        v->getString () + std::string (p.buffer.data (), p.buffer.size ()));
-					    }
+					    Value::performStringAppendValueEdit (
+					        *scriptOutputValue, std::string (p.buffer.data (), p.buffer.size ()));
 				    }
 				    if (p.isEOF)
 				    {
-					    if (scriptRunningValue)
-						    Value::performSingleEdit (*scriptRunningValue, 0.);
+					    assert (scriptRunningValue);
+					    Value::performSingleEdit (*scriptRunningValue, 0.);
+					    if (p.resultCode == 0)
+						    runProjectCMake (projectPath);
 					    process.reset ();
 				    }
 			    }))
 			{
 				showSimpleAlert ("Could not execute CMake", "Please verify your path to CMake!");
+				assert (scriptRunningValue);
+				Value::performSingleEdit (*scriptRunningValue, 0.);
 			}
 		}
 	}
+}
+
+//------------------------------------------------------------------------
+void Controller::runProjectCMake (const UTF8String& path)
+{
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	auto value = model->getValue (valueIdCMakeGenerators);
+	assert (value);
+	if (!value)
+		return;
+	auto generator = value->getConverter ().valueAsString (value->getValue ());
+
+	if (auto process = Process::create (cmakePathStr.getString ()))
+	{
+		auto scriptRunningValue = model->getValue (valueIdScriptRunning);
+		assert (scriptRunningValue);
+		Value::performSingleEdit (*scriptRunningValue, 1.);
+		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
+
+		Process::ArgumentList args;
+		args.emplace_back ("-G" + generator);
+		args.emplace_back ("-S");
+		args.emplace_back (path);
+		args.emplace_back ("-B");
+		auto buildDir = path;
+		buildDir += PlatformPathDelimiter;
+		buildDir += "build";
+		args.emplace_back (buildDir);
+
+		Value::performStringAppendValueEdit (*scriptOutputValue, "\n" + cmakePathStr + " ");
+		for (const auto& a : args)
+			Value::performStringAppendValueEdit (*scriptOutputValue, UTF8String (a) + " ");
+		Value::performStringAppendValueEdit (*scriptOutputValue, "\n");
+
+		auto result = process->run (args, [scriptRunningValue, scriptOutputValue,
+		                                   process] (Process::CallbackParams& p) mutable {
+			if (!p.buffer.empty ())
+			{
+				Value::performStringAppendValueEdit (
+				    *scriptOutputValue, std::string (p.buffer.data (), p.buffer.size ()));
+			}
+			if (p.isEOF)
+			{
+				assert (scriptRunningValue);
+				Value::performSingleEdit (*scriptRunningValue, 0.);
+				process.reset ();
+			}
+		});
+	}
+}
+
+//------------------------------------------------------------------------
+void Controller::onScriptOutput ()
+{
 }
 
 //------------------------------------------------------------------------

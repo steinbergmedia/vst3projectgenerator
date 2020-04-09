@@ -40,7 +40,7 @@ static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
 
 //------------------------------------------------------------------------
-class Controller : public VSTGUI::Standalone::UIDesc::CustomizationAdapter,
+class Controller : public VSTGUI::Standalone::UIDesc::Customization,
                    public VSTGUI::Standalone::WindowControllerAdapter
 {
 public:
@@ -70,6 +70,7 @@ private:
 	void gatherCMakeInformation ();
 
 	void createProject ();
+	void runProjectCMake (const UTF8String& path);
 
 	template <typename Proc>
 	void runFileSelector (const UTF8String& valueId, VSTGUI::CNewFileSelector::Style style,
@@ -79,6 +80,7 @@ private:
 	bool validateCMakePath (const UTF8String& path);
 	bool validatePluginPath (const UTF8String& path);
 
+	void onScriptOutput ();
 	void onScriptRunning (bool state);
 
 	StringList getEnvPaths ();
