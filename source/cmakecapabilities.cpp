@@ -13,38 +13,48 @@ auto parseCMakeCapabilities (const std::string& capabilitesJSON)
     -> VSTGUI::Optional<CMakeCapabilites>
 {
 	using namespace rapidjson;
-	Document doc;
-	doc.Parse (capabilitesJSON.data (), capabilitesJSON.size ());
-
-	if (!doc.HasMember ("version") || !doc.HasMember ("generators"))
-		return {};
-
-	auto& generators = doc["generators"];
-	auto& version = doc["version"];
-	if (!version.HasMember ("major") || !version.HasMember ("minor") ||
-	    !version.HasMember ("patch") || !generators.IsArray ())
-		return {};
 
 	CMakeCapabilites cap;
-	cap.versionMajor = version["major"].GetInt ();
-	cap.versionMinor = version["minor"].GetInt ();
-	cap.versionPatch = version["patch"].GetInt ();
 
-	for (const auto& gen : generators.GetArray ())
+	try
 	{
-		if (!gen.HasMember ("name"))
+		Document doc;
+		doc.Parse (capabilitesJSON.data (), capabilitesJSON.size ());
+
+		if (!doc.HasMember ("version") || !doc.HasMember ("generators"))
 			return {};
-		auto name = std::string (gen["name"].GetString ());
-		cap.generators.emplace_back (name);
-		if (gen.HasMember ("extraGenerators"))
+
+		auto& generators = doc["generators"];
+		auto& version = doc["version"];
+		if (!version.HasMember ("major") || !version.HasMember ("minor") ||
+		    !version.HasMember ("patch") || !generators.IsArray ())
+			return {};
+
+		cap.versionMajor = version["major"].GetInt ();
+		cap.versionMinor = version["minor"].GetInt ();
+		cap.versionPatch = version["patch"].GetInt ();
+
+		for (const auto& gen : generators.GetArray ())
 		{
-			for (auto& extraGen : gen["extraGenerators"].GetArray ())
+			if (!gen.HasMember ("name"))
+				return {};
+			auto name = std::string (gen["name"].GetString ());
+			cap.generators.emplace_back (name);
+			if (gen.HasMember ("extraGenerators"))
 			{
-				if (!extraGen.IsString ())
-					continue;
-				cap.generators.emplace_back (std::string (extraGen.GetString ()) + " - " + name);
+				for (auto& extraGen : gen["extraGenerators"].GetArray ())
+				{
+					if (!extraGen.IsString ())
+						continue;
+					cap.generators.emplace_back (std::string (extraGen.GetString ()) + " - " +
+					                             name);
+				}
 			}
 		}
+	}
+	catch (...)
+	{
+		return {};
 	}
 
 	return {std::move (cap)};
