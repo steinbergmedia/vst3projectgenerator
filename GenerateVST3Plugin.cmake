@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14.0)
 
 set(SMTG_CMAKE_SCRIPT_DIR ${CMAKE_CURRENT_LIST_DIR})
 if(SMTG_CMAKE_SCRIPT_DIR_CLI)
-    set(SMTG_CMAKE_SCRIPT_DIR ${SMTG_CMAKE_SCRIPT_DIR_CLI})
+    string(REPLACE "\"" "" SMTG_CMAKE_SCRIPT_DIR ${SMTG_CMAKE_SCRIPT_DIR_CLI})
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${SMTG_CMAKE_SCRIPT_DIR}/cmake/modules)
@@ -38,13 +38,15 @@ foreach(rel_input_file ${template_files})
         ${rel_input_file}
     )
 
-    # Set the plug-in's file prefix
-    string(REPLACE
-        "vst3plugin"
-        ${SMTG_PREFIX_FOR_FILENAMES}
-        rel_output_file
-        ${rel_output_file}
-    )
+    if(${SMTG_PREFIX_FOR_FILENAMES})
+        # Set the plug-in's file prefix
+        string(REPLACE
+            "vst3plugin"
+            ${SMTG_PREFIX_FOR_FILENAMES}
+            rel_output_file
+            ${rel_output_file}
+        )
+    endif()
     
     # Get last extension, in this case ".in"
     get_filename_component(
