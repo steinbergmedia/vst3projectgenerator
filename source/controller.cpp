@@ -9,6 +9,8 @@
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/icommondirectories.h"
 
+#include "include/rapidjson/document.h"
+
 #include <fstream>
 
 //------------------------------------------------------------------------
@@ -51,6 +53,8 @@ static void setPreferenceStringValue (Preferences& prefs, const UTF8String& key,
 		return;
 	if (auto strValue = value->dynamicCast<IStringValue> ())
 		prefs.set (key, strValue->getString ());
+	else
+		prefs.set (key, value->getConverter ().valueAsString (value->getValue ()));
 }
 
 //------------------------------------------------------------------------
@@ -144,6 +148,10 @@ Controller::Controller ()
 		                 choosePluginPath ();
 		                 v.performEdit (0.);
 	                 }));
+
+	/* CMake */
+	model->addValue (Value::makeStringListValue (valueIdCMakeGenerators, {"", ""}),
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 }
 
 //------------------------------------------------------------------------
@@ -156,30 +164,139 @@ void Controller::storePreferences ()
 	setPreferenceStringValue (prefs, valueIdVSTSDKPath, model->getValue (valueIdVSTSDKPath));
 	setPreferenceStringValue (prefs, valueIdCMakePath, model->getValue (valueIdCMakePath));
 	setPreferenceStringValue (prefs, valueIdPluginPath, model->getValue (valueIdPluginPath));
+	setPreferenceStringValue (prefs, valueIdCMakeGenerators,
+	                          model->getValue (valueIdCMakeGenerators));
 }
 
 //------------------------------------------------------------------------
 void Controller::onScriptRunning (bool state)
 {
-	static constexpr auto valuesToDisable = {valueIdTabBar,
-	                                         valueIdVendor,
-	                                         valueIdEMail,
-	                                         valueIdURL,
-	                                         valueIdVSTSDKPath,
-	                                         valueIdCMakePath,
-	                                         valueIdPluginType,
-	                                         valueIdPluginPath,
-	                                         valueIdPluginName,
-	                                         valueIdPluginBundleID,
-	                                         valueIdPluginFilenamePrefix,
-	                                         valueIdChooseCMakePath,
-	                                         valueIdChooseVSTSDKPath,
-	                                         valueIdChoosePluginPath,
-	                                         valueIdCreateProject};
+	static constexpr auto valuesToDisable = {
+	    valueIdTabBar,
+	    valueIdVendor,
+	    valueIdEMail,
+	    valueIdURL,
+	    valueIdVSTSDKPath,
+	    valueIdCMakePath,
+	    valueIdPluginType,
+	    valueIdPluginPath,
+	    valueIdPluginName,
+	    valueIdPluginBundleID,
+	    valueIdPluginFilenamePrefix,
+	    valueIdChooseCMakePath,
+	    valueIdChooseVSTSDKPath,
+	    valueIdChoosePluginPath,
+	    valueIdCreateProject,
+	    valueIdCMakeGenerators,
+	};
 	for (const auto& valueID : valuesToDisable)
 	{
 		if (auto value = model->getValue (valueID))
 			value->setActive (!state);
+	}
+}
+
+//------------------------------------------------------------------------
+void Controller::onShow (const IWindow& window)
+{
+	if (!verifyCMakeInstallation ())
+	{
+		showCMakeNotInstalledWarning ();
+	}
+	else
+	{
+		gatherCMakeInformation ();
+	}
+}
+
+//------------------------------------------------------------------------
+auto Controller::parseCMakeCapabilities (const std::string& capabilitesJSON)
+    -> Optional<CMakeCapabilites>
+{
+	using namespace rapidjson;
+	Document doc;
+	doc.Parse (capabilitesJSON.data (), capabilitesJSON.size ());
+
+	if (!doc.HasMember ("version") || !doc.HasMember ("generators"))
+		return {};
+
+	auto& generators = doc["generators"];
+	auto& version = doc["version"];
+	if (!version.HasMember ("major") || !version.HasMember ("minor") ||
+	    !version.HasMember ("patch") || !generators.IsArray ())
+		return {};
+
+	CMakeCapabilites cap;
+	cap.versionMajor = version["major"].GetInt ();
+	cap.versionMinor = version["minor"].GetInt ();
+	cap.versionPatch = version["patch"].GetInt ();
+
+	for (const auto& gen : generators.GetArray ())
+	{
+		if (!gen.HasMember ("name"))
+			return {};
+		auto name = std::string (gen["name"].GetString ());
+		cap.generators.emplace_back (name);
+		if (gen.HasMember ("extraGenerators"))
+		{
+			for (auto& extraGen : gen["extraGenerators"].GetArray ())
+			{
+				if (!extraGen.IsString ())
+					continue;
+				cap.generators.emplace_back (std::string (extraGen.GetString ()) + " - " + name);
+			}
+		}
+	}
+
+	return {std::move (cap)};
+}
+
+//------------------------------------------------------------------------
+void Controller::gatherCMakeInformation ()
+{
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	if (auto process = Process::create (cmakePathStr.getString ()))
+	{
+		Process::ArgumentList args;
+		args.emplace_back ("-E");
+		args.emplace_back ("capabilities");
+
+		auto scriptRunningValue = model->getValue (valueIdScriptRunning);
+		assert (scriptRunningValue);
+		Value::performSingleEdit (*scriptRunningValue, 1.);
+		auto outputString = std::make_shared<std::string> ();
+		auto result = process->run (args, [this, scriptRunningValue, outputString,
+		                                   process] (Process::CallbackParams& p) mutable {
+			if (!p.buffer.empty ())
+			{
+				*outputString += std::string (p.buffer.data (), p.buffer.size ());
+			}
+			if (p.isEOF)
+			{
+				if (auto capabilities = parseCMakeCapabilities (*outputString))
+				{
+					auto cmakeGeneratorsValue = model->getValue (valueIdCMakeGenerators);
+					assert (cmakeGeneratorsValue);
+					cmakeGeneratorsValue->dynamicCast<IStringListValue> ()->updateStringList (
+					    capabilities->generators);
+
+					Preferences prefs;
+					if (auto generatorPref = prefs.get (valueIdCMakeGenerators))
+					{
+						auto value =
+						    cmakeGeneratorsValue->getConverter ().stringAsValue (*generatorPref);
+						cmakeGeneratorsValue->performEdit (value);
+					}
+					cmakeCapabilities = std::move (*capabilities);
+				}
+				else
+				{
+					// TODO: show error?
+				}
+				Value::performSingleEdit (*scriptRunningValue, 0.);
+				process.reset ();
+			}
+		});
 	}
 }
 
@@ -234,6 +351,7 @@ void Controller::chooseCMakePath ()
 			    showSimpleAlert ("Wrong CMake path!", "The selected file is not cmake.");
 			    return false;
 		    }
+		    gatherCMakeInformation ();
 		    return true;
 	    });
 }
@@ -243,6 +361,17 @@ void Controller::choosePluginPath ()
 {
 	runFileSelector (valueIdPluginPath, CNewFileSelector::kSelectDirectory,
 	                 [this] (const UTF8String& path) { return validatePluginPath (path); });
+}
+
+//------------------------------------------------------------------------
+bool Controller::verifyCMakeInstallation ()
+{
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	if (cmakePathStr.empty () || !validateCMakePath (cmakePathStr))
+	{
+		return false;
+	}
+	return true;
 }
 
 //------------------------------------------------------------------------
@@ -279,7 +408,6 @@ bool Controller::validateVSTSDKPath (const UTF8String& path)
 //------------------------------------------------------------------------
 bool Controller::validateCMakePath (const UTF8String& path)
 {
-	// TODO: check that the path is valid
 	std::ifstream stream (path.getString ());
 	return stream.is_open ();
 }
@@ -294,6 +422,11 @@ bool Controller::validatePluginPath (const UTF8String& path)
 //------------------------------------------------------------------------
 void Controller::createProject ()
 {
+	if (cmakeCapabilities.versionMajor == 0)
+	{
+		showCMakeNotInstalledWarning ();
+		return;
+	}
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
 	auto sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
 	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
@@ -303,11 +436,6 @@ void Controller::createProject ()
 	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID);
 
-	if (cmakePathStr.empty () || !validateCMakePath (cmakePathStr))
-	{
-		showCMakeNotInstalledWarning ();
-		return;
-	}
 	if (sdkPathStr.empty () || !validateVSTSDKPath (sdkPathStr))
 	{
 		showSimpleAlert ("Cannot create Project", "The VST3 SDK Path is not correct.");
@@ -335,6 +463,7 @@ void Controller::createProject ()
 		*scriptPath += "GenerateVST3Plugin.cmake";
 
 		Process::ArgumentList args;
+		args.emplace_back ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
 		args.emplace_back ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
 		args.emplace_back ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
 		args.emplace_back ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");

@@ -4,6 +4,7 @@
 
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/lib/cframe.h"
+#include "vstgui/lib/optional.h"
 #include "vstgui/standalone/include/helpers/uidesc/customization.h"
 #include "vstgui/standalone/include/helpers/uidesc/modelbinding.h"
 #include "vstgui/standalone/include/helpers/windowcontroller.h"
@@ -32,8 +33,21 @@ static constexpr auto valueIdChooseVSTSDKPath = "Choose VST SDK Path";
 static constexpr auto valueIdChoosePluginPath = "Choose PlugIn Path";
 static constexpr auto valueIdCreateProject = "Create Project";
 
+static constexpr auto valueIdCreateIDEProject = "Create IDE Project";
+static constexpr auto valueIdCMakeGenerators = "CMake Generators";
+
 static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
+
+//------------------------------------------------------------------------
+struct CMakeCapabilites
+{
+	int32_t versionMajor {0};
+	int32_t versionMinor {0};
+	int32_t versionPatch {0};
+
+	std::vector<VSTGUI::UTF8String> generators;
+};
 
 //------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::CustomizationAdapter,
@@ -45,12 +59,14 @@ public:
 	using IValue = VSTGUI::Standalone::IValue;
 	using CFrame = VSTGUI::CFrame;
 	using UTF8String = VSTGUI::UTF8String;
+	using StringList = std::vector<std::string>;
 
 	Controller ();
 
 	const ModelBindingPtr getModel () const { return model; }
 
 private:
+	void onShow (const IWindow& window) override;
 	void onSetContentView (IWindow& window,
 	                       const VSTGUI::SharedPointer<CFrame>& contentView) override;
 
@@ -58,7 +74,11 @@ private:
 	void chooseVSTSDKPath ();
 	void chooseCMakePath ();
 	void choosePluginPath ();
+
+	bool verifyCMakeInstallation ();
 	void showCMakeNotInstalledWarning ();
+	void gatherCMakeInformation ();
+	VSTGUI::Optional<CMakeCapabilites> parseCMakeCapabilities (const std::string& capabilitesJSON);
 
 	void createProject ();
 
@@ -72,12 +92,13 @@ private:
 
 	void onScriptRunning (bool state);
 
-	using StringList = std::vector<std::string>;
 	StringList getEnvPaths ();
 	VSTGUI::Optional<UTF8String> findCMakePath (const StringList& envPaths);
 
 	VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model;
 	VSTGUI::SharedPointer<CFrame> contentView;
+
+	CMakeCapabilites cmakeCapabilities = {};
 };
 
 //------------------------------------------------------------------------
