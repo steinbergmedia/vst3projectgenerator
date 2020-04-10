@@ -117,7 +117,7 @@ std::shared_ptr<Process> Process::create (const std::string& path)
 bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 {
 	NSMutableArray<NSString*>* args = [NSMutableArray new];
-	for (const auto& arg : arguments)
+	for (const auto& arg : arguments.args)
 	{
 		[args addObject:[NSString stringWithUTF8String:arg.data ()]];
 	}
@@ -137,6 +137,12 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 
 //------------------------------------------------------------------------
 Process::~Process () noexcept = default;
+
+//------------------------------------------------------------------------
+void Process::ArgumentList::addPath (const std::string& str)
+{
+	args.emplace_back (str);
+}
 
 //------------------------------------------------------------------------
 bool openURL (const std::string& url)
