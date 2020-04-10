@@ -1,3 +1,4 @@
+//------------------------------------------------------------------------
 // Flags       : clang-format SMTGSequencer
 
 #include "application.h"

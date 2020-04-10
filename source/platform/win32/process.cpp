@@ -1,10 +1,5 @@
 //------------------------------------------------------------------------
 // Flags       : clang-format SMTGSequencer
-// Project     : VST3 Hosting Example
-// Filename    : ExternalProcess_win32.cpp
-// Created by  : ascheffler, 06/2016
-// Description : <#Description#>
-//------------------------------------------------------------------------
 
 #include "../../process.h"
 #include "vstgui/lib/cvstguitimer.h"

@@ -1,3 +1,4 @@
+//------------------------------------------------------------------------
 // Flags       : clang-format SMTGSequencer
 
 #pragma once
@@ -5,6 +6,7 @@
 #include "cmakecapabilities.h"
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/lib/cframe.h"
+#include "vstgui/standalone/include/helpers/menubuilder.h"
 #include "vstgui/standalone/include/helpers/uidesc/customization.h"
 #include "vstgui/standalone/include/helpers/uidesc/modelbinding.h"
 #include "vstgui/standalone/include/helpers/windowcontroller.h"
@@ -41,7 +43,8 @@ static constexpr auto valueIdScriptRunning = "Script Running";
 
 //------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::Customization,
-                   public VSTGUI::Standalone::WindowControllerAdapter
+                   public VSTGUI::Standalone::WindowControllerAdapter,
+                   public VSTGUI::Standalone::NoMenuBuilder
 {
 public:
 	using ModelBindingPtr = VSTGUI::Standalone::UIDesc::ModelBindingPtr;
@@ -59,6 +62,7 @@ private:
 	void onShow (const IWindow& window) override;
 	void onSetContentView (IWindow& window,
 	                       const VSTGUI::SharedPointer<CFrame>& contentView) override;
+	const IMenuBuilder* getWindowMenuBuilder (const IWindow& window) const override;
 
 	void storePreferences ();
 	void chooseVSTSDKPath ();
@@ -71,6 +75,7 @@ private:
 
 	void createProject ();
 	void runProjectCMake (const UTF8String& path);
+	void openCMakeGeneratedProject (const UTF8String& path);
 
 	template <typename Proc>
 	void runFileSelector (const UTF8String& valueId, VSTGUI::CNewFileSelector::Style style,

@@ -1,3 +1,4 @@
+//------------------------------------------------------------------------
 // Flags       : clang-format SMTGSequencer
 
 #include "controller.h"
@@ -10,9 +11,10 @@
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/icommondirectories.h"
-#include "vstgui/uidescription/delegationcontroller.h"
 #include "vstgui/uidescription/cstream.h"
+#include "vstgui/uidescription/delegationcontroller.h"
 
+#include <cassert>
 #include <fstream>
 
 //------------------------------------------------------------------------
@@ -558,7 +560,7 @@ void Controller::runProjectCMake (const UTF8String& path)
 			Value::performStringAppendValueEdit (*scriptOutputValue, UTF8String (a) + " ");
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n");
 
-		auto result = process->run (args, [scriptRunningValue, scriptOutputValue,
+		auto result = process->run (args, [this, scriptRunningValue, scriptOutputValue, buildDir,
 		                                   process] (Process::CallbackParams& p) mutable {
 			if (!p.buffer.empty ())
 			{
@@ -569,9 +571,45 @@ void Controller::runProjectCMake (const UTF8String& path)
 			{
 				assert (scriptRunningValue);
 				Value::performSingleEdit (*scriptRunningValue, 0.);
+				if (p.resultCode == 0)
+					openCMakeGeneratedProject (buildDir);
 				process.reset ();
 			}
 		});
+		if (!result)
+		{
+			// TODO: Show error
+		}
+	}
+}
+
+//------------------------------------------------------------------------
+void Controller::openCMakeGeneratedProject (const UTF8String& path)
+{
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
+	if (auto process = Process::create (cmakePathStr.getString ()))
+	{
+		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
+		Process::ArgumentList args;
+		args.emplace_back (CMakeExecutableName);
+		args.emplace_back ("--open");
+		args.emplace_back (path.getString ());
+		auto result = process->run (
+		    args, [this, scriptOutputValue, process] (Process::CallbackParams& p) mutable {
+			    if (!p.buffer.empty ())
+			    {
+				    Value::performStringAppendValueEdit (
+				        *scriptOutputValue, std::string (p.buffer.data (), p.buffer.size ()));
+			    }
+			    if (p.isEOF)
+			    {
+				    process.reset ();
+			    }
+		    });
+		if (!result)
+		{
+			// TODO: Show error
+		}
 	}
 }
 
@@ -621,6 +659,12 @@ VSTGUI::Optional<UTF8String> Controller::findCMakePath (const StringList& envPat
 		return {std::move (path)};
 #endif
 	return {};
+}
+
+//------------------------------------------------------------------------
+const IMenuBuilder* Controller::getWindowMenuBuilder (const IWindow& window) const
+{
+	return this;
 }
 
 //------------------------------------------------------------------------
