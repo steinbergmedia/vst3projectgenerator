@@ -123,12 +123,10 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 			params.isEOF = true;
 			params.resultCode = exitCode;
 		}
+		if (params.isEOF)
+			timer->stop ();
 		if (!params.buffer.empty () || params.isEOF)
 			pImpl->callback (params);
-		if (params.isEOF)
-		{
-			timer->stop ();
-		}
 	});
 
 	return true;
