@@ -265,7 +265,6 @@ void Controller::gatherCMakeInformation ()
 	if (auto process = Process::create (cmakePathStr.getString ()))
 	{
 		Process::ArgumentList args;
-		args.emplace_back (CMakeExecutableName);
 		args.emplace_back ("-E");
 		args.emplace_back ("capabilities");
 
@@ -481,7 +480,6 @@ void Controller::createProject ()
 		*scriptPath += "GenerateVST3Plugin.cmake";
 
 		Process::ArgumentList args;
-		args.emplace_back (CMakeExecutableName);
 		args.emplace_back ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
 		args.emplace_back ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
 		args.emplace_back ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
@@ -536,7 +534,10 @@ void Controller::runProjectCMake (const UTF8String& path)
 	if (!value)
 		return;
 	auto generator = value->getConverter ().valueAsString (value->getValue ());
-
+	if (generator.getString ().find (' ') != std::string::npos)
+	{
+		generator = "\"" + generator + "\"";
+	}
 	if (auto process = Process::create (cmakePathStr.getString ()))
 	{
 		auto scriptRunningValue = model->getValue (valueIdScriptRunning);
@@ -545,8 +546,7 @@ void Controller::runProjectCMake (const UTF8String& path)
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 
 		Process::ArgumentList args;
-		args.emplace_back (CMakeExecutableName);
-		args.emplace_back ("-G\"" + generator + "\"");
+		args.emplace_back ("-G" + generator);
 		args.emplace_back ("-S");
 		args.emplace_back (path);
 		args.emplace_back ("-B");
@@ -591,7 +591,6 @@ void Controller::openCMakeGeneratedProject (const UTF8String& path)
 	{
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 		Process::ArgumentList args;
-		args.emplace_back (CMakeExecutableName);
 		args.emplace_back ("--open");
 		args.emplace_back (path.getString ());
 		auto result = process->run (
