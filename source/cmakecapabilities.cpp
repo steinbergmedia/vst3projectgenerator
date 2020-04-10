@@ -20,6 +20,8 @@ auto parseCMakeCapabilities (const std::string& capabilitesJSON)
 	{
 		Document doc;
 		doc.Parse (capabilitesJSON.data (), capabilitesJSON.size ());
+		if (!doc.IsObject ())
+			return {};
 
 		if (!doc.HasMember ("version") || !doc.HasMember ("generators"))
 			return {};
