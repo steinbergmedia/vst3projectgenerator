@@ -71,12 +71,19 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	startupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	startupInfo.wShowWindow = 0;
 
+	std::string commandLine;
+	auto lastSeparatorPos = pImpl->appPathUTF8Str.find_last_of ('\\');
+	if (lastSeparatorPos != std::string::npos)
+	{
+		commandLine = pImpl->appPathUTF8Str.substr (lastSeparatorPos + 1);
+		commandLine += " ";
+	}
+
 	UTF8StringHelper appPath (pImpl->appPathUTF8Str.data ());
 
-	std::string commandLine;
 	auto it = arguments.begin ();
 	if (it != arguments.end ())
-		commandLine = *it;
+		commandLine += *it;
 	while (++it != arguments.end ())
 		commandLine += " " + *it;
 
