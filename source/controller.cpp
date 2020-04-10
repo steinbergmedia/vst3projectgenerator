@@ -11,6 +11,7 @@
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/icommondirectories.h"
 #include "vstgui/uidescription/delegationcontroller.h"
+#include "vstgui/uidescription/cstream.h"
 
 #include <fstream>
 
@@ -441,7 +442,7 @@ void Controller::createProject ()
 		return;
 	}
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
-	auto sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
+	auto _sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
 	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
 	auto vendorStr = getModelValueString (model, valueIdVendor);
 	auto emailStr = getModelValueString (model, valueIdEMail);
@@ -449,11 +450,13 @@ void Controller::createProject ()
 	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID);
 
-	if (sdkPathStr.empty () || !validateVSTSDKPath (sdkPathStr))
+	if (_sdkPathStr.empty () || !validateVSTSDKPath (_sdkPathStr))
 	{
 		showSimpleAlert ("Cannot create Project", "The VST3 SDK Path is not correct.");
 		return;
 	}
+	auto sdkPathStr = _sdkPathStr.getString ();
+	unixfyPath (sdkPathStr);
 	if (pluginOutputPathStr.empty ())
 	{
 		showSimpleAlert ("Cannot create Project", "You need to specify an output directory.");
@@ -541,7 +544,7 @@ void Controller::runProjectCMake (const UTF8String& path)
 
 		Process::ArgumentList args;
 		args.emplace_back (CMakeExecutableName);
-		args.emplace_back ("-G" + generator);
+		args.emplace_back ("-G\"" + generator + "\"");
 		args.emplace_back ("-S");
 		args.emplace_back (path);
 		args.emplace_back ("-B");
