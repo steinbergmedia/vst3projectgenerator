@@ -23,8 +23,15 @@ public:
 		std::vector<char> buffer;
 	};
 
+	struct ArgumentList
+	{
+		void add (const std::string& str) { args.emplace_back (str); }
+		void addPath (const std::string& str);
+
+		std::vector<std::string> args;
+	};
+
 	using CallbackFunction = std::function<void (CallbackParams&)>;
-	using ArgumentList = std::vector<std::string>;
 
 	static std::shared_ptr<Process> create (const std::string& path);
 

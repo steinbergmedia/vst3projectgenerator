@@ -81,10 +81,10 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 
 	UTF8StringHelper appPath (pImpl->appPathUTF8Str.data ());
 
-	auto it = arguments.begin ();
-	if (it != arguments.end ())
+	auto it = arguments.args.begin ();
+	if (it != arguments.args.end ())
 		commandLine += *it;
-	while (++it != arguments.end ())
+	while (++it != arguments.args.end ())
 		commandLine += " " + *it;
 
 	UTF8StringHelper commandLineUTF16 (commandLine.data ());
@@ -136,6 +136,12 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 
 //------------------------------------------------------------------------
 Process::~Process () noexcept = default;
+
+//------------------------------------------------------------------------
+void Process::ArgumentList::addPath (const std::string& str)
+{
+	args.emplace_back ("\"" + str + "\"");
+}
 
 //------------------------------------------------------------------------
 bool openURL (const std::string& url)

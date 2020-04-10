@@ -265,8 +265,8 @@ void Controller::gatherCMakeInformation ()
 	if (auto process = Process::create (cmakePathStr.getString ()))
 	{
 		Process::ArgumentList args;
-		args.emplace_back ("-E");
-		args.emplace_back ("capabilities");
+		args.add ("-E");
+		args.add ("capabilities");
 
 		auto scriptRunningValue = model->getValue (valueIdScriptRunning);
 		assert (scriptRunningValue);
@@ -480,15 +480,16 @@ void Controller::createProject ()
 		*scriptPath += "GenerateVST3Plugin.cmake";
 
 		Process::ArgumentList args;
-		args.emplace_back ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
-		args.emplace_back ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
-		args.emplace_back ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
-		args.emplace_back ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");
-		args.emplace_back ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"");
-		args.emplace_back ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"");
-		args.emplace_back ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"");
-		args.emplace_back ("-P");
-		args.emplace_back (scriptPath->getString ());
+		args.add ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
+		args.add ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr.getString () +
+		          "\"");
+		args.add ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr.getString () + "\"");
+		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr.getString () + "\"");
+		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr.getString () + "\"");
+		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr.getString () + "\"");
+		args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr.getString () + "\"");
+		args.add ("-P");
+		args.add (scriptPath->getString ());
 
 		if (auto process = Process::create (cmakePathStr.getString ()))
 		{
@@ -546,17 +547,17 @@ void Controller::runProjectCMake (const UTF8String& path)
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 
 		Process::ArgumentList args;
-		args.emplace_back ("-G" + generator);
-		args.emplace_back ("-S");
-		args.emplace_back (path);
-		args.emplace_back ("-B");
+		args.add ("-G" + generator.getString ());
+		args.add ("-S");
+		args.addPath (path.getString ());
+		args.add ("-B");
 		auto buildDir = path;
 		buildDir += PlatformPathDelimiter;
 		buildDir += "build";
-		args.emplace_back (buildDir);
+		args.addPath (buildDir.getString ());
 
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n" + cmakePathStr + " ");
-		for (const auto& a : args)
+		for (const auto& a : args.args)
 			Value::performStringAppendValueEdit (*scriptOutputValue, UTF8String (a) + " ");
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n");
 
@@ -591,8 +592,8 @@ void Controller::openCMakeGeneratedProject (const UTF8String& path)
 	{
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 		Process::ArgumentList args;
-		args.emplace_back ("--open");
-		args.emplace_back (path.getString ());
+		args.add ("--open");
+		args.addPath (path.getString ());
 		auto result = process->run (
 		    args, [this, scriptOutputValue, process] (Process::CallbackParams& p) mutable {
 			    if (!p.buffer.empty ())
