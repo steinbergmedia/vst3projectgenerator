@@ -54,6 +54,9 @@ auto parseCMakeCapabilities (const std::string& capabilitesJSON)
 				}
 			}
 		}
+		std::sort (
+		    cap.generators.begin (), cap.generators.end (),
+		    [] (const auto& lhs, const auto& rhs) { return lhs.getString () > rhs.getString (); });
 	}
 	catch (...)
 	{
