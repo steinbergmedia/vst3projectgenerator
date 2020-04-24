@@ -38,18 +38,18 @@ foreach(rel_input_file ${template_files})
         ${rel_input_file}
     )
 
-    if(${SMTG_PREFIX_FOR_FILENAMES})
-        # Set the plug-in's file prefix
+    # Set the plug-in's file prefix
+    if(NOT SMTG_PREFIX_FOR_FILENAMES)
         string(REPLACE
             "vst3plugin"
-            ${SMTG_PREFIX_FOR_FILENAMES}
+            ""
             rel_output_file
             ${rel_output_file}
         )
     else()
         string(REPLACE
             "vst3plugin"
-            ""
+            ${SMTG_PREFIX_FOR_FILENAMES}
             rel_output_file
             ${rel_output_file}
         )
