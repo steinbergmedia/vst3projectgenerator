@@ -124,6 +124,10 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	}
 	pImpl->delegate.task.arguments = args;
 
+#if DEBUG
+	NSLog (@"%@", [args description]);
+#endif
+
 	[pImpl->delegate setCallback:std::move (callback)];
 	@try
 	{

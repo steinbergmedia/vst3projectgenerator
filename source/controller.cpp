@@ -10,9 +10,12 @@
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
+#include "vstgui/standalone/include/iasync.h"
 #include "vstgui/standalone/include/icommondirectories.h"
 #include "vstgui/uidescription/cstream.h"
 #include "vstgui/uidescription/delegationcontroller.h"
+#include "vstgui/uidescription/iuidescription.h"
+#include "vstgui/uidescription/uiattributes.h"
 
 #include <cassert>
 #include <fstream>
@@ -40,6 +43,16 @@ constexpr auto CMakeExecutableName = "cmake";
 
 //------------------------------------------------------------------------
 constexpr auto CMakeWebPageURL = "https://cmake.org";
+constexpr auto SteinbergSDKWebPageURL = "https://www.steinberg.net/en/company/developers.html";
+constexpr auto GitHubSDKWebPageURL = "https://github.com/steinbergmedia/vst3sdk";
+
+//------------------------------------------------------------------------
+constexpr auto valueIdWelcomeDownloadSDK = "Welcome Download SDK";
+constexpr auto valueIdWelcomeLocateSDK = "Welcome Locate SDK";
+constexpr auto valueIdWelcomeDownloadCMake = "Welcome Download CMake";
+constexpr auto valueIdWelcomeLocateCMake = "Welcome Locate CMake";
+constexpr auto valueIdValidVSTSDKPath = "Valid VST SDK Path";
+constexpr auto valueIdValidCMakePath = "Valid CMake Path";
 
 //------------------------------------------------------------------------
 void showSimpleAlert (const char* headline, const char* description)
@@ -76,16 +89,31 @@ UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallback
 	return {};
 }
 
-//------------------------------------------------------------------------
-class ScriptScrollViewController : public DelegationController, public ValueListenerAdapter
+class ValueListenerViewController : public DelegationController, public ValueListenerAdapter
 {
 public:
-	ScriptScrollViewController (IController* parent, ValuePtr value)
+	ValueListenerViewController (IController* parent, ValuePtr value)
 	: DelegationController (parent), value (value)
 	{
 		value->registerListener (this);
 	}
-	~ScriptScrollViewController () noexcept { value->unregisterListener (this); }
+
+	virtual ~ValueListenerViewController () noexcept { value->unregisterListener (this); }
+
+	const ValuePtr& getValue () const { return value; }
+
+private:
+	ValuePtr value {nullptr};
+};
+
+//------------------------------------------------------------------------
+class ScriptScrollViewController : public ValueListenerViewController
+{
+public:
+	ScriptScrollViewController (IController* parent, ValuePtr value)
+	: ValueListenerViewController (parent, value)
+	{
+	}
 
 	CView* verifyView (CView* view, const UIAttributes& attributes,
 	                   const IUIDescription* description) override
@@ -105,7 +133,42 @@ public:
 	}
 
 	CScrollView* scrollView {nullptr};
-	ValuePtr value {nullptr};
+};
+
+//------------------------------------------------------------------------
+class DimmViewController : public ValueListenerViewController
+{
+public:
+	DimmViewController (IController* parent, ValuePtr value)
+	: ValueListenerViewController (parent, value)
+	{
+	}
+
+	CView* verifyView (CView* view, const UIAttributes& attributes,
+	                   const IUIDescription* description) override
+	{
+		if (auto name = attributes.getAttributeValue (IUIDescription::kCustomViewName))
+		{
+			if (*name == "Container")
+			{
+				dimmView = view;
+				onEndEdit (*getValue ());
+			}
+		}
+		return controller->verifyView (view, attributes, description);
+	}
+
+	void onEndEdit (IValue& value) override
+	{
+		if (!dimmView)
+			return;
+		bool b = value.getValue () > 0.5;
+		float alphaValue = b ? 0.f : 1.f;
+		dimmView->setAlphaValue (alphaValue);
+		dimmView->setMouseEnabled (!b);
+	}
+
+	CView* dimmView {nullptr};
 };
 
 //------------------------------------------------------------------------
@@ -195,11 +258,48 @@ Controller::Controller ()
 	model->addValue (Value::makeStringListValue (valueIdCMakeGenerators, {"", ""}),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 
+	/* Welcome Page */
+	model->addValue (Value::make (valueIdWelcomeDownloadSDK),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 downloadVSTSDK ();
+		                 v.performEdit (0.);
+	                 }));
+	model->addValue (Value::make (valueIdWelcomeLocateSDK),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 chooseVSTSDKPath ();
+		                 v.performEdit (0.);
+	                 }));
+	model->addValue (Value::make (valueIdWelcomeDownloadCMake),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 downloadCMake ();
+		                 v.performEdit (0.);
+	                 }));
+	model->addValue (Value::make (valueIdWelcomeLocateCMake),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 chooseCMakePath ();
+		                 verifyCMakeInstallation ();
+		                 v.performEdit (0.);
+	                 }));
+
+	/* Valid Path values */
+	model->addValue (Value::make (valueIdValidVSTSDKPath));
+	model->addValue (Value::make (valueIdValidCMakePath));
+
 	// sub controllers
 	addCreateViewControllerFunc (
 	    "ScriptOutputController",
 	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
 		    return new ScriptScrollViewController (parent, model->getValue (valueIdScriptOutput));
+	    });
+	addCreateViewControllerFunc (
+	    "DimmViewController_CMake",
+	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
+		    return new DimmViewController (parent, model->getValue (valueIdValidCMakePath));
+	    });
+	addCreateViewControllerFunc (
+	    "DimmViewController_VSTSDK",
+	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
+		    return new DimmViewController (parent, model->getValue (valueIdValidVSTSDKPath));
 	    });
 }
 
@@ -248,14 +348,13 @@ void Controller::onScriptRunning (bool state)
 //------------------------------------------------------------------------
 void Controller::onShow (const IWindow& window)
 {
-	if (!verifyCMakeInstallation ())
-	{
-		showCMakeNotInstalledWarning ();
-	}
-	else
-	{
+	bool sdkInstallationVerified = verifySDKInstallation ();
+	bool cmakeInstallationVerified = verifyCMakeInstallation ();
+	Value::performSinglePlainEdit (*model->getValue (valueIdTabBar),
+	                               sdkInstallationVerified && cmakeInstallationVerified ? 1 : 0);
+
+	if (cmakeInstallationVerified)
 		gatherCMakeInformation ();
-	}
 }
 
 //------------------------------------------------------------------------
@@ -352,6 +451,7 @@ void Controller::chooseVSTSDKPath ()
 			        "The selected folder does not look like the root folder of the VST SDK.");
 			    return false;
 		    }
+		    Async::schedule (Async::mainQueue (), [this] () { verifySDKInstallation (); });
 		    return true;
 	    });
 }
@@ -366,7 +466,10 @@ void Controller::chooseCMakePath ()
 			    showSimpleAlert ("Wrong CMake path!", "The selected file is not cmake.");
 			    return false;
 		    }
-		    gatherCMakeInformation ();
+		    Async::schedule (Async::mainQueue (), [this] () {
+			    verifyCMakeInstallation ();
+			    gatherCMakeInformation ();
+		    });
 		    return true;
 	    });
 }
@@ -379,14 +482,65 @@ void Controller::choosePluginPath ()
 }
 
 //------------------------------------------------------------------------
+void Controller::downloadVSTSDK ()
+{
+	AlertBoxForWindowConfig alert;
+	alert.window = IApplication::instance ().getWindows ().front ();
+	alert.headline = "Which SDK to download?";
+	alert.description = "TODO: description";
+	alert.defaultButton = "Commercial";
+	alert.secondButton = "Open Source";
+	alert.thirdButton = "Cancel";
+	alert.callback = [] (AlertResult result) {
+		switch (result)
+		{
+			case AlertResult::DefaultButton:
+			{
+				openURL (SteinbergSDKWebPageURL);
+				break;
+			}
+			case AlertResult::SecondButton:
+			{
+				openURL (GitHubSDKWebPageURL);
+				break;
+			}
+			case AlertResult::ThirdButton:
+			{
+				// Canceled
+				break;
+			}
+			default:
+			{
+				assert (false);
+				break;
+			}
+		}
+	};
+	IApplication::instance ().showAlertBoxForWindow (alert);
+}
+
+//------------------------------------------------------------------------
+void Controller::downloadCMake ()
+{
+	openURL (CMakeWebPageURL);
+}
+
+//------------------------------------------------------------------------
+bool Controller::verifySDKInstallation ()
+{
+	auto sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
+	auto result = !(sdkPathStr.empty () || !validateVSTSDKPath (sdkPathStr));
+	Value::performSinglePlainEdit (*model->getValue (valueIdValidVSTSDKPath), result);
+	return result;
+}
+
+//------------------------------------------------------------------------
 bool Controller::verifyCMakeInstallation ()
 {
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
-	if (cmakePathStr.empty () || !validateCMakePath (cmakePathStr))
-	{
-		return false;
-	}
-	return true;
+	auto result = !(cmakePathStr.empty () || !validateCMakePath (cmakePathStr));
+	Value::performSinglePlainEdit (*model->getValue (valueIdValidCMakePath), result);
+	return result;
 }
 
 //------------------------------------------------------------------------
@@ -396,11 +550,11 @@ void Controller::showCMakeNotInstalledWarning ()
 	config.headline = "CMake not found!";
 	config.description = "You need to install CMake for your platform to use this application.";
 	config.defaultButton = "OK";
-	config.secondButton = "Open the CMake homepage";
+	config.secondButton = "Download CMake";
 	config.window = IApplication::instance ().getWindows ().front ();
-	config.callback = [] (AlertResult result) {
+	config.callback = [this] (AlertResult result) {
 		if (result == AlertResult::SecondButton)
-			openURL (CMakeWebPageURL);
+			downloadCMake ();
 	};
 	IApplication::instance ().showAlertBoxForWindow (config);
 }

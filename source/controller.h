@@ -4,6 +4,7 @@
 #pragma once
 
 #include "cmakecapabilities.h"
+#include "preferences.h"
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/lib/cframe.h"
 #include "vstgui/standalone/include/helpers/menubuilder.h"
@@ -21,8 +22,8 @@ static constexpr auto valueIdTabBar = "TabBar";
 static constexpr auto valueIdVendor = "Vendor";
 static constexpr auto valueIdEMail = "EMail";
 static constexpr auto valueIdURL = "URL";
-static constexpr auto valueIdVSTSDKPath = "VST SDK Path";
-static constexpr auto valueIdCMakePath = "CMake Path";
+static constexpr auto valueIdVSTSDKPath = prefKeyVSTSDKPath;
+static constexpr auto valueIdCMakePath = prefKeyCMakePath;
 
 static constexpr auto valueIdPluginType = "PlugIn Type";
 static constexpr auto valueIdPluginPath = "PlugIn Path";
@@ -69,6 +70,10 @@ private:
 	void chooseCMakePath ();
 	void choosePluginPath ();
 
+	void downloadVSTSDK ();
+	void downloadCMake ();
+
+	bool verifySDKInstallation ();
 	bool verifyCMakeInstallation ();
 	void showCMakeNotInstalledWarning ();
 	void gatherCMakeInformation ();
