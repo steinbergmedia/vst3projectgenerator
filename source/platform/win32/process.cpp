@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <shellapi.h>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -146,8 +147,9 @@ void Process::ArgumentList::addPath (const std::string& str)
 //------------------------------------------------------------------------
 bool openURL (const std::string& url)
 {
-	assert (false && "Implement me");
-	return false;
+	UTF8StringHelper helper (url.data (), static_cast<int> (url.size ()));
+	ShellExecute (0, 0, helper.getWideString (), 0, 0, SW_SHOW);
+	return true;
 }
 
 //------------------------------------------------------------------------
