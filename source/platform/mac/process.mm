@@ -106,6 +106,7 @@ std::shared_ptr<Process> Process::create (const std::string& path)
 	task.launchPath = [NSString stringWithUTF8String:path.data ()];
 	task.standardOutput = [NSPipe pipe];
 	task.standardError = task.standardOutput;
+	task.environment = [NSDictionary new];
 	[[task.standardOutput fileHandleForReading] readInBackgroundAndNotify];
 
 	proc->pImpl->delegate = [[SMTG_ExternalProcess alloc] initWithTask:task];
