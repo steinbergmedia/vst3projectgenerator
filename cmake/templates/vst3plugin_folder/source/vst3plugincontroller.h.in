@@ -40,9 +40,11 @@ public:
                                                          Steinberg::Vst::TChar* string,
                                                          Steinberg::Vst::ParamValue& valueNormalized) SMTG_OVERRIDE;
 
-    // FUnknown
-    Steinberg::tresult PLUGIN_API queryInterface (const char* iid, void** obj) SMTG_OVERRIDE;
-
+ 	//---Interface---------
+	DEFINE_INTERFACES
+		// Here you can add your supported VST3 interfaces
+		// DEF_INTERFACE (Vst::IXXX)
+	END_DEFINE_INTERFACES (EditController)
     DELEGATE_REFCOUNT (EditController)
 
 //------------------------------------------------------------------------

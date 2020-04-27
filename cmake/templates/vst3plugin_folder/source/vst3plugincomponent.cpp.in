@@ -51,6 +51,8 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setActive (TBool state)
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::process (Vst::ProcessData& data)
 {
+	// Here you have to implement your processing
+
 	return kResultOk;
 }
 
@@ -63,8 +65,13 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setupProcessing (Vst::ProcessSetup&
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::canProcessSampleSize (int32 symbolicSampleSize)
 {
+	// by default kSample32 is supported
 	if (symbolicSampleSize == Vst::kSample32)
 		return kResultTrue;
+
+	// disable the following comment if your processing support kSample64
+	/* if (symbolicSampleSize == Vst::kSample64)
+		return kResultTrue; */
 
 	return kResultFalse;
 }
