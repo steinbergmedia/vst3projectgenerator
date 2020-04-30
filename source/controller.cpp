@@ -5,7 +5,10 @@
 #include "process.h"
 #include "version.h"
 
+#include "vstgui/lib/cdropsource.h"
 #include "vstgui/lib/cfileselector.h"
+#include "vstgui/lib/controls/coptionmenu.h"
+#include "vstgui/lib/controls/ctextlabel.h"
 #include "vstgui/lib/cscrollview.h"
 #include "vstgui/lib/iviewlistener.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
@@ -108,7 +111,9 @@ private:
 };
 
 //------------------------------------------------------------------------
-class ScriptScrollViewController : public ValueListenerViewController
+class ScriptScrollViewController : public ValueListenerViewController,
+                                   public ViewListenerAdapter,
+                                   public IContextMenuController2
 {
 public:
 	ScriptScrollViewController (IController* parent, ValuePtr value)
@@ -120,7 +125,13 @@ public:
 	                   const IUIDescription* description) override
 	{
 		if (auto sv = dynamic_cast<CScrollView*> (view))
+		{
 			scrollView = sv;
+			if (auto label = dynamic_cast<CMultiLineTextLabel*> (scrollView->getView (0)))
+			{
+				label->registerViewListener (this);
+			}
+		}
 		return controller->verifyView (view, attributes, description);
 	}
 
@@ -131,6 +142,40 @@ public:
 		auto containerSize = scrollView->getContainerSize ();
 		containerSize.top = containerSize.bottom - 10;
 		scrollView->makeRectVisible (containerSize);
+	}
+
+	void viewAttached (CView* view) override
+	{
+		if (auto label = dynamic_cast<CMultiLineTextLabel*> (view))
+		{
+			if (label->getAutoHeight ())
+			{
+				label->setAutoHeight (false);
+				label->setAutoHeight (true);
+			}
+			label->unregisterViewListener (this);
+		}
+	}
+
+	void appendContextMenuItems (COptionMenu& contextMenu, CView* view,
+	                             const CPoint& where) override
+	{
+		if (auto stringValue = getValue ()->dynamicCast<IStringValue> ())
+		{
+			if (stringValue->getString ().empty ())
+				return;
+			auto commandItem = new CCommandMenuItem ({"Copy text to clipboard"});
+			commandItem->setActions ([&, stringValue] (CCommandMenuItem*) {
+				auto frame = contextMenu.getFrame ();
+				if (!frame)
+					return;
+				auto data = CDropSource::create (stringValue->getString ().data (),
+				                                 stringValue->getString ().length (),
+				                                 IDataPackage::Type::kText);
+				frame->setClipboard (data);
+			});
+			contextMenu.addEntry (commandItem);
+		}
 	}
 
 	CScrollView* scrollView {nullptr};
