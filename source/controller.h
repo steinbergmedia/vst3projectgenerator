@@ -41,6 +41,8 @@ static constexpr auto valueIdCMakeGenerators = "CMake Generators";
 static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
 
+static constexpr auto valueIdAppVersion = "App Version";
+
 //------------------------------------------------------------------------
 class Controller : public VSTGUI::Standalone::UIDesc::Customization,
                    public VSTGUI::Standalone::WindowControllerAdapter,

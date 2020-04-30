@@ -35,6 +35,8 @@ set(${target}_sources
   "source/controller.cpp"
   "source/controller.h"
   "source/process.h"
+  "source/version_buildnumber.h"
+  "source/version.h"
 )
 
 set(${target}_resources

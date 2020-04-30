@@ -3,6 +3,7 @@
 
 #include "application.h"
 #include "controller.h"
+#include "version.h"
 
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
@@ -20,7 +21,7 @@ using namespace VSTGUI::Standalone;
 //------------------------------------------------------------------------
 Application::Application ()
 : Application::DelegateAdapter (
-      {"VST3 Project Generator", "1.0.0", "com.steinberg.vst3sdk.projectgenerator"})
+      {"VST3 Project Generator", BUILD_STRING, "com.steinberg.vst3sdk.projectgenerator"})
 {
 }
 

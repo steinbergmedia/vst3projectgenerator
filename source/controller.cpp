@@ -3,6 +3,7 @@
 
 #include "controller.h"
 #include "process.h"
+#include "version.h"
 
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/lib/cscrollview.h"
@@ -197,6 +198,8 @@ Controller::Controller ()
 
 	model = UIDesc::ModelBindingCallbacks::make ();
 	/* UI only */
+	model->addValue (Value::makeStringValue (valueIdAppVersion, BUILD_STRING));
+
 	model->addValue (Value::makeStringListValue (
 	    valueIdTabBar, {"Welcome", "Create Plug-In Project", "Preferences"}));
 
