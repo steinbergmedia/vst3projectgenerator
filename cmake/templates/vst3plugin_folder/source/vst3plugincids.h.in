@@ -6,8 +6,8 @@
 
 namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
-static const Steinberg::FUID @SMTG_PLUGIN_CLASS_NAME@ProcessorUID (@SMTG_Processor_UUID@);
-static const Steinberg::FUID @SMTG_PLUGIN_CLASS_NAME@ControllerUID (@SMTG_Controller_UUID@);
+static const Steinberg::FUID k@SMTG_PLUGIN_CLASS_NAME@ProcessorUID (@SMTG_Processor_UUID@);
+static const Steinberg::FUID k@SMTG_PLUGIN_CLASS_NAME@ControllerUID (@SMTG_Controller_UUID@);
 
 #define @SMTG_PLUGIN_CLASS_NAME@VST3Category "@SMTG_PLUGIN_CATEGORY@"
 

@@ -7,19 +7,19 @@ using namespace Steinberg;
 
 namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
-// @SMTG_PLUGIN_CLASS_NAME@
+// @SMTG_PLUGIN_CLASS_NAME@Processor
 //------------------------------------------------------------------------
-@SMTG_PLUGIN_CLASS_NAME@::@SMTG_PLUGIN_CLASS_NAME@ ()
+@SMTG_PLUGIN_CLASS_NAME@Processor::@SMTG_PLUGIN_CLASS_NAME@Processor ()
 {
-	setControllerClass (@SMTG_PLUGIN_CLASS_NAME@ControllerUID);
+	setControllerClass (k@SMTG_PLUGIN_CLASS_NAME@ControllerUID);
 }
 
 //------------------------------------------------------------------------
-@SMTG_PLUGIN_CLASS_NAME@::~@SMTG_PLUGIN_CLASS_NAME@ ()
+@SMTG_PLUGIN_CLASS_NAME@Processor::~@SMTG_PLUGIN_CLASS_NAME@Processor ()
 {}
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::initialize (FUnknown* context)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* context)
 {
 	//---always initialize the parent-------
 	tresult result = AudioEffect::initialize (context);
@@ -37,19 +37,19 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::initialize (FUnknown* context)
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::terminate ()
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::terminate ()
 {
 	return AudioEffect::terminate ();
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setActive (TBool state)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setActive (TBool state)
 {
 	return AudioEffect::setActive (state);
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::process (Vst::ProcessData& data)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData& data)
 {
 	// Here you have to implement your processing
 
@@ -57,13 +57,13 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::process (Vst::ProcessData& data)
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::setupProcessing (Vst::ProcessSetup& newSetup)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setupProcessing (Vst::ProcessSetup& newSetup)
 {
 	return AudioEffect::setupProcessing (newSetup);
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@::canProcessSampleSize (int32 symbolicSampleSize)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::canProcessSampleSize (int32 symbolicSampleSize)
 {
 	// by default kSample32 is supported
 	if (symbolicSampleSize == Vst::kSample32)
