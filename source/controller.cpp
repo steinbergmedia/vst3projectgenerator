@@ -169,9 +169,10 @@ public:
 				auto frame = contextMenu.getFrame ();
 				if (!frame)
 					return;
-				auto data = CDropSource::create (stringValue->getString ().data (),
-				                                 stringValue->getString ().length (),
-				                                 IDataPackage::Type::kText);
+				auto data = CDropSource::create (
+				    stringValue->getString ().data (),
+				    static_cast<uint32_t> (stringValue->getString ().length ()),
+				    IDataPackage::Type::kText);
 				frame->setClipboard (data);
 			});
 			contextMenu.addEntry (commandItem);
