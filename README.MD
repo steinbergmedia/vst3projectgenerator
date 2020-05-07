@@ -30,3 +30,8 @@ vst3plugingenerator/myplugin
 ```
 
 folder in the directory the script was executed in.
+
+## Using command line parameters
+```console
+cmake -DSMTG_VENDOR_NAME_CLI="Test Company" -DSMTG_VENDOR_HOMEPAGE_CLI="https://www.testcompany.com" -DSMTG_VENDOR_EMAIL_CLI="tester@testcompany.com" -DSMTG_PLUGIN_NAME_CLI="TestPlugin" -DSMTG_PREFIX_FOR_FILENAMES_CLI="Test_" -DSMTG_PLUGIN_IDENTIFIER_CLI="com.testcompany.vst3.testplugin" -DSMTG_CMAKE_PROJECT_NAME_CLI="TestPlugin" -DSMTG_VENDOR_NAMESPACE_CLI="TestCompany" -DSMTG_PLUGIN_CLASS_NAME_CLI="CTestPlugin" -DSMTG_PLUGIN_CATEGORY_CLI="TestCategory" -DSMTG_PLUGIN_BUNDLE_NAME_CLI="testpluginbundle" -P GenerateVST3Plugin.cmake
+```
