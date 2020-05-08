@@ -18,15 +18,17 @@ namespace ProjectCreator {
 
 //------------------------------------------------------------------------
 static constexpr auto valueIdTabBar = "TabBar";
-static constexpr auto valueIdVendor = "Vendor";
-static constexpr auto valueIdEMail = "EMail";
-static constexpr auto valueIdURL = "URL";
+static constexpr auto valueIdVendorName = "Vendor";
+static constexpr auto valueIdVendorEMail = "EMail";
+static constexpr auto valueIdVendorURL = "URL";
+static constexpr auto valueIdVendorNamespace = "Vendor Namespace";
 static constexpr auto valueIdVSTSDKPath = "VST SDK Path";
 static constexpr auto valueIdCMakePath = "CMake Path";
 
 static constexpr auto valueIdPluginType = "PlugIn Type";
 static constexpr auto valueIdPluginPath = "PlugIn Path";
 static constexpr auto valueIdPluginName = "PlugIn Name";
+static constexpr auto valueIdPluginClassName = "PlugIn Class Name";
 static constexpr auto valueIdPluginBundleID = "PlugIn Bundle ID";
 static constexpr auto valueIdPluginFilenamePrefix = "PlugIn Filename Prefix";
 
@@ -40,6 +42,7 @@ static constexpr auto valueIdCMakeGenerators = "CMake Generators";
 
 static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
+static constexpr auto valueIdCopyScriptOutput = "Copy Script Output";
 
 static constexpr auto valueIdAppVersion = "App Version";
 
@@ -80,8 +83,8 @@ private:
 	void gatherCMakeInformation ();
 
 	void createProject ();
-	void runProjectCMake (const UTF8String& path);
-	void openCMakeGeneratedProject (const UTF8String& path);
+	void runProjectCMake (const std::string& path);
+	void openCMakeGeneratedProject (const std::string& path);
 
 	template <typename Proc>
 	void runFileSelector (const UTF8String& valueId, VSTGUI::CNewFileSelector::Style style,
@@ -93,6 +96,7 @@ private:
 
 	void onScriptOutput ();
 	void onScriptRunning (bool state);
+	void copyScriptOutputToClipboard ();
 
 	StringList getEnvPaths ();
 	VSTGUI::Optional<UTF8String> findCMakePath (const StringList& envPaths);

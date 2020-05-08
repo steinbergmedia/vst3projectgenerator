@@ -70,6 +70,38 @@ void showSimpleAlert (const char* headline, const char* description)
 }
 
 //------------------------------------------------------------------------
+size_t makeValidCppName (std::string& str, char replaceChar = '_')
+{
+	size_t replaced = 0;
+	std::replace_if (str.begin (), str.end (),
+	                 [&] (auto c) {
+		                 auto legal = (c >= 0x30 && c < 0x3A) || (c >= 0x41 && c < 0x5B) ||
+		                              (c >= 0x61 && c < 0x7B) || c == replaceChar;
+		                 if (!legal)
+			                 replaced++;
+		                 return !legal;
+	                 },
+	                 replaceChar);
+	return replaced;
+}
+
+//------------------------------------------------------------------------
+void makeValidCppValueString (IValue& value)
+{
+	if (auto strValue = value.dynamicCast<IStringValue> ())
+	{
+		auto str = strValue->getString ().getString ();
+		auto replaced = makeValidCppName (str);
+		if (replaced)
+		{
+			value.beginEdit ();
+			strValue->setString (UTF8String (std::move (str)));
+			value.endEdit ();
+		}
+	}
+}
+
+//------------------------------------------------------------------------
 void setPreferenceStringValue (Preferences& prefs, const UTF8String& key, const ValuePtr& value)
 {
 	if (!value)
@@ -93,6 +125,7 @@ UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallback
 	return {};
 }
 
+//------------------------------------------------------------------------
 class ValueListenerViewController : public DelegationController, public ValueListenerAdapter
 {
 public:
@@ -135,13 +168,21 @@ public:
 		return controller->verifyView (view, attributes, description);
 	}
 
-	void onEndEdit (IValue&) override
+	void scrollToBottom ()
 	{
 		if (!scrollView)
 			return;
 		auto containerSize = scrollView->getContainerSize ();
 		containerSize.top = containerSize.bottom - 10;
 		scrollView->makeRectVisible (containerSize);
+	}
+
+	void onEndEdit (IValue&) override { scrollToBottom (); }
+
+	void viewWillDelete (CView* view) override
+	{
+		if (auto label = dynamic_cast<CMultiLineTextLabel*> (view))
+			label->unregisterViewListener (this);
 	}
 
 	void viewAttached (CView* view) override
@@ -154,6 +195,7 @@ public:
 				label->setAutoHeight (true);
 			}
 			label->unregisterViewListener (this);
+			scrollToBottom ();
 		}
 	}
 
@@ -231,9 +273,10 @@ void Controller::onSetContentView (IWindow& window, const VSTGUI::SharedPointer<
 Controller::Controller ()
 {
 	Preferences prefs;
-	auto vendorPref = prefs.get (valueIdVendor);
-	auto emailPref = prefs.get (valueIdEMail);
-	auto urlPref = prefs.get (valueIdURL);
+	auto vendorPref = prefs.get (valueIdVendorName);
+	auto emailPref = prefs.get (valueIdVendorEMail);
+	auto urlPref = prefs.get (valueIdVendorURL);
+	auto namespacePref = prefs.get (valueIdVendorNamespace);
 	auto vstSdkPathPref = prefs.get (valueIdVSTSDKPath);
 	auto cmakePathPref = prefs.get (valueIdCMakePath);
 	auto pluginPathPref = prefs.get (valueIdPluginPath);
@@ -262,13 +305,25 @@ Controller::Controller ()
 		                 onScriptRunning (v.getValue () > 0.5 ? true : false);
 	                 }));
 
-	/* Factory Infos */
-	model->addValue (Value::makeStringValue (valueIdVendor, vendorPref ? *vendorPref : ""),
+	model->addValue (Value::make (valueIdCopyScriptOutput),
+	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
+		                 copyScriptOutputToClipboard ();
+		                 v.performEdit (0.);
+	                 }));
+
+	/* Factory/Vendor Infos */
+	model->addValue (Value::makeStringValue (valueIdVendorName, vendorPref ? *vendorPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
-	model->addValue (Value::makeStringValue (valueIdEMail, emailPref ? *emailPref : ""),
+	model->addValue (Value::makeStringValue (valueIdVendorEMail, emailPref ? *emailPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
-	model->addValue (Value::makeStringValue (valueIdURL, urlPref ? *urlPref : ""),
+	model->addValue (Value::makeStringValue (valueIdVendorURL, urlPref ? *urlPref : ""),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
+	model->addValue (
+	    Value::makeStringValue (valueIdVendorNamespace, namespacePref ? *namespacePref : ""),
+	    UIDesc::ValueCalls::onEndEdit ([this] (IValue& val) {
+		    makeValidCppValueString (val);
+		    storePreferences ();
+	    }));
 
 	/* Directories */
 	model->addValue (Value::make (valueIdChooseVSTSDKPath),
@@ -293,6 +348,9 @@ Controller::Controller ()
 	    Value::makeStringListValue (valueIdPluginType, {"Audio Effect", "Instrument"}));
 	model->addValue (Value::makeStringValue (valueIdPluginBundleID, ""));
 	model->addValue (Value::makeStringValue (valueIdPluginFilenamePrefix, ""));
+	model->addValue (
+	    Value::makeStringValue (valueIdPluginClassName, ""),
+	    UIDesc::ValueCalls::onEndEdit ([] (IValue& val) { makeValidCppValueString (val); }));
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginPath, pluginPathPref ? *pluginPathPref : ""),
 	    UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
@@ -356,9 +414,11 @@ Controller::Controller ()
 void Controller::storePreferences ()
 {
 	Preferences prefs;
-	setPreferenceStringValue (prefs, valueIdVendor, model->getValue (valueIdVendor));
-	setPreferenceStringValue (prefs, valueIdEMail, model->getValue (valueIdEMail));
-	setPreferenceStringValue (prefs, valueIdURL, model->getValue (valueIdURL));
+	setPreferenceStringValue (prefs, valueIdVendorName, model->getValue (valueIdVendorName));
+	setPreferenceStringValue (prefs, valueIdVendorEMail, model->getValue (valueIdVendorEMail));
+	setPreferenceStringValue (prefs, valueIdVendorURL, model->getValue (valueIdVendorURL));
+	setPreferenceStringValue (prefs, valueIdVendorNamespace,
+	                          model->getValue (valueIdVendorNamespace));
 	setPreferenceStringValue (prefs, valueIdVSTSDKPath, model->getValue (valueIdVSTSDKPath));
 	setPreferenceStringValue (prefs, valueIdCMakePath, model->getValue (valueIdCMakePath));
 	setPreferenceStringValue (prefs, valueIdPluginPath, model->getValue (valueIdPluginPath));
@@ -371,14 +431,16 @@ void Controller::onScriptRunning (bool state)
 {
 	static constexpr auto valuesToDisable = {
 	    valueIdTabBar,
-	    valueIdVendor,
-	    valueIdEMail,
-	    valueIdURL,
+	    valueIdVendorName,
+	    valueIdVendorEMail,
+	    valueIdVendorURL,
+	    valueIdVendorNamespace,
 	    valueIdVSTSDKPath,
 	    valueIdCMakePath,
 	    valueIdPluginType,
 	    valueIdPluginPath,
 	    valueIdPluginName,
+	    valueIdPluginClassName,
 	    valueIdPluginBundleID,
 	    valueIdPluginFilenamePrefix,
 	    valueIdChooseCMakePath,
@@ -645,15 +707,17 @@ void Controller::createProject ()
 		showCMakeNotInstalledWarning ();
 		return;
 	}
-	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
 	auto _sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
-	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
-	auto vendorStr = getModelValueString (model, valueIdVendor);
-	auto vendorHomePageStr = getModelValueString (model, valueIdURL);
-	auto emailStr = getModelValueString (model, valueIdEMail);
-	auto pluginNameStr = getModelValueString (model, valueIdPluginName);
-	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
-	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID);
+	auto cmakePathStr = getModelValueString (model, valueIdCMakePath).getString ();
+	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath).getString ();
+	auto vendorStr = getModelValueString (model, valueIdVendorName).getString ();
+	auto vendorHomePageStr = getModelValueString (model, valueIdVendorURL).getString ();
+	auto emailStr = getModelValueString (model, valueIdVendorEMail).getString ();
+	auto pluginNameStr = getModelValueString (model, valueIdPluginName).getString ();
+	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix).getString ();
+	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID).getString ();
+	auto vendorNamspaceStr = getModelValueString (model, valueIdVendorNamespace).getString ();
+	auto pluginClassNameStr = getModelValueString (model, valueIdPluginClassName).getString ();
 
 	if (_sdkPathStr.empty () || !validateVSTSDKPath (_sdkPathStr))
 	{
@@ -678,6 +742,14 @@ void Controller::createProject ()
 		return;
 	}
 
+	if (pluginClassNameStr.empty ())
+	{
+		pluginClassNameStr = pluginNameStr;
+		makeValidCppName (pluginClassNameStr);
+	}
+	auto cmakeProjectName = pluginNameStr;
+	makeValidCppName (cmakeProjectName);
+
 	if (auto scriptPath = IApplication::instance ().getCommonDirectories ().get (
 	        CommonDirectoryLocation::AppResourcesPath))
 	{
@@ -685,25 +757,38 @@ void Controller::createProject ()
 
 		Process::ArgumentList args;
 		args.add ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
-		args.add ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr.getString () +
-		          "\"");
-		args.add ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr.getString () + "\"");
-		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr.getString () + "\"");
-		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr.getString () + "\"");
-		args.add ("-DSMTG_VENDOR_HOMEPAGE_CLI=\"" + vendorHomePageStr.getString () + "\"");
-		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr.getString () + "\"");
-		args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr.getString () + "\"");
+		args.add ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
+		args.add ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
+		args.add ("-DSMTG_CMAKE_PROJECT_NAME_CLI=\"" + cmakeProjectName + "\"");
+		args.add ("-DSMTG_PLUGIN_BUNDLE_NAME_CLI=\"" + pluginNameStr + "\"");
+		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");
+		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"");
+		args.add ("-DSMTG_VENDOR_HOMEPAGE_CLI=\"" + vendorHomePageStr + "\"");
+		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"");
+		args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"");
+		if (!vendorNamspaceStr.empty ())
+			args.add ("-DSMTG_VENDOR_NAMESPACE_CLI=\"" + vendorNamspaceStr + "\"");
+		if (!pluginClassNameStr.empty ())
+			args.add ("-DSMTG_PLUGIN_CLASS_NAME_CLI=\"" + pluginClassNameStr + "\"");
+
+		// DSMTG_PLUGIN_BUNDLE_NAME_CLI
 		args.add ("-P");
 		args.add (scriptPath->getString ());
 
-		if (auto process = Process::create (cmakePathStr.getString ()))
+		if (auto process = Process::create (cmakePathStr))
 		{
 			auto scriptRunningValue = model->getValue (valueIdScriptRunning);
 			assert (scriptRunningValue);
 			Value::performSingleEdit (*scriptRunningValue, 1.);
 			auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 			assert (scriptOutputValue);
-			Value::performStringValueEdit (*scriptOutputValue, "");
+
+			Value::performStringValueEdit (*scriptOutputValue, cmakePathStr.data ());
+			Value::performStringAppendValueEdit (*scriptOutputValue, " " + *scriptPath);
+			for (const auto& arg : args.args)
+			{
+				Value::performStringAppendValueEdit (*scriptOutputValue, " " + arg);
+			}
 
 			auto projectPath = pluginOutputPathStr + PlatformPathDelimiter + pluginNameStr;
 			if (!process->run (args, [this, scriptRunningValue, scriptOutputValue, process,
@@ -732,7 +817,7 @@ void Controller::createProject ()
 }
 
 //------------------------------------------------------------------------
-void Controller::runProjectCMake (const UTF8String& path)
+void Controller::runProjectCMake (const std::string& path)
 {
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
 	auto value = model->getValue (valueIdCMakeGenerators);
@@ -754,12 +839,12 @@ void Controller::runProjectCMake (const UTF8String& path)
 		Process::ArgumentList args;
 		args.add ("-G" + generator.getString ());
 		args.add ("-S");
-		args.addPath (path.getString ());
+		args.addPath (path);
 		args.add ("-B");
 		auto buildDir = path;
 		buildDir += PlatformPathDelimiter;
 		buildDir += "build";
-		args.addPath (buildDir.getString ());
+		args.addPath (buildDir);
 
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n" + cmakePathStr + " ");
 		for (const auto& a : args.args)
@@ -790,7 +875,7 @@ void Controller::runProjectCMake (const UTF8String& path)
 }
 
 //------------------------------------------------------------------------
-void Controller::openCMakeGeneratedProject (const UTF8String& path)
+void Controller::openCMakeGeneratedProject (const std::string& path)
 {
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
 	if (auto process = Process::create (cmakePathStr.getString ()))
@@ -798,7 +883,7 @@ void Controller::openCMakeGeneratedProject (const UTF8String& path)
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 		Process::ArgumentList args;
 		args.add ("--open");
-		args.addPath (path.getString ());
+		args.addPath (path);
 		auto result = process->run (
 		    args, [this, scriptOutputValue, process] (Process::CallbackParams& p) mutable {
 			    if (!p.buffer.empty ())
@@ -821,6 +906,27 @@ void Controller::openCMakeGeneratedProject (const UTF8String& path)
 //------------------------------------------------------------------------
 void Controller::onScriptOutput ()
 {
+}
+
+//------------------------------------------------------------------------
+void Controller::copyScriptOutputToClipboard ()
+{
+	if (auto value = model->getValue (valueIdScriptOutput))
+	{
+		if (auto stringValue = value->dynamicCast<IStringValue> ())
+		{
+			if (stringValue->getString ().empty ())
+				return;
+			auto frame = contentView.get ();
+			if (!frame)
+				return;
+			auto data =
+			    CDropSource::create (stringValue->getString ().data (),
+			                         static_cast<uint32_t> (stringValue->getString ().length ()),
+			                         IDataPackage::Type::kText);
+			frame->setClipboard (data);
+		}
+	}
 }
 
 //------------------------------------------------------------------------
