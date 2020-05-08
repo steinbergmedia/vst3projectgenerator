@@ -2,7 +2,12 @@
 cmake_minimum_required(VERSION 3.12)
 project(vst3_project_generator)
 
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+	if(CMAKE_CONFIGURATION_TYPES)
+		set(CMAKE_CONFIGURATION_TYPES Debug Release ReleaseLTO)
+		set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+	endif()
+
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
         $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/>
     )
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY

@@ -649,6 +649,7 @@ void Controller::createProject ()
 	auto _sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
 	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
 	auto vendorStr = getModelValueString (model, valueIdVendor);
+	auto vendorHomePageStr = getModelValueString (model, valueIdURL);
 	auto emailStr = getModelValueString (model, valueIdEMail);
 	auto pluginNameStr = getModelValueString (model, valueIdPluginName);
 	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix);
@@ -689,6 +690,7 @@ void Controller::createProject ()
 		args.add ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr.getString () + "\"");
 		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr.getString () + "\"");
 		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr.getString () + "\"");
+		args.add ("-DSMTG_VENDOR_HOMEPAGE_CLI=\"" + vendorHomePageStr.getString () + "\"");
 		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr.getString () + "\"");
 		args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr.getString () + "\"");
 		args.add ("-P");
