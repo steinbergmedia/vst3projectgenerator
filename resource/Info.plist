@@ -21,6 +21,8 @@
 	<string>1</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2020 Steinberg Media Technologies. All rights reserved.</string>
+	<key>CFBundleIconFile</key>
+	<string>VST_Logo_Steinberg.icns</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

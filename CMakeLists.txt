@@ -57,6 +57,10 @@ if(CMAKE_HOST_APPLE)
     "source/platform/mac/process.mm"
     "source/platform/win32"
   )
+  set(${target}_resources 
+    ${${target}_resources}
+    "resource/VST_Logo_Steinberg.icns"
+  )
 elseif(MSVC)
   set(${target}_sources 
     ${${target}_sources}
