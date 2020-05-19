@@ -119,15 +119,19 @@ void setPreferenceStringValue (Preferences& prefs, const UTF8String& key, const 
 }
 
 //------------------------------------------------------------------------
+UTF8String getValueString (IValue& value)
+{
+	if (auto strValue = value.dynamicCast<IStringValue> ())
+		return strValue->getString ();
+	return {};
+}
+
+//------------------------------------------------------------------------
 UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallbacksPtr model,
                                 const UTF8String& key)
 {
-	auto value = model->getValue (key);
-	if (auto strValue = value->dynamicCast<IStringValue> ())
-	{
-		return strValue->getString ();
-	}
-
+	if (auto value = model->getValue (key))
+		return getValueString (*value.get ());
 	return {};
 }
 
