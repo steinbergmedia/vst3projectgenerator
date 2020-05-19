@@ -21,6 +21,7 @@
 #include "vstgui/uidescription/iuidescription.h"
 #include "vstgui/uidescription/uiattributes.h"
 
+#include <array>
 #include <cassert>
 #include <fstream>
 
@@ -57,6 +58,11 @@ constexpr auto valueIdWelcomeDownloadCMake = "Welcome Download CMake";
 constexpr auto valueIdWelcomeLocateCMake = "Welcome Locate CMake";
 constexpr auto valueIdValidVSTSDKPath = "Valid VST SDK Path";
 constexpr auto valueIdValidCMakePath = "Valid CMake Path";
+
+//------------------------------------------------------------------------
+const std::initializer_list<IStringListValue::StringType> pluginTypeDisplayStrings = {
+    "Audio Effect", "Instrument"};
+const std::array<std::string, 2> pluginTypeStrings = {"Fx", "Instrument"};
 
 //------------------------------------------------------------------------
 void showSimpleAlert (const char* headline, const char* description)
@@ -344,8 +350,7 @@ Controller::Controller ()
 
 	/* Plug-In */
 	model->addValue (Value::makeStringValue (valueIdPluginName, ""));
-	model->addValue (
-	    Value::makeStringListValue (valueIdPluginType, {"Audio Effect", "Instrument"}));
+	model->addValue (Value::makeStringListValue (valueIdPluginType, pluginTypeDisplayStrings));
 	model->addValue (Value::makeStringValue (valueIdPluginBundleID, ""));
 	model->addValue (Value::makeStringValue (valueIdPluginFilenamePrefix, ""));
 	model->addValue (
@@ -718,6 +723,11 @@ void Controller::createProject ()
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID).getString ();
 	auto vendorNamspaceStr = getModelValueString (model, valueIdVendorNamespace).getString ();
 	auto pluginClassNameStr = getModelValueString (model, valueIdPluginClassName).getString ();
+	auto pluginTypeValue = model->getValue (valueIdPluginType);
+	assert (pluginTypeValue);
+	auto pluginTypeIndex = static_cast<size_t> (
+	    pluginTypeValue->getConverter ().normalizedToPlain (pluginTypeValue->getValue ()));
+	auto pluginTypeStr = pluginTypeStrings[pluginTypeIndex];
 
 	if (_sdkPathStr.empty () || !validateVSTSDKPath (_sdkPathStr))
 	{
@@ -759,6 +769,7 @@ void Controller::createProject ()
 		args.add ("-DSMTG_VST3_SDK_SOURCE_DIR_CLI=\"" + sdkPathStr + "\"");
 		args.add ("-DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI=\"" + pluginOutputPathStr + "\"");
 		args.add ("-DSMTG_PLUGIN_NAME_CLI=\"" + pluginNameStr + "\"");
+		args.add ("-DSMTG_PLUGIN_CATEGORY_CLI=\"" + pluginTypeStr + "\"");
 		args.add ("-DSMTG_CMAKE_PROJECT_NAME_CLI=\"" + cmakeProjectName + "\"");
 		args.add ("-DSMTG_PLUGIN_BUNDLE_NAME_CLI=\"" + pluginNameStr + "\"");
 		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");
