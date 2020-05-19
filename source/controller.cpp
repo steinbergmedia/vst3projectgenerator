@@ -234,8 +234,8 @@ public:
 class DimmViewController : public ValueListenerViewController
 {
 public:
-	DimmViewController (IController* parent, ValuePtr value)
-	: ValueListenerViewController (parent, value)
+	DimmViewController (IController* parent, ValuePtr value, float dimm = 0.f)
+	: ValueListenerViewController (parent, value), dimmValue (dimm)
 	{
 	}
 
@@ -258,11 +258,12 @@ public:
 		if (!dimmView)
 			return;
 		bool b = value.getValue () > 0.5;
-		float alphaValue = b ? 0.f : 1.f;
+		float alphaValue = b ? dimmValue : 1.f;
 		dimmView->setAlphaValue (alphaValue);
 		dimmView->setMouseEnabled (!b);
 	}
 
+	float dimmValue {0.f};
 	CView* dimmView {nullptr};
 };
 
@@ -412,6 +413,11 @@ Controller::Controller ()
 	    "DimmViewController_VSTSDK",
 	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
 		    return new DimmViewController (parent, model->getValue (valueIdValidVSTSDKPath));
+	    });
+	addCreateViewControllerFunc (
+	    "DimmViewController_CreateProjectTab",
+	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
+		    return new DimmViewController (parent, model->getValue (valueIdScriptRunning), 0.5f);
 	    });
 }
 
