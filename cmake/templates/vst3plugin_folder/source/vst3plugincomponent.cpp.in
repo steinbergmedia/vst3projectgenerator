@@ -51,7 +51,26 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setActive (TBool state)
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData& data)
 {
-	// Here you have to implement your processing
+	//--- First : Read inputs parameter changes-----------
+
+    /*if (data.inputParameterChanges)
+    {
+        int32 numParamsChanged = data.inputParameterChanges->getParameterCount ();
+        for (int32 index = 0; index < numParamsChanged; index++)
+        {
+            if (auto* paramQueue = data.inputParameterChanges->getParameterData (index))
+            {
+                Vst::ParamValue value;
+                int32 sampleOffset;
+                int32 numPoints = paramQueue->getPointCount ();
+                switch (paramQueue->getParameterId ())
+                {
+				}
+			}
+		}
+	}*/
+	
+	//--- Here you have to implement your processing
 
 	return kResultOk;
 }
