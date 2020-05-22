@@ -50,6 +50,7 @@ constexpr auto CMakeExecutableName = "cmake";
 constexpr auto CMakeWebPageURL = "https://cmake.org";
 constexpr auto SteinbergSDKWebPageURL = "https://www.steinberg.net/en/company/developers.html";
 constexpr auto GitHubSDKWebPageURL = "https://github.com/steinbergmedia/vst3sdk";
+constexpr auto VST3SDKPortalPageURL = "https://developer.steinberg.help/display/VST";
 
 //------------------------------------------------------------------------
 constexpr auto valueIdWelcomeDownloadSDK = "Welcome Download SDK";
