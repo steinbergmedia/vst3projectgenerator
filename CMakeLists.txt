@@ -40,6 +40,11 @@ set(${target}_sources
   "source/controller.cpp"
   "source/controller.h"
   "source/process.h"
+  "source/dimmviewcontroller.cpp"
+  "source/dimmviewcontroller.h"
+  "source/valuelistenerviewcontroller.h"
+  "source/scriptscrollviewcontroller.cpp"
+  "source/scriptscrollviewcontroller.h"
   "source/version_buildnumber.h"
   "source/version.h"
 )

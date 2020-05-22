@@ -2,24 +2,19 @@
 // Flags       : clang-format SMTGSequencer
 
 #include "controller.h"
+#include "dimmviewcontroller.h"
 #include "process.h"
+#include "scriptscrollviewcontroller.h"
 #include "version.h"
 
 #include "vstgui/lib/cdropsource.h"
 #include "vstgui/lib/cfileselector.h"
-#include "vstgui/lib/controls/coptionmenu.h"
-#include "vstgui/lib/controls/ctextlabel.h"
-#include "vstgui/lib/cscrollview.h"
-#include "vstgui/lib/iviewlistener.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
 #include "vstgui/standalone/include/helpers/value.h"
 #include "vstgui/standalone/include/ialertbox.h"
 #include "vstgui/standalone/include/iasync.h"
 #include "vstgui/standalone/include/icommondirectories.h"
 #include "vstgui/uidescription/cstream.h"
-#include "vstgui/uidescription/delegationcontroller.h"
-#include "vstgui/uidescription/iuidescription.h"
-#include "vstgui/uidescription/uiattributes.h"
 
 #include <array>
 #include <cassert>
@@ -135,142 +130,6 @@ UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallback
 		return getValueString (*value.get ());
 	return {};
 }
-
-//------------------------------------------------------------------------
-class ValueListenerViewController : public DelegationController, public ValueListenerAdapter
-{
-public:
-	ValueListenerViewController (IController* parent, ValuePtr value)
-	: DelegationController (parent), value (value)
-	{
-		value->registerListener (this);
-	}
-
-	virtual ~ValueListenerViewController () noexcept { value->unregisterListener (this); }
-
-	const ValuePtr& getValue () const { return value; }
-
-private:
-	ValuePtr value {nullptr};
-};
-
-//------------------------------------------------------------------------
-class ScriptScrollViewController : public ValueListenerViewController,
-                                   public ViewListenerAdapter,
-                                   public IContextMenuController2
-{
-public:
-	ScriptScrollViewController (IController* parent, ValuePtr value)
-	: ValueListenerViewController (parent, value)
-	{
-	}
-
-	CView* verifyView (CView* view, const UIAttributes& attributes,
-	                   const IUIDescription* description) override
-	{
-		if (auto sv = dynamic_cast<CScrollView*> (view))
-		{
-			scrollView = sv;
-			if (auto label = dynamic_cast<CMultiLineTextLabel*> (scrollView->getView (0)))
-			{
-				label->registerViewListener (this);
-			}
-		}
-		return controller->verifyView (view, attributes, description);
-	}
-
-	void scrollToBottom ()
-	{
-		if (!scrollView)
-			return;
-		auto containerSize = scrollView->getContainerSize ();
-		containerSize.top = containerSize.bottom - 10;
-		scrollView->makeRectVisible (containerSize);
-	}
-
-	void onEndEdit (IValue&) override { scrollToBottom (); }
-
-	void viewWillDelete (CView* view) override
-	{
-		if (auto label = dynamic_cast<CMultiLineTextLabel*> (view))
-			label->unregisterViewListener (this);
-	}
-
-	void viewAttached (CView* view) override
-	{
-		if (auto label = dynamic_cast<CMultiLineTextLabel*> (view))
-		{
-			if (label->getAutoHeight ())
-			{
-				label->setAutoHeight (false);
-				label->setAutoHeight (true);
-			}
-			label->unregisterViewListener (this);
-			scrollToBottom ();
-		}
-	}
-
-	void appendContextMenuItems (COptionMenu& contextMenu, CView* view,
-	                             const CPoint& where) override
-	{
-		if (auto stringValue = getValue ()->dynamicCast<IStringValue> ())
-		{
-			if (stringValue->getString ().empty ())
-				return;
-			auto commandItem = new CCommandMenuItem ({"Copy text to clipboard"});
-			commandItem->setActions ([&, stringValue] (CCommandMenuItem*) {
-				auto frame = contextMenu.getFrame ();
-				if (!frame)
-					return;
-				auto data = CDropSource::create (
-				    stringValue->getString ().data (),
-				    static_cast<uint32_t> (stringValue->getString ().length ()),
-				    IDataPackage::Type::kText);
-				frame->setClipboard (data);
-			});
-			contextMenu.addEntry (commandItem);
-		}
-	}
-
-	CScrollView* scrollView {nullptr};
-};
-
-//------------------------------------------------------------------------
-class DimmViewController : public ValueListenerViewController
-{
-public:
-	DimmViewController (IController* parent, ValuePtr value, float dimm = 0.f)
-	: ValueListenerViewController (parent, value), dimmValue (dimm)
-	{
-	}
-
-	CView* verifyView (CView* view, const UIAttributes& attributes,
-	                   const IUIDescription* description) override
-	{
-		if (auto name = attributes.getAttributeValue (IUIDescription::kCustomViewName))
-		{
-			if (*name == "Container")
-			{
-				dimmView = view;
-				onEndEdit (*getValue ());
-			}
-		}
-		return controller->verifyView (view, attributes, description);
-	}
-
-	void onEndEdit (IValue& value) override
-	{
-		if (!dimmView)
-			return;
-		bool b = value.getValue () > 0.5;
-		float alphaValue = b ? dimmValue : 1.f;
-		dimmView->setAlphaValue (alphaValue);
-		dimmView->setMouseEnabled (!b);
-	}
-
-	float dimmValue {0.f};
-	CView* dimmView {nullptr};
-};
 
 //------------------------------------------------------------------------
 } // anonymous
@@ -906,8 +765,8 @@ void Controller::openCMakeGeneratedProject (const std::string& path)
 		Process::ArgumentList args;
 		args.add ("--open");
 		args.addPath (path);
-		auto result = process->run (
-		    args, [this, scriptOutputValue, process] (Process::CallbackParams& p) mutable {
+		auto result =
+		    process->run (args, [scriptOutputValue, process] (Process::CallbackParams& p) mutable {
 			    if (!p.buffer.empty ())
 			    {
 				    Value::performStringAppendValueEdit (
