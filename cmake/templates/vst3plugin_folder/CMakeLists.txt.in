@@ -9,7 +9,9 @@ setupPlatformToolset()
 setupCoreAudioSupport()
 setupAaxSupport()
 
-smtg_add_vst3plugin(@SMTG_PLUGIN_BUNDLE_NAME@
+set(target "@SMTG_PLUGIN_BUNDLE_NAME@")
+
+smtg_add_vst3plugin(${target}
     source/version.h
     source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
     source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
@@ -23,18 +25,18 @@ add_subdirectory(${vst3sdk_SOURCE_DIR}/base ${vst3sdk_BINARY_DIR}/base)
 add_subdirectory(${vst3sdk_SOURCE_DIR}/pluginterfaces ${vst3sdk_BINARY_DIR}/pluginterfaces)
 add_subdirectory(${vst3sdk_SOURCE_DIR}/public.sdk ${vst3sdk_BINARY_DIR}/public.sdk)
 
-target_link_libraries(@SMTG_PLUGIN_BUNDLE_NAME@
+target_link_libraries(${target}
     PRIVATE
         sdk
 )
 
 if(SMTG_MAC)
-    smtg_set_bundle(@SMTG_PLUGIN_BUNDLE_NAME@ INFOPLIST 
+    smtg_set_bundle(${target} INFOPLIST 
         "${CMAKE_CURRENT_LIST_DIR}/resource/Info.plist" 
         PREPROCESS
     )
 elseif(SMTG_WIN)
-    target_sources(@SMTG_PLUGIN_BUNDLE_NAME@ PRIVATE 
+    target_sources(${target} PRIVATE 
         resource/@SMTG_PREFIX_FOR_FILENAMES@.rc
     )
 endif()
