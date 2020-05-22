@@ -7,6 +7,9 @@
 #include "scriptscrollviewcontroller.h"
 #include "version.h"
 
+#include "vstgui/lib/controls/ctextedit.h"
+#include "vstgui/lib/controls/itexteditlistener.h"
+
 #include "vstgui/lib/cdropsource.h"
 #include "vstgui/lib/cfileselector.h"
 #include "vstgui/standalone/include/helpers/preferences.h"
@@ -130,6 +133,72 @@ UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallback
 		return getValueString (*value.get ());
 	return {};
 }
+
+//------------------------------------------------------------------------
+class SyncProjectAndClassNameController : public ValueListenerViewController,
+                                          public TextEditListenerAdapter,
+                                          public ViewListenerAdapter
+{
+public:
+	SyncProjectAndClassNameController (IController* parent, ValuePtr value, ValuePtr secondValue)
+	: ValueListenerViewController (parent, value), secondValue (secondValue)
+	{
+		vstgui_assert (value && secondValue);
+	}
+	~SyncProjectAndClassNameController () noexcept override
+	{
+		if (textEdit)
+			viewWillDelete (textEdit);
+	}
+
+	CView* verifyView (CView* view, const UIAttributes& attributes,
+	                   const IUIDescription* description) override
+	{
+		if (auto te = dynamic_cast<CTextEdit*> (view))
+		{
+			vstgui_assert (textEdit == nullptr);
+			textEdit = te;
+			textEdit->registerViewListener (this);
+			textEdit->registerTextEditListener (this);
+		}
+		return ValueListenerViewController::verifyView (view, attributes, description);
+	}
+
+	void viewWillDelete (CView* view) override
+	{
+		vstgui_assert (view == textEdit);
+		textEdit->unregisterTextEditListener (this);
+		view->unregisterViewListener (this);
+		textEdit = nullptr;
+	}
+
+	void onTextEditPlatformControlTookFocus (CTextEdit*) override
+	{
+		syncValues = getValueString (*getSecondValue ()) == getValueString (*getValue ());
+	}
+	void onTextEditPlatformControlLostFocus (CTextEdit*) override { syncValues = false; }
+
+	void onEndEdit (IValue& value) override
+	{
+		if (!syncValues)
+			return;
+		auto strValue = value.dynamicCast<IStringValue> ();
+		auto secondStrValue = secondValue->dynamicCast<IStringValue> ();
+		if (secondStrValue->getString () == strValue->getString ())
+			return;
+		secondValue->beginEdit ();
+		secondStrValue->setString (strValue->getString ());
+		secondValue->endEdit ();
+	}
+
+private:
+	ValuePtr getSecondValue () const { return secondValue; }
+	ValuePtr secondValue;
+
+	CTextEdit* textEdit {nullptr};
+
+	bool syncValues {false};
+};
 
 //------------------------------------------------------------------------
 } // anonymous
@@ -282,6 +351,13 @@ Controller::Controller ()
 	    "DimmViewController_CreateProjectTab",
 	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
 		    return new DimmViewController (parent, model->getValue (valueIdScriptRunning), 0.5f);
+	    });
+	addCreateViewControllerFunc (
+	    "SyncProjectAndClassNameController",
+	    [this] (const auto& name, auto parent, const auto uiDesc) -> IController* {
+		    return new SyncProjectAndClassNameController (parent,
+		                                                  model->getValue (valueIdPluginName),
+		                                                  model->getValue (valueIdPluginClassName));
 	    });
 }
 
