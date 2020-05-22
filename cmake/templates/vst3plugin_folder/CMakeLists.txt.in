@@ -12,8 +12,8 @@ setupAaxSupport()
 smtg_add_vst3plugin(@SMTG_PLUGIN_BUNDLE_NAME@
     source/version.h
     source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
-    source/@SMTG_PREFIX_FOR_FILENAMES@component.h
-    source/@SMTG_PREFIX_FOR_FILENAMES@component.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.cpp
     source/@SMTG_PREFIX_FOR_FILENAMES@controller.h
     source/@SMTG_PREFIX_FOR_FILENAMES@controller.cpp
     source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp

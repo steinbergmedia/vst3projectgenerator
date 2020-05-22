@@ -1,0 +1,12 @@
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+
+#include "public.sdk/source/vst/vst2wrapper/vst2wrapper.h"
+#include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
+
+#define VST2_UID 'GnV2' // @SMTG_VST2_UID@
+
+//------------------------------------------------------------------------
+::AudioEffect* createEffectInstance (audioMasterCallback audioMaster)
+{
+	return Steinberg::Vst::Vst2Wrapper::create (GetPluginFactory (), k@SMTG_PLUGIN_CLASS_NAME@ProcessorUID, VST2_UID, audioMaster);
+}

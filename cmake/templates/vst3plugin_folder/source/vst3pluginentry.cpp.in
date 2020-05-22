@@ -51,7 +51,7 @@ BEGIN_FACTORY_DEF ("@SMTG_VENDOR_NAME@",
 				@SMTG_PLUGIN_CLASS_NAME@VST3Category,		// Subcategory for this Plug-in (to be changed)
 				FULL_VERSION_STR,		// Plug-in version (to be changed)
 				kVstVersionString,		// the VST 3 SDK version (do not changed this, use always this define)
-				@SMTG_PLUGIN_CLASS_NAME@::createInstance)	// function pointer called when this component should be instantiated
+				@SMTG_PLUGIN_CLASS_NAME@Processor::createInstance)	// function pointer called when this component should be instantiated
 
 	// its kVstComponentControllerClass component
 	DEF_CLASS2 (INLINE_UID_FROM_FUID (k@SMTG_PLUGIN_CLASS_NAME@ControllerUID),
