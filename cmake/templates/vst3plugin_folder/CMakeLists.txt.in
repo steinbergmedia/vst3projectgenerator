@@ -9,7 +9,7 @@ setupPlatformToolset()
 setupCoreAudioSupport()
 setupAaxSupport()
 
-set(target "@SMTG_PLUGIN_BUNDLE_NAME@")
+set(target "@SMTG_CMAKE_PROJECT_NAME@")
 
 smtg_add_vst3plugin(${target}
     source/version.h
