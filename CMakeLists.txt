@@ -22,7 +22,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 set(VSTGUI_DISABLE_UNITTESTS ON)
 set(VSTGUI_STANDALONE_EXAMPLES OFF)
 set(VSTGUI_STANDALONE ON)
-set(VSTGUI_TOOLS OFF)
+set(VSTGUI_TOOLS OFF CACHE BOOL "VSTGUI TOOLS")
 
 set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI Path")
 set(PROJECTGENERATOR_SCRIPT_DIR "../vst3_project_generator_script" CACHE PATH "Project Generator Script Path")
@@ -81,7 +81,7 @@ vstgui_set_target_infoplist(${target} "resource/Info.plist")
 vstgui_set_target_rcfile(${target} "resource/win32_resources.rc")
 vstgui_set_cxx_version(${target} 14)
 
-target_include_directories(${target} PUBLIC ../vstgui)
+target_include_directories(${target} PUBLIC "${VSTGUI_DIR}/..")
 
 ## cmake script
 vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/GenerateVST3Plugin.cmake")
