@@ -145,6 +145,15 @@ void Process::ArgumentList::addPath (const std::string& str)
 }
 
 //------------------------------------------------------------------------
+void Process::ArgumentList::add (const std::string& str)
+{
+	if (str ().find (' ') != std::string::npos)
+		addPath (str);
+	else
+		args.emplace_back (str);
+}
+
+//------------------------------------------------------------------------
 bool openURL (const std::string& url)
 {
 	UTF8StringHelper helper (url.data (), static_cast<int> (url.size ()));

@@ -782,10 +782,6 @@ void Controller::runProjectCMake (const std::string& path)
 	if (!value)
 		return;
 	auto generator = value->getConverter ().valueAsString (value->getValue ());
-	if (generator.getString ().find (' ') != std::string::npos)
-	{
-		generator = "\"" + generator + "\"";
-	}
 	if (auto process = Process::create (cmakePathStr.getString ()))
 	{
 		auto scriptRunningValue = model->getValue (valueIdScriptRunning);
@@ -794,7 +790,8 @@ void Controller::runProjectCMake (const std::string& path)
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 
 		Process::ArgumentList args;
-		args.add ("-G" + generator.getString ());
+		args.add ("-G");
+		args.add (generator.getString ());
 		args.add ("-S");
 		args.addPath (path);
 		args.add ("-B");

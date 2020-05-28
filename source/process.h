@@ -25,7 +25,7 @@ public:
 
 	struct ArgumentList
 	{
-		void add (const std::string& str) { args.emplace_back (str); }
+		void add (const std::string& str);
 		void addPath (const std::string& str);
 
 		std::vector<std::string> args;

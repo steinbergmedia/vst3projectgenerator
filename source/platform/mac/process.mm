@@ -150,6 +150,12 @@ void Process::ArgumentList::addPath (const std::string& str)
 }
 
 //------------------------------------------------------------------------
+void Process::ArgumentList::add (const std::string& str)
+{
+	args.emplace_back (str);
+}
+
+//------------------------------------------------------------------------
 bool openURL (const std::string& url)
 {
 	NSURL* nsUrl = [NSURL URLWithString:[NSString stringWithUTF8String:url.data ()]];
