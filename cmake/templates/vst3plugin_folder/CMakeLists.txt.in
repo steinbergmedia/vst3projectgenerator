@@ -11,7 +11,7 @@ setupAaxSupport()
 
 set(target "@SMTG_CMAKE_PROJECT_NAME@")
 
-smtg_add_vst3plugin(${target}
+set(sources
     source/version.h
     source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
     source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
@@ -21,9 +21,14 @@ smtg_add_vst3plugin(${target}
     source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp
 )
 
+smtg_add_vst3plugin(${target} ${sources})
+
 add_subdirectory(${vst3sdk_SOURCE_DIR}/base ${vst3sdk_BINARY_DIR}/base)
 add_subdirectory(${vst3sdk_SOURCE_DIR}/pluginterfaces ${vst3sdk_BINARY_DIR}/pluginterfaces)
 add_subdirectory(${vst3sdk_SOURCE_DIR}/public.sdk ${vst3sdk_BINARY_DIR}/public.sdk)
+
+smtg_add_vst3_snapshot(${target} resource/@SMTG_Processor_PLAIN_UUID@_snapshot.png)
+smtg_add_vst3_snapshot(${target} resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2.0x.png)
 
 target_link_libraries(${target}
     PRIVATE
@@ -37,6 +42,6 @@ if(SMTG_MAC)
     )
 elseif(SMTG_WIN)
     target_sources(${target} PRIVATE 
-        resource/@SMTG_PREFIX_FOR_FILENAMES@.rc
+        resource/win32resource.rc
     )
 endif()

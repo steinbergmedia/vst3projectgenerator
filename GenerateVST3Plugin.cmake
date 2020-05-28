@@ -21,12 +21,12 @@ smtg_print_generator_specifics()
 smtg_print_vendor_specifics()
 smtg_print_plugin_uuids()
 
-# Collect all template files
+# Collect all files in our template folder
 file(GLOB_RECURSE 
     template_files 
     RELATIVE 
         ${SMTG_TEMPLATE_FILES_PATH}
-    ${SMTG_TEMPLATE_FILES_PATH}/*.in
+    ${SMTG_TEMPLATE_FILES_PATH}/*
 )
 
 foreach(rel_input_file ${template_files})
@@ -36,6 +36,14 @@ foreach(rel_input_file ${template_files})
         ${SMTG_PLUGIN_NAME}
         rel_output_file
         ${rel_input_file}
+    )
+
+    # Set real UUID for snapshots
+    string(REPLACE
+        "SMTG_Processor_UUID"
+        ${SMTG_Processor_PLAIN_UUID}
+        rel_output_file
+        ${rel_output_file}
     )
 
     # Set the plug-in's file prefix
@@ -54,33 +62,48 @@ foreach(rel_input_file ${template_files})
             ${rel_output_file}
         )
     endif()
-    
+
     # Get last extension, in this case ".in"
     get_filename_component(
         TEMPLATE_EXT
         ${rel_output_file}
         LAST_EXT
     )
-   
-    # Remove ".in"
-    string(REPLACE
-        ${TEMPLATE_EXT}
-        ""
-        rel_output_file
-        ${rel_output_file}
-    )
 
+	# Remove ".in"
+	if(${TEMPLATE_EXT} STREQUAL ".in")
+		set(DO_CONFIGURE_FILE 1)
+		string(REPLACE
+			${TEMPLATE_EXT}
+			""
+			rel_output_file
+			${rel_output_file}
+		)
+	else()
+		set(DO_CONFIGURE_FILE 0)
+	endif()
+	
     # Create absolute paths from relative paths
     set(abs_input_file ${SMTG_TEMPLATE_FILES_PATH}/${rel_input_file})
     set(abs_output_file ${SMTG_GENERATOR_OUTPUT_DIRECTORY}/${rel_output_file})
 
-    # Write file to HD
-    configure_file(
-        ${abs_input_file}
-        ${abs_output_file}
-        @ONLY
-        LF
-    )
+	if(DO_CONFIGURE_FILE)
+		# Configure and Write file to HD
+		configure_file(
+			${abs_input_file}
+			${abs_output_file}
+			@ONLY
+			LF
+		)
+		message(STATUS "Configured: ${abs_output_file}")
+	else()
+		# otherwise do a simple copy
+		configure_file(
+			${abs_input_file}
+			${abs_output_file}
+			COPYONLY
+		)
+		message(STATUS "Copied    : ${abs_output_file}")
+	endif()
 
-    message(STATUS "${abs_output_file}")
 endforeach()
