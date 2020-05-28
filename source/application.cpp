@@ -37,7 +37,7 @@ void Application::finishLaunching ()
 	config.customization = controller;
 	config.windowConfig.title = "VST3 Project Generator";
 	config.windowConfig.autoSaveFrameName = "MainWindow";
-	config.windowConfig.style.border ().close ().centered ();
+	config.windowConfig.style.border ().close ().centered ().size ();
 	if (auto window = UIDesc::makeWindow (config))
 	{
 		window->show ();
