@@ -99,6 +99,7 @@ if(CMAKE_HOST_APPLE)
   endif()
   set_target_properties(${target} PROPERTIES
     XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS YES
+    XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 10.9
   )
 elseif(MSVC)
   target_link_options(${target}
