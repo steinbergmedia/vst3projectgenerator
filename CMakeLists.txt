@@ -89,10 +89,22 @@ vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/modules" cm
 vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/templates" cmake/)
 
 ## code signing macOS
-if(CMAKE_HOST_APPLE AND SMTG_DEVELOPMENT_TEAMID)
+if(CMAKE_HOST_APPLE)
+  if(SMTG_DEVELOPMENT_TEAMID)
+    set_target_properties(${target} PROPERTIES
+      XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${SMTG_DEVELOPMENT_TEAMID}
+      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${SMTG_CODE_SIGN_IDENTITY}"
+    )
+    message(STATUS "Setup macOS signing with TeamID: ${SMTG_DEVELOPMENT_TEAMID} and Identity: ${SMTG_CODE_SIGN_IDENTITY}")
+  endif()
   set_target_properties(${target} PROPERTIES
-    XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${SMTG_DEVELOPMENT_TEAMID}
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${SMTG_CODE_SIGN_IDENTITY}"
+    XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS YES
   )
-  message(STATUS "Setup macOS signing with TeamID: ${SMTG_DEVELOPMENT_TEAMID} and Identity: ${SMTG_CODE_SIGN_IDENTITY}")
+elseif(MSVC)
+  target_compile_options(${target} PRIVATE /Zi)
+  set_target_properties(${target} PROPERTIES 
+    LINK_FLAGS "/DEBUG"
+    COMPILE_PDB_NAME ${target} 
+    COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
+  )
 endif()
