@@ -101,7 +101,7 @@ if(CMAKE_HOST_APPLE)
     XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS YES
   )
 elseif(MSVC)
-  target_compile_options(${target} PRIVATE /Zi)
+  # target_compile_options(${target} PRIVATE /Zi)
   set_target_properties(${target} PROPERTIES 
     LINK_FLAGS "/DEBUG"
     COMPILE_PDB_NAME ${target} 
