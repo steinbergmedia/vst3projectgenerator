@@ -53,20 +53,18 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getState (IBStream* state
 }
 
 //------------------------------------------------------------------------
-IPlugView* PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::createView (const char* name)
+IPlugView* PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::createView (FIDString name)
 {
 	// Here the Host wants to open your editor (if you have one)
 	if (FIDStringsEqual (name, Vst::ViewType::kEditor))
 	{
 		// create your editor here and return a IPlugView ptr of it
-
 	}
 	return nullptr;
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setParamNormalized (Vst::ParamID tag,
-                                                                           Vst::ParamValue value)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setParamNormalized (Vst::ParamID tag, Vst::ParamValue value)
 {
 	// called by host to update your parameters
 	tresult result = EditControllerEx1::setParamNormalized (tag, value);
@@ -74,9 +72,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setParamNormalized (Vst::
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamStringByValue (Vst::ParamID tag, 
-                                                                              Vst::ParamValue valueNormalized,
-                                                                              Vst::String128 string)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamStringByValue (Vst::ParamID tag, Vst::ParamValue valueNormalized, Vst::String128 string)
 {
 	// called by host to get a string for given normalized value of a specific parameter
 	// (without having to set the value!)
@@ -84,9 +80,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamStringByValue (Vs
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamValueByString (Vst::ParamID tag,
-                                                                              Vst::TChar* string,
-                                                                              Vst::ParamValue& valueNormalized)
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamValueByString (Vst::ParamID tag, Vst::TChar* string, Vst::ParamValue& valueNormalized)
 {
 	// called by host to get a normalized value from a string representation of a specific parameter
 	// (without having to set the value!)
