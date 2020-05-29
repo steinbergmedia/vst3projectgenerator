@@ -32,7 +32,7 @@ smtg_add_vst3_snapshot(${target} resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2
 
 target_link_libraries(${target}
     PRIVATE
-        sdk
+    sdk
 )
 
 if(SMTG_MAC)
