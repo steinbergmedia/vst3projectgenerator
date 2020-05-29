@@ -87,3 +87,12 @@ target_include_directories(${target} PUBLIC "${VSTGUI_DIR}/..")
 vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/GenerateVST3Plugin.cmake")
 vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/modules" cmake/)
 vstgui_add_resources(${target} "${PROJECTGENERATOR_SCRIPT_DIR}/cmake/templates" cmake/)
+
+## code signing macOS
+if(CMAKE_HOST_APPLE AND SMTG_DEVELOPMENT_TEAMID)
+  set_target_properties(${target} PROPERTIES
+    XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${SMTG_DEVELOPMENT_TEAMID}
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${SMTG_CODE_SIGN_IDENTITY}"
+  )
+  message(STATUS "Setup macOS signing with TeamID: ${SMTG_DEVELOPMENT_TEAMID} and Identity: ${SMTG_CODE_SIGN_IDENTITY}")
+endif()
