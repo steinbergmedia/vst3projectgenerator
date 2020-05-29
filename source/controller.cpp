@@ -230,7 +230,7 @@ Controller::Controller ()
 	model->addValue (Value::makeStringValue (valueIdAppVersion, BUILD_STRING));
 
 	model->addValue (Value::makeStringListValue (
-	    valueIdTabBar, {"Welcome", "Create Plug-In Project", "Preferences"}));
+	    valueIdTabBar, {"Welcome", "Create Plug-in Project", "Preferences"}));
 
 	model->addValue (Value::make (valueIdCreateProject),
 	                 UIDesc::ValueCalls::onAction ([this] (IValue& v) {
