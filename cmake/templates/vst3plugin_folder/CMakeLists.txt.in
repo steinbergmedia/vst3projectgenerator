@@ -46,3 +46,8 @@ elseif(SMTG_WIN)
     )
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${target})
 endif()
+
+### move all SDK targets into its own folder in Visual Studio and Xcode
+set_target_properties(base PROPERTIES FOLDER "VST SDK")
+set_target_properties(sdk PROPERTIES FOLDER "VST SDK")
+set_target_properties(pluginterfaces PROPERTIES FOLDER "VST SDK")
