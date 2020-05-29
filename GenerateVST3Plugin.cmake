@@ -25,7 +25,7 @@ smtg_print_plugin_uuids()
 file(GLOB_RECURSE 
     template_files 
     RELATIVE 
-        ${SMTG_TEMPLATE_FILES_PATH}
+    ${SMTG_TEMPLATE_FILES_PATH}
     ${SMTG_TEMPLATE_FILES_PATH}/*
 )
 
@@ -70,40 +70,40 @@ foreach(rel_input_file ${template_files})
         LAST_EXT
     )
 
-	# Remove ".in"
-	if(${TEMPLATE_EXT} STREQUAL ".in")
-		set(DO_CONFIGURE_FILE 1)
-		string(REPLACE
-			${TEMPLATE_EXT}
-			""
-			rel_output_file
-			${rel_output_file}
-		)
-	else()
-		set(DO_CONFIGURE_FILE 0)
-	endif()
-	
+    # Remove ".in"
+    if(${TEMPLATE_EXT} STREQUAL ".in")
+        set(DO_CONFIGURE_FILE 1)
+        string(REPLACE
+            ${TEMPLATE_EXT}
+            ""
+            rel_output_file
+            ${rel_output_file}
+        )
+    else()
+        set(DO_CONFIGURE_FILE 0)
+    endif()
+    
     # Create absolute paths from relative paths
     set(abs_input_file ${SMTG_TEMPLATE_FILES_PATH}/${rel_input_file})
     set(abs_output_file ${SMTG_GENERATOR_OUTPUT_DIRECTORY}/${rel_output_file})
 
-	if(DO_CONFIGURE_FILE)
-		# Configure and Write file to HD
-		configure_file(
-			${abs_input_file}
-			${abs_output_file}
-			@ONLY
-			LF
-		)
-		message(STATUS "Configured: ${abs_output_file}")
-	else()
-		# otherwise do a simple copy
-		configure_file(
-			${abs_input_file}
-			${abs_output_file}
-			COPYONLY
-		)
-		message(STATUS "Copied    : ${abs_output_file}")
-	endif()
+    if(DO_CONFIGURE_FILE)
+        # Configure and Write file to HD
+        configure_file(
+            ${abs_input_file}
+            ${abs_output_file}
+            @ONLY
+            LF
+        )
+        message(STATUS "Configured: ${abs_output_file}")
+    else()
+        # otherwise do a simple copy
+        configure_file(
+            ${abs_input_file}
+            ${abs_output_file}
+            COPYONLY
+        )
+        message(STATUS "Copied    : ${abs_output_file}")
+    endif()
 
 endforeach()
