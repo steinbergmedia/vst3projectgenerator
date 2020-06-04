@@ -677,7 +677,7 @@ void Controller::createProject ()
 
 	if (_sdkPathStr.empty () || !validateVSTSDKPath (_sdkPathStr))
 	{
-		showSimpleAlert ("Cannot create Project", "The VST3 SDK Path is not correct.");
+		showSimpleAlert ("Cannot create Project", "The VST3 SDK path is not correct.");
 		return;
 	}
 	auto sdkPathStr = _sdkPathStr.getString ();
@@ -689,7 +689,7 @@ void Controller::createProject ()
 	}
 	if (pluginNameStr.empty ())
 	{
-		showSimpleAlert ("Cannot create Project", "You need to specify a name for your plugin.");
+		showSimpleAlert ("Cannot create Project", "You need to specify a name for your plug-in.");
 		return;
 	}
 	if (pluginBundleIDStr.empty ())
