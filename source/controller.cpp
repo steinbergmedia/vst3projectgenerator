@@ -46,7 +46,7 @@ constexpr auto CMakeExecutableName = "cmake";
 
 //------------------------------------------------------------------------
 constexpr auto CMakeWebPageURL = "https://cmake.org";
-constexpr auto SteinbergSDKWebPageURL = "https://www.steinberg.net/en/company/developers.html";
+constexpr auto SteinbergSDKWebPageURL = "https://www.steinberg.net/vst3sdk";
 constexpr auto GitHubSDKWebPageURL = "https://github.com/steinbergmedia/vst3sdk";
 constexpr auto VST3SDKPortalPageURL = "https://developer.steinberg.help/display/VST";
 
@@ -549,7 +549,8 @@ void Controller::downloadVSTSDK ()
 	AlertBoxForWindowConfig alert;
 	alert.window = IApplication::instance ().getWindows ().front ();
 	alert.headline = "Which SDK to download?";
-	alert.description = "TODO: description";
+	alert.description =
+	    "You can choose between the \"Proprietary Steinberg VST 3\" or the \"Open-source GPLv3\" license (dual-license) depending on how you like to distribute your VST 3 plug-in.";
 	alert.defaultButton = "Commercial";
 	alert.secondButton = "Open Source";
 	alert.thirdButton = "Cancel";
