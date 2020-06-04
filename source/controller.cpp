@@ -227,7 +227,8 @@ Controller::Controller ()
 
 	model = UIDesc::ModelBindingCallbacks::make ();
 	/* UI only */
-	model->addValue (Value::makeStringValue (valueIdAppVersion, BUILD_STRING));
+	model->addValue (Value::makeStringValue (
+	    valueIdAppVersion, UTF8String ("Version ") + MAJOR_VERSION_STR "." SUB_VERSION_STR));
 
 	model->addValue (Value::makeStringListValue (
 	    valueIdTabBar, {"Welcome", "Create Plug-in Project", "Preferences"}));

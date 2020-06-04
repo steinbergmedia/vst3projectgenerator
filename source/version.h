@@ -5,7 +5,7 @@
 #define MAJOR_VERSION_STR "2020"
 #define MAJOR_VERSION_INT 2020
 
-#define SUB_VERSION_STR "6"
+#define SUB_VERSION_STR "06"
 #define SUB_VERSION_INT 6
 
 #define RELEASE_NUMBER_STR "0"
