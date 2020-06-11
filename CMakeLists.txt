@@ -42,6 +42,8 @@ set(${target}_sources
   "source/process.h"
   "source/dimmviewcontroller.cpp"
   "source/dimmviewcontroller.h"
+  "source/linkcontroller.cpp"
+  "source/linkcontroller.h"
   "source/valuelistenerviewcontroller.h"
   "source/scriptscrollviewcontroller.cpp"
   "source/scriptscrollviewcontroller.h"
@@ -51,6 +53,7 @@ set(${target}_sources
 
 set(${target}_resources
   "resource/Window.uidesc"
+  "resource/links.json"
 )
 
 ##########################################################################################

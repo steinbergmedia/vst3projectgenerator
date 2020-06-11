@@ -44,6 +44,8 @@ static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
 static constexpr auto valueIdCopyScriptOutput = "Copy Script Output";
 
+static constexpr auto valueIdLinkList = "Link List";
+
 static constexpr auto valueIdAppVersion = "App Version";
 
 //------------------------------------------------------------------------

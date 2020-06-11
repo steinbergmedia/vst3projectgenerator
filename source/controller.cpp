@@ -3,6 +3,7 @@
 
 #include "controller.h"
 #include "dimmviewcontroller.h"
+#include "linkcontroller.h"
 #include "process.h"
 #include "scriptscrollviewcontroller.h"
 #include "version.h"
@@ -327,6 +328,19 @@ Controller::Controller ()
 		                 verifyCMakeInstallation ();
 		                 v.performEdit (0.);
 	                 }));
+
+	// Link List
+	model->addValue (
+	    Value::makeStringListValue (valueIdLinkList, LinkController::instance ().getTitles ()),
+	    UIDesc::ValueCalls::onEndEdit ([this] (IValue& v) {
+		    auto index = v.getConverter ().normalizedToPlain (v.getValue ());
+		    const auto& urlList = LinkController::instance ().getUrls ();
+		    if (index >= 0 && index < urlList.size ())
+		    {
+			    openURL (urlList[index].getString ());
+		    }
+		    v.performEdit (0.);
+	    }));
 
 	/* Valid Path values */
 	model->addValue (Value::make (valueIdValidVSTSDKPath));
