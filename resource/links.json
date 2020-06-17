@@ -1,5 +1,9 @@
 [
 	{
+		"title": "VST 3 Official Portal",
+		"url": "https://developer.steinberg.help/display/VST"
+	},
+	{
 		"title": "SDK Forum",
 		"url": "https://sdk.steinberg.net/"
 	},
