@@ -49,7 +49,6 @@ constexpr auto CMakeExecutableName = "cmake";
 constexpr auto CMakeWebPageURL = "https://cmake.org";
 constexpr auto SteinbergSDKWebPageURL = "https://www.steinberg.net/vst3sdk";
 constexpr auto GitHubSDKWebPageURL = "https://github.com/steinbergmedia/vst3sdk";
-constexpr auto VST3SDKPortalPageURL = "https://developer.steinberg.help/display/VST";
 
 //------------------------------------------------------------------------
 constexpr auto valueIdWelcomeDownloadSDK = "Welcome Download SDK";
@@ -332,7 +331,7 @@ Controller::Controller ()
 	// Link List
 	model->addValue (
 	    Value::makeStringListValue (valueIdLinkList, LinkController::instance ().getTitles ()),
-	    UIDesc::ValueCalls::onEndEdit ([this] (IValue& v) {
+	    UIDesc::ValueCalls::onEndEdit ([] (IValue& v) {
 		    auto index = v.getConverter ().normalizedToPlain (v.getValue ());
 		    const auto& urlList = LinkController::instance ().getUrls ();
 		    if (index >= 0 && index < urlList.size ())
