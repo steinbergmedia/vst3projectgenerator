@@ -337,7 +337,7 @@ Controller::Controller ()
 		    const auto& urlList = LinkController::instance ().getUrls ();
 		    if (index >= 0 && index < urlList.size ())
 		    {
-			    openURL (urlList[index].getString ());
+			    openURL (urlList[static_cast<uint32_t> (index)].getString ());
 		    }
 		    v.performEdit (0.);
 	    }));
@@ -676,7 +676,7 @@ void Controller::createProject ()
 	}
 	auto _sdkPathStr = getModelValueString (model, valueIdVSTSDKPath);
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath).getString ();
-	auto pluginOutputPathStr = getModelValueString (model, valueIdPluginPath).getString ();
+	auto _pluginOutputPathStr = getModelValueString (model, valueIdPluginPath);
 	auto vendorStr = getModelValueString (model, valueIdVendorName).getString ();
 	auto vendorHomePageStr = getModelValueString (model, valueIdVendorURL).getString ();
 	auto emailStr = getModelValueString (model, valueIdVendorEMail).getString ();
@@ -698,11 +698,13 @@ void Controller::createProject ()
 	}
 	auto sdkPathStr = _sdkPathStr.getString ();
 	unixfyPath (sdkPathStr);
-	if (pluginOutputPathStr.empty ())
+	if (_pluginOutputPathStr.empty ())
 	{
 		showSimpleAlert ("Cannot create Project", "You need to specify an output directory.");
 		return;
 	}
+	auto pluginOutputPathStr = _pluginOutputPathStr.getString ();
+	unixfyPath (pluginOutputPathStr);
 	if (pluginNameStr.empty ())
 	{
 		showSimpleAlert ("Cannot create Project", "You need to specify a name for your plug-in.");
@@ -710,7 +712,8 @@ void Controller::createProject ()
 	}
 	if (pluginBundleIDStr.empty ())
 	{
-		showSimpleAlert ("Cannot create Project", "You need to specify a bundle ID.");
+		showSimpleAlert ("Cannot create Project",
+		                 "You need to specify a Bundle ID (e.g. com.company.pluginame).");
 		return;
 	}
 

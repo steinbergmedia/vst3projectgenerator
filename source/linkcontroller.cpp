@@ -33,7 +33,7 @@ LinkController::LinkController ()
 	fs.seek (0, SeekableStream::SeekMode::kSeekSet);
 
 	Buffer<char> buffer (fileSize);
-	fs.readRaw (buffer.data (), buffer.size ());
+	fs.readRaw (buffer.data (), static_cast<uint32_t> (buffer.size ()));
 
 	try
 	{
