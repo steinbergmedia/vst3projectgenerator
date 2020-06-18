@@ -12,6 +12,7 @@ include(SMTG_PrintGeneratorCopyrightHeader)
 include(SMTG_GeneratePluginUuids)
 include(SMTG_GeneratorSpecifics)
 include(SMTG_VendorSpecifics)
+include(SMTG_CodeSnippets)
 
 smtg_print_generator_copyright_header()
 smtg_check_system()
