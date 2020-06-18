@@ -9,6 +9,9 @@ setupPlatformToolset()
 setupCoreAudioSupport()
 setupAaxSupport()
 
+# add the validator to check the plug-in
+add_subdirectory(${vst3sdk_SOURCE_DIR}/public.sdk/samples/vst-hosting/validator ${vst3sdk_BINARY_DIR}/validator)
+
 set(target "@SMTG_CMAKE_PROJECT_NAME@")
 
 set(sources
