@@ -14,7 +14,7 @@
 	<key>CFBundleName</key>
 	<string>VST3 Project Generator</string>
 	<key>CFBundlePackageType</key>
-	<string>BNDL</string>
+	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>SHORT_BUNDLE_VERSION</string>
 	<key>CFBundleVersion</key>
