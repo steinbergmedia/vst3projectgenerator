@@ -147,10 +147,7 @@ void Process::ArgumentList::addPath (const std::string& str)
 //------------------------------------------------------------------------
 void Process::ArgumentList::add (const std::string& str)
 {
-	if (str.find (' ') != std::string::npos)
-		addPath (str);
-	else
-		args.emplace_back (str);
+	args.emplace_back (str);
 }
 
 //------------------------------------------------------------------------

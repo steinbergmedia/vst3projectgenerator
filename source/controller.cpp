@@ -746,9 +746,8 @@ void Controller::createProject ()
 		if (!pluginClassNameStr.empty ())
 			args.add ("-DSMTG_PLUGIN_CLASS_NAME_CLI=\"" + pluginClassNameStr + "\"");
 
-		// DSMTG_PLUGIN_BUNDLE_NAME_CLI
 		args.add ("-P");
-		args.add (scriptPath->getString ());
+		args.addPath (scriptPath->getString ());
 
 		if (auto process = Process::create (cmakePathStr))
 		{
@@ -809,7 +808,7 @@ void Controller::runProjectCMake (const std::string& path)
 
 		Process::ArgumentList args;
 		args.add ("-G");
-		args.add (generator.getString ());
+		args.addPath (generator.getString ());
 		args.add ("-S");
 		args.addPath (path);
 		args.add ("-B");
