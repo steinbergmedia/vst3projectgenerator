@@ -11,6 +11,7 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 @SMTG_PLUGIN_CLASS_NAME@Processor::@SMTG_PLUGIN_CLASS_NAME@Processor ()
 {
+	//--- connect our processor with the wanted controller
 	setControllerClass (k@SMTG_PLUGIN_CLASS_NAME@ControllerUID);
 }
 
@@ -29,6 +30,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* cont
 		return result;
 	}
 
+	//--- create Audio IO ------
 	@SMTG_EFFECT_AUDIO_BUSSES_CODE_SNIPPET@
 
 	@SMTG_EFFECT_EVENT_BUSSES_CODE_SNIPPET@
@@ -39,12 +41,14 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* cont
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::terminate ()
 {
+	//---do not forget to call parent ------
 	return AudioEffect::terminate ();
 }
 
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setActive (TBool state)
 {
+	//--- called when the Plug-in is enable/disable (On/Off) -----
 	return AudioEffect::setActive (state);
 }
 
@@ -78,6 +82,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData&
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setupProcessing (Vst::ProcessSetup& newSetup)
 {
+	//--- called before any processing ----
 	return AudioEffect::setupProcessing (newSetup);
 }
 
