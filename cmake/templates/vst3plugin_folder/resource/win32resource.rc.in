@@ -42,4 +42,3 @@ BEGIN
         VALUE "Translation", 0x400, 1252
     END
 END
-

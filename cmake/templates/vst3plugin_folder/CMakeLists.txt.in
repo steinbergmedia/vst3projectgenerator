@@ -9,6 +9,10 @@ setupPlatformToolset()
 setupCoreAudioSupport()
 setupAaxSupport()
 
+# VSTGUI Wanted 
+#set(VSTGUI_ROOT "${vst3sdk_SOURCE_DIR}")
+#setupVstGuiSupport()
+
 # add the validator to check the plug-in
 add_subdirectory(${vst3sdk_SOURCE_DIR}/public.sdk/samples/vst-hosting/validator ${vst3sdk_BINARY_DIR}/validator)
 
