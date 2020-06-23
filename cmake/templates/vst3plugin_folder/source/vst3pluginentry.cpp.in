@@ -1,4 +1,6 @@
+//------------------------------------------------------------------------
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
 
 #include "@SMTG_PREFIX_FOR_FILENAMES@processor.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
@@ -48,7 +50,7 @@ BEGIN_FACTORY_DEF ("@SMTG_VENDOR_NAME@",
 				kVstAudioEffectClass,	// the component category (do not changed this)
 				stringPluginName,		// here the Plug-in name (to be changed)
 				Vst::kDistributable,	// means that component and controller could be distributed on different computers
-				@SMTG_PLUGIN_CLASS_NAME@VST3Category,		// Subcategory for this Plug-in (to be changed)
+				@SMTG_PLUGIN_CLASS_NAME@VST3Category, // Subcategory for this Plug-in (to be changed)
 				FULL_VERSION_STR,		// Plug-in version (to be changed)
 				kVstVersionString,		// the VST 3 SDK version (do not changed this, use always this define)
 				@SMTG_PLUGIN_CLASS_NAME@Processor::createInstance)	// function pointer called when this component should be instantiated

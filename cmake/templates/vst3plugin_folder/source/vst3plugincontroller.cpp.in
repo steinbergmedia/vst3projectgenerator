@@ -1,4 +1,6 @@
+//------------------------------------------------------------------------
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
 
 #include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
 
@@ -11,11 +13,16 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* context)
 {
+	// Here the Plug-in will be instanciated
+
+	//---do not forget to call parent ------
 	tresult result = EditControllerEx1::initialize (context);
 	if (result != kResultOk)
 	{
 		return result;
 	}
+
+	// Here you could register some parameters
 
 	return result;
 }
@@ -23,6 +30,9 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* con
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::terminate ()
 {
+	// Here the Plug-in will be de-instanciated, last possibility to remove some memory!
+
+	//---do not forget to call parent ------
 	return EditControllerEx1::terminate ();
 }
 
@@ -48,6 +58,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setState (IBStream* state
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getState (IBStream* state)
 {
 	// Here you are asked to deliver the state of the controller (if needed)
+	// Note: the real state of your plug-in is saved in the processor
 
 	return kResultTrue;
 }

@@ -1,7 +1,11 @@
+//------------------------------------------------------------------------
 // @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
 
 #include "@SMTG_PREFIX_FOR_FILENAMES@processor.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
+
+#include "base/source/fstreamer.h"
 
 using namespace Steinberg;
 
@@ -11,7 +15,7 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 @SMTG_PLUGIN_CLASS_NAME@Processor::@SMTG_PLUGIN_CLASS_NAME@Processor ()
 {
-	//--- connect our processor with the wanted controller
+	//--- set the wanted controller for our processor
 	setControllerClass (k@SMTG_PLUGIN_CLASS_NAME@ControllerUID);
 }
 
@@ -22,6 +26,8 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* context)
 {
+	// Here the Plug-in will be instanciated
+	
 	//---always initialize the parent-------
 	tresult result = AudioEffect::initialize (context);
 	// if everything Ok, continue
@@ -41,6 +47,8 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* cont
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::terminate ()
 {
+	// Here the Plug-in will be de-instanciated, last possibility to remove some memory!
+	
 	//---do not forget to call parent ------
 	return AudioEffect::terminate ();
 }
@@ -98,6 +106,24 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::canProcessSampleSize (int3
 		return kResultTrue; */
 
 	return kResultFalse;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setState (IBStream* state)
+{
+	// called when we load a preset, the model has to be reloaded
+	IBStreamer streamer (state, kLittleEndian);
+	
+	return kResultOk;
+}
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::getState (IBStream* state)
+{
+	// here we need to save the model
+	IBStreamer streamer (state, kLittleEndian);
+
+	return kResultOk;
 }
 
 //------------------------------------------------------------------------
