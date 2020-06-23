@@ -45,8 +45,8 @@ public:
 	Steinberg::tresult PLUGIN_API process (Steinberg::Vst::ProcessData& data) SMTG_OVERRIDE;
 		
 	/** For persistence */
-	Steinberg::tresult PLUGIN_API setState (IBStream* state) SMTG_OVERRIDE;
-	Steinberg::tresult PLUGIN_API getState (IBStream* state) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API setState (Steinberg::IBStream* state) SMTG_OVERRIDE;
+	Steinberg::tresult PLUGIN_API getState (Steinberg::IBStream* state) SMTG_OVERRIDE;
 
 //------------------------------------------------------------------------
 protected:
