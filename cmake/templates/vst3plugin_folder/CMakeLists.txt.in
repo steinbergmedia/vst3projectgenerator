@@ -14,7 +14,7 @@ add_subdirectory(${vst3sdk_SOURCE_DIR}/public.sdk/samples/vst-hosting/validator 
 
 set(target "@SMTG_CMAKE_PROJECT_NAME@")
 
-set(sources
+smtg_add_vst3plugin(${target}     
     source/version.h
     source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
     source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
@@ -23,8 +23,6 @@ set(sources
     source/@SMTG_PREFIX_FOR_FILENAMES@controller.cpp
     source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp
 )
-
-smtg_add_vst3plugin(${target} ${sources})
 
 add_subdirectory(${vst3sdk_SOURCE_DIR}/base ${vst3sdk_BINARY_DIR}/base)
 add_subdirectory(${vst3sdk_SOURCE_DIR}/pluginterfaces ${vst3sdk_BINARY_DIR}/pluginterfaces)
