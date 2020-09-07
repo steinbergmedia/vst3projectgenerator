@@ -6,6 +6,7 @@
 #include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
 
 #include "base/source/fstreamer.h"
+#include "pluginterfaces/vst/ivstparameterchanges.h"
 
 using namespace Steinberg;
 

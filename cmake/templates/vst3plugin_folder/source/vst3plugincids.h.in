@@ -5,6 +5,7 @@
 #pragma once
 
 #include "pluginterfaces/base/funknown.h"
+#include "pluginterfaces/vst/vsttypes.h"
 
 namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
