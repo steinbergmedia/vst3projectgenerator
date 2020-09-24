@@ -485,8 +485,14 @@ void Controller::gatherCMakeInformation ()
 		});
 		if (!result)
 		{
-			// TODO: show error!
 			Value::performSingleEdit (*scriptRunningValue, 0.);
+			Value::performSinglePlainEdit (*model->getValue (valueIdValidCMakePath), 0);
+			Async::schedule (Async::mainQueue (), [this] () {
+				showSimpleAlert (
+				    "Failure",
+				    "Could not check cmake capabilities. Check your cmake executable path!");
+				Value::performSinglePlainEdit (*model->getValue (valueIdTabBar), 0);
+			});
 		}
 	}
 }
