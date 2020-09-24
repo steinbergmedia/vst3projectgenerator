@@ -486,6 +486,7 @@ void Controller::gatherCMakeInformation ()
 		if (!result)
 		{
 			// TODO: show error!
+			Value::performSingleEdit (*scriptRunningValue, 0.);
 		}
 	}
 }
@@ -841,6 +842,7 @@ void Controller::runProjectCMake (const std::string& path)
 		if (!result)
 		{
 			// TODO: Show error
+			Value::performSingleEdit (*scriptRunningValue, 0.);
 		}
 	}
 }
