@@ -4,6 +4,7 @@
 
 #include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
+@SMTG_INCLUDE_VSTGUI_HEADER_CODE_SNIPPET@
 
 using namespace Steinberg;
 
@@ -70,7 +71,7 @@ IPlugView* PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::createView (FIDString 
 	// Here the Host wants to open your editor (if you have one)
 	if (FIDStringsEqual (name, Vst::ViewType::kEditor))
 	{
-		// create your editor here and return a IPlugView ptr of it
+		@SMTG_CREATE_VSTGUI_EDITOR_CODE_SNIPPET@
 	}
 	return nullptr;
 }
