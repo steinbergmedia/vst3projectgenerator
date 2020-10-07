@@ -345,6 +345,9 @@ Controller::Controller ()
 	model->addValue (Value::make (valueIdValidVSTSDKPath));
 	model->addValue (Value::make (valueIdValidCMakePath));
 
+	/* Use VSTGUI by default ON */
+	model->addValue (Value::make (valueIdUseVSTGUI, 1));
+
 	// sub controllers
 	addCreateViewControllerFunc (
 	    "ScriptOutputController",
@@ -697,6 +700,8 @@ void Controller::createProject ()
 	    pluginTypeValue->getConverter ().normalizedToPlain (pluginTypeValue->getValue ()));
 	auto pluginTypeStr = pluginTypeStrings[pluginTypeIndex];
 
+	auto pluginUseVSTGUI = model->getValue (valueIdUseVSTGUI)->getValue () != 0;
+
 	if (_sdkPathStr.empty () || !validateVSTSDKPath (_sdkPathStr))
 	{
 		showSimpleAlert ("Cannot create Project", "The VST3 SDK path is not correct.");
@@ -752,6 +757,11 @@ void Controller::createProject ()
 			args.add ("-DSMTG_VENDOR_NAMESPACE_CLI=\"" + vendorNamspaceStr + "\"");
 		if (!pluginClassNameStr.empty ())
 			args.add ("-DSMTG_PLUGIN_CLASS_NAME_CLI=\"" + pluginClassNameStr + "\"");
+
+		if (pluginUseVSTGUI)
+			args.add ("-DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON");
+		else
+			args.add ("-DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=OFF");
 
 		args.add ("-P");
 		args.addPath (scriptPath->getString ());
@@ -823,6 +833,15 @@ void Controller::runProjectCMake (const std::string& path)
 		buildDir += PlatformPathDelimiter;
 		buildDir += "build";
 		args.addPath (buildDir);
+
+		args.add ("-DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF");
+		args.add ("-DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF");
+		args.add ("-DSMTG_CREATE_PLUGIN_LINK=ON");
+
+		if (auto pluginUseVSTGUI = model->getValue (valueIdUseVSTGUI)->getValue () != 0)
+			args.add ("-DSMTG_ADD_VSTGUI=ON");
+		else
+			args.add ("-DSMTG_ADD_VSTGUI=OFF");
 
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n" + cmakePathStr + " ");
 		for (const auto& a : args.args)
