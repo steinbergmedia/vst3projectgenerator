@@ -16,7 +16,7 @@ if(SMTG_ENABLE_VSTGUI_SUPPORT)
     )
     set(SMTG_CREATE_VSTGUI_EDITOR_CODE_SNIPPET
         "// create your editor here and return a IPlugView ptr of it
-		auto* view = new VSTGUI::VST3Editor (this, \"view\", \"${SMTG_PREFIX_FOR_FILENAMES}.uidesc\");
+		auto* view = new VSTGUI::VST3Editor (this, \"view\", \"${SMTG_PREFIX_FOR_FILENAMES}editor.uidesc\");
 		return view;"
     )
 else()
