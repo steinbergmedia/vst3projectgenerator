@@ -26,13 +26,13 @@ smtg_add_vst3plugin(@SMTG_CMAKE_PROJECT_NAME@
 if(SMTG_ADD_VSTGUI)
 	target_sources(@SMTG_CMAKE_PROJECT_NAME@
 		PRIVATE
-			resource/@SMTG_PREFIX_FOR_FILENAMES@.uidesc
+			resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc
 	)
     target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
         PRIVATE
             vstgui_support
     )
-    smtg_add_vst3_resource(@SMTG_CMAKE_PROJECT_NAME@ "resource/@SMTG_PREFIX_FOR_FILENAMES@.uidesc")
+    smtg_add_vst3_resource(@SMTG_CMAKE_PROJECT_NAME@ "resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc")
 endif()
 # -------------------
 
