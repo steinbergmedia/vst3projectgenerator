@@ -84,6 +84,7 @@ private:
 	bool verifyCMakeInstallation ();
 	void showCMakeNotInstalledWarning ();
 	void gatherCMakeInformation ();
+	void onCMakeCapabilityCheckError ();
 
 	void createProject ();
 	void runProjectCMake (const std::string& path);

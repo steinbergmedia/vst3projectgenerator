@@ -437,6 +437,17 @@ void Controller::onShow (const IWindow& window)
 }
 
 //------------------------------------------------------------------------
+void Controller::onCMakeCapabilityCheckError ()
+{
+	Value::performSinglePlainEdit (*model->getValue (valueIdValidCMakePath), 0);
+	Async::schedule (Async::mainQueue (), [this] () {
+		showSimpleAlert ("Failure",
+		                 "Could not check cmake capabilities. Check your cmake executable path!");
+		Value::performSinglePlainEdit (*model->getValue (valueIdTabBar), 0);
+	});
+}
+
+//------------------------------------------------------------------------
 void Controller::gatherCMakeInformation ()
 {
 	auto cmakePathStr = getModelValueString (model, valueIdCMakePath);
@@ -480,7 +491,7 @@ void Controller::gatherCMakeInformation ()
 				}
 				else
 				{
-					// TODO: show error?
+					onCMakeCapabilityCheckError ();
 				}
 				Value::performSingleEdit (*scriptRunningValue, 0.);
 				process.reset ();
@@ -489,13 +500,7 @@ void Controller::gatherCMakeInformation ()
 		if (!result)
 		{
 			Value::performSingleEdit (*scriptRunningValue, 0.);
-			Value::performSinglePlainEdit (*model->getValue (valueIdValidCMakePath), 0);
-			Async::schedule (Async::mainQueue (), [this] () {
-				showSimpleAlert (
-				    "Failure",
-				    "Could not check cmake capabilities. Check your cmake executable path!");
-				Value::performSinglePlainEdit (*model->getValue (valueIdTabBar), 0);
-			});
+			onCMakeCapabilityCheckError ();
 		}
 	}
 }
