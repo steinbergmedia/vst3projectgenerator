@@ -839,10 +839,6 @@ void Controller::runProjectCMake (const std::string& path)
 		buildDir += "build";
 		args.addPath (buildDir);
 
-		args.add ("-DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF");
-		args.add ("-DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF");
-		args.add ("-DSMTG_CREATE_PLUGIN_LINK=ON");
-
 		if (auto pluginUseVSTGUI = model->getValue (valueIdUseVSTGUI)->getValue () != 0)
 			args.add ("-DSMTG_ADD_VSTGUI=ON");
 		else
