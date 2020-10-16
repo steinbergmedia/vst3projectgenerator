@@ -14,5 +14,9 @@
 	{
 		"title": "Steinberg 3rd Party Developer",
 		"url": "https://www.steinberg.net/en/company/developers.html"
+	},
+	{
+		"title": "How to Use \"VST 3 Project Generator\"",
+		"url": "https://developer.steinberg.help/display/VST/VST+3+Project+Generator"
 	}
 ]
