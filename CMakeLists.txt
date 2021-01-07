@@ -25,7 +25,7 @@ set(VSTGUI_STANDALONE ON)
 set(VSTGUI_TOOLS OFF CACHE BOOL "VSTGUI TOOLS")
 
 set(VSTGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../vstgui/vstgui" CACHE PATH "VSTGUI Path")
-set(PROJECTGENERATOR_SCRIPT_DIR "../vst3_project_generator_script" CACHE PATH "Project Generator Script Path")
+set(PROJECTGENERATOR_SCRIPT_DIR "../script" CACHE PATH "Project Generator Script Path")
 add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
