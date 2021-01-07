@@ -24,8 +24,4 @@ endif()
 
 FetchContent_MakeAvailable(vstgui)
 
-set(VSTGUI_DIR "${vstgui_SOURCE_DIR}/vstgui/" CACHE PATH "VSTGUI Path")
-message(STATUS VSTGUI_DIR=${VSTGUI_DIR})
-
 add_subdirectory(app)
-
