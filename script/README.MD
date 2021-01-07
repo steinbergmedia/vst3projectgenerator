@@ -9,9 +9,6 @@ A cmake script for generating VST 3 plug-ins using cmake's script mode.
 Execute on command line:
 
 ```console
-$ git clone https://stash.steinberg-intra.net/scm/~rhansen/vst3plugingenerator.git
-
-$ cd vst3plugingenerator
 $ cmake -P GenerateVST3Plugin.cmake
 ```
 
