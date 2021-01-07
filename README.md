@@ -4,7 +4,6 @@
 
 ```
 git clone https://github.com/steinbergmedia/vst3_project_generator.git
-git clone https://github.com/steinbergmedia/vstgui.git
 mkdir build
 cd build
 cmake -GXcode ../vst3_project_generator
