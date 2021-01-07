@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.14.0)
+
+set(vst3sdk_SOURCE_DIR @SMTG_VST3_SDK_SOURCE_DIR@)
+if(NOT vst3sdk_SOURCE_DIR)
+    message(FATAL_ERROR "Path to VST3 SDK is empty!")
+endif()
+
+project(@SMTG_CMAKE_PROJECT_NAME@)
+  
+set(SMTG_VSTGUI_ROOT "${vst3sdk_SOURCE_DIR}")
+
+add_subdirectory(${vst3sdk_SOURCE_DIR} ${PROJECT_BINARY_DIR}/vst3sdk)
+smtg_enable_vst3_sdk()
+
+smtg_add_vst3plugin(@SMTG_CMAKE_PROJECT_NAME@     
+    source/version.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@controller.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@controller.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp
+)
+
+#- VSTGUI Wanted ----
+if(SMTG_ADD_VSTGUI)
+	target_sources(@SMTG_CMAKE_PROJECT_NAME@
+		PRIVATE
+			resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc
+	)
+    target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
+        PRIVATE
+            vstgui_support
+    )
+    smtg_add_vst3_resource(@SMTG_CMAKE_PROJECT_NAME@ "resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc")
+endif()
+# -------------------
+
+smtg_add_vst3_snapshot(@SMTG_CMAKE_PROJECT_NAME@ resource/@SMTG_Processor_PLAIN_UUID@_snapshot.png)
+smtg_add_vst3_snapshot(@SMTG_CMAKE_PROJECT_NAME@ resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2.0x.png)
+
+target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
+    PRIVATE
+        sdk
+)
+
+if(SMTG_MAC)
+    smtg_set_bundle(@SMTG_CMAKE_PROJECT_NAME@ INFOPLIST 
+        "${CMAKE_CURRENT_LIST_DIR}/resource/Info.plist" 
+        PREPROCESS
+    )
+elseif(SMTG_WIN)
+    target_sources(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE 
+        resource/win32resource.rc
+    )
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT @SMTG_CMAKE_PROJECT_NAME@)
+	
+	set_target_properties(@SMTG_CMAKE_PROJECT_NAME@ PROPERTIES
+		VS_DEBUGGER_COMMAND
+			"$(ProgramW6432)/Steinberg/VST3PluginTestHost/VST3PluginTestHost.exe"
+		VS_DEBUGGER_COMMAND_ARGUMENTS
+			" --pluginfolder \"$(OutDir)\" "
+	)
+endif()
+
+
