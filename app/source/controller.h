@@ -32,6 +32,7 @@ static constexpr auto valueIdPluginClassName = "PlugIn Class Name";
 static constexpr auto valueIdPluginBundleID = "PlugIn Bundle ID";
 static constexpr auto valueIdPluginFilenamePrefix = "PlugIn Filename Prefix";
 static constexpr auto valueIdUseVSTGUI = "Use VSTGUI";
+static constexpr auto valueIdMacOSDeploymentTarget = "macOS Deployment Target";
 
 static constexpr auto valueIdChooseCMakePath = "Choose CMake Path";
 static constexpr auto valueIdChooseVSTSDKPath = "Choose VST SDK Path";

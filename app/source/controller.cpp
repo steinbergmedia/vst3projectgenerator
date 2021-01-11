@@ -291,6 +291,8 @@ Controller::Controller ()
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginClassName, ""),
 	    UIDesc::ValueCalls::onEndEdit ([] (IValue& val) { makeValidCppValueString (val); }));
+	model->addValue (Value::makeStringValue (valueIdMacOSDeploymentTarget, "10.12"),
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginPath, pluginPathPref ? *pluginPathPref : ""),
 	    UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
@@ -392,6 +394,8 @@ void Controller::storePreferences ()
 	setPreferenceStringValue (prefs, valueIdPluginPath, model->getValue (valueIdPluginPath));
 	setPreferenceStringValue (prefs, valueIdCMakeGenerators,
 	                          model->getValue (valueIdCMakeGenerators));
+	setPreferenceStringValue (prefs, valueIdMacOSDeploymentTarget,
+	                          model->getValue (valueIdMacOSDeploymentTarget));
 }
 
 //------------------------------------------------------------------------
@@ -416,6 +420,7 @@ void Controller::onScriptRunning (bool state)
 	    valueIdChoosePluginPath,
 	    valueIdCreateProject,
 	    valueIdCMakeGenerators,
+	    valueIdMacOSDeploymentTarget,
 	};
 	for (const auto& valueID : valuesToDisable)
 	{
@@ -699,6 +704,8 @@ void Controller::createProject ()
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID).getString ();
 	auto vendorNamspaceStr = getModelValueString (model, valueIdVendorNamespace).getString ();
 	auto pluginClassNameStr = getModelValueString (model, valueIdPluginClassName).getString ();
+	auto pluginMacOSDeploymentTargetStr =
+	    getModelValueString (model, valueIdMacOSDeploymentTarget).getString ();
 	auto pluginTypeValue = model->getValue (valueIdPluginType);
 	assert (pluginTypeValue);
 	auto pluginTypeIndex = static_cast<size_t> (
@@ -754,6 +761,7 @@ void Controller::createProject ()
 		args.add ("-DSMTG_CMAKE_PROJECT_NAME_CLI=\"" + cmakeProjectName + "\"");
 		args.add ("-DSMTG_PLUGIN_BUNDLE_NAME_CLI=\"" + pluginNameStr + "\"");
 		args.add ("-DSMTG_PLUGIN_IDENTIFIER_CLI=\"" + pluginBundleIDStr + "\"");
+		args.add ("-DSMTG_MACOS_DEPLOYMENT_TARGET_CLI=\"" + pluginMacOSDeploymentTargetStr + "\"");
 		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"");
 		args.add ("-DSMTG_VENDOR_HOMEPAGE_CLI=\"" + vendorHomePageStr + "\"");
 		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"");
