@@ -11,24 +11,6 @@
 
 #define stringPluginName "@SMTG_PLUGIN_NAME@"
 
-//------------------------------------------------------------------------
-//  Module init/exit
-//------------------------------------------------------------------------
-
-//------------------------------------------------------------------------
-// called after library was loaded
-bool InitModule ()
-{
-	return true;
-}
-
-//------------------------------------------------------------------------
-// called after library is unloaded
-bool DeinitModule ()
-{
-	return true;
-}
-
 using namespace Steinberg::Vst;
 using namespace @SMTG_VENDOR_NAMESPACE@;
 
