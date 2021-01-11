@@ -4,11 +4,13 @@ include(FetchContent)
 
 project(vst3_project_generator_distribution)
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
+
 # Clone vstgui
 FetchContent_Declare(
   vstgui
   GIT_REPOSITORY https://github.com/steinbergmedia/vstgui.git
-  GIT_TAG        origin/master
+  GIT_TAG        origin/develop
   GIT_SHALLOW    OFF
 )
 
@@ -21,6 +23,11 @@ if(${CMAKE_VERSION} VERSION_LESS 3.14)
         endif()
     endmacro()
 endif()
+
+set(VSTGUI_DISABLE_UNITTESTS ON)
+set(VSTGUI_STANDALONE_EXAMPLES OFF)
+set(VSTGUI_STANDALONE ON)
+set(VSTGUI_TOOLS OFF)
 
 FetchContent_MakeAvailable(vstgui)
 

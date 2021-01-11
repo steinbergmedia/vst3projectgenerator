@@ -17,18 +17,11 @@ project(vst3_project_generator)
         $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs>
     )
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
-
-set(VSTGUI_DISABLE_UNITTESTS ON)
-set(VSTGUI_STANDALONE_EXAMPLES OFF)
-set(VSTGUI_STANDALONE ON)
-set(VSTGUI_TOOLS OFF CACHE BOOL "VSTGUI TOOLS")
-
 set(VSTGUI_DIR "${vstgui_SOURCE_DIR}/vstgui" CACHE PATH "VSTGUI Path")
 message(STATUS VSTGUI_DIR=${VSTGUI_DIR})
 set(PROJECTGENERATOR_SCRIPT_DIR "../script" CACHE PATH "Project Generator Script Path")
-add_subdirectory(${VSTGUI_DIR} ${CMAKE_CURRENT_BINARY_DIR}/VSTGUI.build)
 
+list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH "${VSTGUI_DIR}/standalone/cmake/modules")
 
 set(target VST3_Project_Generator)
