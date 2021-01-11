@@ -2,11 +2,11 @@
 
 #include "version_buildnumber.h"
 
-#define MAJOR_VERSION_STR "2020"
-#define MAJOR_VERSION_INT 2020
+#define MAJOR_VERSION_STR "2021"
+#define MAJOR_VERSION_INT 2021
 
-#define SUB_VERSION_STR "10"
-#define SUB_VERSION_INT 10
+#define SUB_VERSION_STR "1"
+#define SUB_VERSION_INT 1
 
 #define RELEASE_NUMBER_STR "0"
 #define RELEASE_NUMBER_INT 0
