@@ -6,7 +6,7 @@ With this little application (Win / macOS) you can easily create a new VST 3 plu
 
 ## How to clone and build
 
-```
+```Example
 git clone https://github.com/steinbergmedia/vst3_project_generator.git
 mkdir build
 cd build
