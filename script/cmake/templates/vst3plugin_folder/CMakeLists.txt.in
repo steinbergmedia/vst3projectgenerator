@@ -49,6 +49,11 @@ if(SMTG_MAC)
         "${CMAKE_CURRENT_LIST_DIR}/resource/Info.plist" 
         PREPROCESS
     )
+    set_target_properties(@SMTG_CMAKE_PROJECT_NAME@ PROPERTIES
+        XCODE_GENERATE_SCHEME YES
+        XCODE_SCHEME_EXECUTABLE "/Applications/VST3PluginTestHost.app"
+        XCODE_SCHEME_ARGUMENTS "--pluginfolder;$(BUILT_PRODUCTS_DIR)"
+    )
 elseif(SMTG_WIN)
     target_sources(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE 
         resource/win32resource.rc
