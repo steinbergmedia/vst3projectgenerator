@@ -11,7 +11,7 @@ FetchContent_Declare(
   vstgui
   GIT_REPOSITORY https://github.com/steinbergmedia/vstgui.git
   GIT_TAG        origin/develop
-  GIT_SHALLOW    OFF
+  GIT_SHALLOW    ON
 )
 
 if(${CMAKE_VERSION} VERSION_LESS 3.14)
