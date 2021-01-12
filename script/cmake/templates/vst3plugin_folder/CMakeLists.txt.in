@@ -63,7 +63,7 @@ elseif(SMTG_WIN)
     
         smtg_set_debug_executable(@SMTG_CMAKE_PROJECT_NAME@
             "$(ProgramW6432)/Steinberg/VST3PluginTestHost/VST3PluginTestHost.exe"
-            " --pluginfolder \"$(OutDir)\" "
+            "--pluginfolder \"$(OutDir)/\""
         )
     endif()
 endif()
