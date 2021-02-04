@@ -87,7 +87,7 @@
 		},
 		"custom": {
 			"UIDescFilePath": {
-				"path": "/Volumes/VSTSDK/stash/vst3_project_generator/app/resource/Window.uidesc"
+				"path": "/Volumes/DevPluginSet/stash/vst3_project_generator/app/resource/Window.uidesc"
 			},
 			"UIGridController": {
 				"Grids": "1x 1,5x 5,10x 10,12x 12,15x 15",
@@ -227,7 +227,7 @@
 							"text-inset": "0, 0",
 							"text-rotation": "0",
 							"text-shadow-offset": "1, 1",
-							"title": "Version 2020.10",
+							"title": "Version 2021.1",
 							"transparent": "true",
 							"value-precision": "2",
 							"wants-focus": "false",
@@ -1129,6 +1129,7 @@
 							"title": "Welcome to the VST3 SDK Project Generator!",
 							"transparent": "true",
 							"value-precision": "2",
+							"vertical-centered": "false",
 							"wants-focus": "false",
 							"wheel-inc-value": "0.1"
 						}
@@ -1685,13 +1686,12 @@
 									"style-no-text": "false",
 									"style-round-rect": "false",
 									"style-shadow-text": "false",
-									"sub-controller": "SyncProjectAndClassNameController",
 									"text-alignment": "left",
 									"text-inset": "5, 0",
 									"text-rotation": "0",
 									"text-shadow-offset": "1, 1",
 									"title": "10.12",
-									"tooltip": "Plug-in Name",
+									"tooltip": "macOS deployment target",
 									"transparent": "false",
 									"value-precision": "2",
 									"wants-focus": "true",
@@ -2267,6 +2267,7 @@
 											"text-shadow-offset": "1, 1",
 											"transparent": "false",
 											"value-precision": "2",
+											"vertical-centered": "false",
 											"wants-focus": "false",
 											"wheel-inc-value": "0.1"
 										}
