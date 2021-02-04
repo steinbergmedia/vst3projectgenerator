@@ -971,10 +971,20 @@ VSTGUI::Optional<UTF8String> Controller::findCMakePath (const StringList& envPat
 		}
 	}
 #if !WINDOWS
-	std::string path = "/usr/local/bin/cmake";
-	std::ifstream stream (path);
-	if (stream.is_open ())
-		return {std::move (path)};
+	{
+		std::string path = "/usr/local/bin/cmake";
+		std::ifstream stream (path);
+		if (stream.is_open ())
+			return {std::move (path)};
+	}
+#endif
+#if MAC
+	{
+		std::string path = "/Applications/CMake.app/Contents/bin/cmake";
+		std::ifstream stream (path);
+		if (stream.is_open ())
+			return {std::move (path)};
+	}
 #endif
 	return {};
 }
