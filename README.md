@@ -17,3 +17,7 @@ cmake --build .
 ## Project Structure
 
 The VST 3 Project Generator repository contains an app that uses VSTGUI and a cmake script that the app calls.
+
+## Online Documentation
+
+Please visit the [VST 3 Project Generator](https://developer.steinberg.help/display/VST/VST+3+Project+Generator).
