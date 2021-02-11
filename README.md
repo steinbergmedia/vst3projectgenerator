@@ -24,4 +24,4 @@ Please visit the [VST 3 Project Generator](https://developer.steinberg.help/disp
 
 ## License & Usage guidelines
 
-More details are found at [www.steinberg.net/sdklicenses_vst3](http://www.steinberg.net/sdklicenses_vst3)
+More details are found at [license](https://forums.steinberg.net/t/vst-3-sdk-public-sdk-license/695592).
