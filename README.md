@@ -21,3 +21,7 @@ The VST 3 Project Generator repository contains an app that uses VSTGUI and a cm
 ## Online Documentation
 
 Please visit the [VST 3 Project Generator](https://developer.steinberg.help/display/VST/VST+3+Project+Generator).
+
+## License & Usage guidelines
+
+More details are found at [www.steinberg.net/sdklicenses_vst3](http://www.steinberg.net/sdklicenses_vst3)
