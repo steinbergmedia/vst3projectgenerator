@@ -103,6 +103,20 @@ if(CMAKE_HOST_APPLE)
     XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "$<$<CONFIG:Debug>:YES>$<$<CONFIG:Release>:NO>"
     XCODE_GENERATE_SCHEME YES
   )
+  #make sure the vstgui libraries are build as universal binary
+  set_target_properties(vstgui PROPERTIES
+    XCODE_ATTRIBUTE_ARCHS "$(ARCHS_STANDARD_64_BIT)"
+    XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "$<$<CONFIG:Debug>:YES>$<$<CONFIG:Release>:NO>"
+  )
+  set_target_properties(vstgui_uidescription PROPERTIES
+    XCODE_ATTRIBUTE_ARCHS "$(ARCHS_STANDARD_64_BIT)"
+    XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "$<$<CONFIG:Debug>:YES>$<$<CONFIG:Release>:NO>"
+  )
+  set_target_properties(vstgui_standalone PROPERTIES
+    XCODE_ATTRIBUTE_ARCHS "$(ARCHS_STANDARD_64_BIT)"
+    XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "$<$<CONFIG:Debug>:YES>$<$<CONFIG:Release>:NO>"
+  )
+  
 elseif(MSVC)
   target_link_options(${target}
     PRIVATE /MAP /DEBUG
