@@ -7,10 +7,10 @@ With this little application (Win / macOS) you can easily create a new VST 3 plu
 ## How to clone and build
 
 ```Example
-git clone https://github.com/steinbergmedia/vst3_project_generator.git
+git clone https://github.com/steinbergmedia/vst3projectgenerator.git
 mkdir build
 cd build
-cmake -GXcode ../vst3_project_generator
+cmake -GXcode ../vst3projectgenerator
 cmake --build .
 ```
 
