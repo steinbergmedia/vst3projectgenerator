@@ -4,7 +4,7 @@ on: [push]
 
 env:
   build-dir: build
-  build-type: Debug
+  build-type: Release
 
 jobs:
   build:
