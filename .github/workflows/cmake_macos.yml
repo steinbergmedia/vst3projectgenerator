@@ -26,4 +26,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: VST3_Project_Generator
-        path: '${{github.workspace}}/${{env.build-dir}}/${{env.build-type}}/VST3_Project_Generator'
+        path: '${{github.workspace}}/${{env.build-dir}}/${{env.build-type}}/VST3_Project_Generator.app'
