@@ -18,3 +18,9 @@ jobs:
         source-dir: '${{github.workspace}}'
         build-dir: '${{github.workspace}}/build'
         build-type: 'Debug'
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: win32-project_generator
+        path: '${{github.workspace}}/build/Debug/VST3_Project_Generator'
+ 
