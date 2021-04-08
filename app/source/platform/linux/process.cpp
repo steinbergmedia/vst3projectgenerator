@@ -69,10 +69,11 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 		Process::CallbackParams params;
 		
 		constexpr size_t kBufferSize = 256;
-		char plainBuffer[kBufferSize];
-		if (fgets (plainBuffer, sizeof(plainBuffer), pImpl->handle) != 0)
+		char plainBuffer[kBufferSize] = {0};
+		if (fgets (plainBuffer, sizeof (plainBuffer), pImpl->handle) != NULL)
 		{
-			params.buffer.assign (plainBuffer, plainBuffer + kBufferSize);
+			// plainBuffer[255] is '\0', hence -1
+			params.buffer.assign (std::begin (plainBuffer), std::end (plainBuffer) - 1);
 		}
 		else
 		{
@@ -108,7 +109,7 @@ void Process::ArgumentList::add (const std::string& str)
 bool openURL (const std::string& url)
 {
 	const std::string command = "xdg-open " + url;
-	system(command.data());
+	system (command.data ());
 	return true;
 }
 
