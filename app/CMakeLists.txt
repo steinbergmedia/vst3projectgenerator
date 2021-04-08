@@ -69,6 +69,12 @@ elseif(MSVC)
     "source/platform/win32/process.cpp"
     "source/platform/mac"
   )
+elseif(UNIX)
+  set(${target}_sources 
+    ${${target}_sources}
+    "source/platform/linux/process.cpp"
+    "source/platform/linux"
+  )
 endif()
 
 ##########################################################################################
