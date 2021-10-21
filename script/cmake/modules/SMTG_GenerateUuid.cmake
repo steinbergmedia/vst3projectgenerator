@@ -7,8 +7,8 @@ macro(smtg_make_uuid SHA1_UUID PREFIX)
     string(SUBSTRING ${SHA1_UUID} 24 8 SMTG_${PREFIX}_UUID_PART_3)
 
     set(SMTG_${PREFIX}_UUID "0x${SMTG_${PREFIX}_UUID_PART_0}, 0x${SMTG_${PREFIX}_UUID_PART_1}, 0x${SMTG_${PREFIX}_UUID_PART_2}, 0x${SMTG_${PREFIX}_UUID_PART_3}")
-	set(SMTG_${PREFIX}_PLAIN_UUID "${SMTG_${PREFIX}_UUID_PART_0}${SMTG_${PREFIX}_UUID_PART_1}${SMTG_${PREFIX}_UUID_PART_2}${SMTG_${PREFIX}_UUID_PART_3}")
-endmacro()
+    set(SMTG_${PREFIX}_PLAIN_UUID "${SMTG_${PREFIX}_UUID_PART_0}${SMTG_${PREFIX}_UUID_PART_1}${SMTG_${PREFIX}_UUID_PART_2}${SMTG_${PREFIX}_UUID_PART_3}")
+endmacro(smtg_make_uuid)
 
 macro(smtg_generate_uuid PREFIX)
     string(RANDOM SMTG_RAND_NUMBER)
@@ -30,4 +30,4 @@ macro(smtg_generate_uuid PREFIX)
         ${SHA1_UUID}
     )
     smtg_make_uuid(${SHA1_UUID} ${PREFIX})
-endmacro()
+endmacro(smtg_generate_uuid)

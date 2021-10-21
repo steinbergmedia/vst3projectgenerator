@@ -2,20 +2,20 @@
 cmake_minimum_required(VERSION 3.12)
 project(vst3_project_generator)
 
-	if(CMAKE_CONFIGURATION_TYPES)
-		set(CMAKE_CONFIGURATION_TYPES Debug Release)
-		set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-	endif()
+if(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES Debug Release)
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif(CMAKE_CONFIGURATION_TYPES)
 
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/>
-    )
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs/>
-    )
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs>
-    )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/>
+)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+    $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs/>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs/>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs/>
+)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/Debug/libs>$<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/Release/libs>$<$<CONFIG:ReleaseLTO>:${CMAKE_BINARY_DIR}/ReleaseLTO/libs>
+)
 
 set(VSTGUI_DIR "${vstgui_SOURCE_DIR}/vstgui" CACHE PATH "VSTGUI Path")
 message(STATUS VSTGUI_DIR=${VSTGUI_DIR})
@@ -75,7 +75,7 @@ elseif(UNIX)
     "source/platform/linux/process.cpp"
     "source/platform/linux"
   )
-endif()
+endif(CMAKE_HOST_APPLE)
 
 ##########################################################################################
 vstgui_add_executable(${target} "${${target}_sources}" )
@@ -99,7 +99,7 @@ if(CMAKE_HOST_APPLE)
       XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${SMTG_CODE_SIGN_IDENTITY}"
     )
     message(STATUS "Setup macOS signing with TeamID: ${SMTG_DEVELOPMENT_TEAMID} and Identity: ${SMTG_CODE_SIGN_IDENTITY}")
-  endif()
+  endif(SMTG_DEVELOPMENT_TEAMID)
   set_target_properties(${target} PROPERTIES
     XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS YES
     XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
@@ -131,4 +131,4 @@ elseif(MSVC)
   target_link_options(${target}
     PRIVATE /MAP /DEBUG
   )
-endif()
+endif(CMAKE_HOST_APPLE)

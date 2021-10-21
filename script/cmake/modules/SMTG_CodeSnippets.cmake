@@ -24,4 +24,4 @@ else()
         "// create your editor here and return a IPlugView ptr of it
         return nullptr;"
     )
-endif()
+endif(SMTG_ENABLE_VSTGUI_SUPPORT)
