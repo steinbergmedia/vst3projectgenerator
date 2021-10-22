@@ -92,12 +92,12 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 	auto success = CreateProcess (
 	    reinterpret_cast<const TCHAR*> (appPath.getWideString ()),
 	    const_cast<LPWSTR> (reinterpret_cast<const TCHAR*> (commandLineUTF16.getWideString ())),
-	    NULL, // process security attributes
-	    NULL, // primary thread security attributes
+	    nullptr, // process security attributes
+	    nullptr, // primary thread security attributes
 	    TRUE, // handles are inherited
 	    0, // creation flags
-	    NULL, // use parent's environment
-	    NULL, // use parent's current directory
+	    nullptr, // use parent's environment
+	    nullptr, // use parent's current directory
 	    &startupInfo, &pImpl->procInfo);
 
 	if (!success)
@@ -110,7 +110,7 @@ bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 		if (WaitForSingleObject (pImpl->readPipe, 0) == WAIT_OBJECT_0)
 		{
 			DWORD bytesAvailable {};
-			PeekNamedPipe (pImpl->readPipe, NULL, 0, nullptr, &bytesAvailable, nullptr);
+			PeekNamedPipe (pImpl->readPipe, nullptr, 0, nullptr, &bytesAvailable, nullptr);
 			if (bytesAvailable > 0)
 			{
 				params.buffer.resize (bytesAvailable);
@@ -154,7 +154,7 @@ void Process::ArgumentList::add (const std::string& str)
 bool openURL (const std::string& url)
 {
 	UTF8StringHelper helper (url.data (), static_cast<int> (url.size ()));
-	ShellExecute (0, 0, helper.getWideString (), 0, 0, SW_SHOW);
+	ShellExecute (nullptr, nullptr, helper.getWideString (), nullptr, nullptr, SW_SHOW);
 	return true;
 }
 

@@ -15,7 +15,7 @@ $ cmake -P GenerateVST3Plugin.cmake
 The script will output all variables and its current values. In order to adapt variables, edit
 
 ```console
-vst3plugingenerator/cmake/modules/SMTG_VendorSepcifics.cmake
+vst3plugingenerator/cmake/modules/SMTG_VendorSpecifics.cmake
 ```
 
 file to your needs.

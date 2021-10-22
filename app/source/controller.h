@@ -41,6 +41,7 @@ static constexpr auto valueIdCreateProject = "Create Project";
 
 static constexpr auto valueIdCreateIDEProject = "Create IDE Project";
 static constexpr auto valueIdCMakeGenerators = "CMake Generators";
+static constexpr auto valueIdCMakeSupportedPlatforms = "CMake SupportedPlatforms";
 
 static constexpr auto valueIdScriptOutput = "Script Output";
 static constexpr auto valueIdScriptRunning = "Script Running";
@@ -74,6 +75,7 @@ private:
 	const IMenuBuilder* getWindowMenuBuilder (const IWindow& window) const override;
 
 	void storePreferences ();
+
 	void chooseVSTSDKPath ();
 	void chooseCMakePath ();
 	void choosePluginPath ();
@@ -86,6 +88,7 @@ private:
 	void showCMakeNotInstalledWarning ();
 	void gatherCMakeInformation ();
 	void onCMakeCapabilityCheckError ();
+	void fillCmakeSupportedPlatforms (const std::string& currentGenerator);
 
 	void createProject ();
 	void runProjectCMake (const std::string& path);

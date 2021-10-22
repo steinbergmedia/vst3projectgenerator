@@ -130,7 +130,7 @@ UTF8String getModelValueString (VSTGUI::Standalone::UIDesc::ModelBindingCallback
                                 const UTF8String& key)
 {
 	if (auto value = model->getValue (key))
-		return getValueString (*value.get ());
+		return getValueString (*value);
 	return {};
 }
 
@@ -305,7 +305,17 @@ Controller::Controller ()
 
 	/* CMake */
 	model->addValue (Value::makeStringListValue (valueIdCMakeGenerators, {"", ""}),
-	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) {
+		                 storePreferences ();
+
+		                 auto cmakeGeneratorsValue = model->getValue (valueIdCMakeGenerators);
+		                 assert (cmakeGeneratorsValue);
+
+		                 auto generatorStr = cmakeGeneratorsValue->getConverter ().valueAsString (
+		                     cmakeGeneratorsValue->getValue ());
+
+		                 fillCmakeSupportedPlatforms (generatorStr.getString ());
+	                 }));
 
 	/* Welcome Page */
 	model->addValue (Value::make (valueIdWelcomeDownloadSDK),
@@ -349,6 +359,13 @@ Controller::Controller ()
 
 	/* Use VSTGUI by default ON */
 	model->addValue (Value::make (valueIdUseVSTGUI, 1));
+
+	/* Cmake */
+	model->addValue (Value::makeStringListValue (valueIdCMakeSupportedPlatforms, {"", ""}),
+	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
+
+	// HERE add new values when needed (keep the previous order else the uidesc
+	// could not find itsvalues!)
 
 	// sub controllers
 	addCreateViewControllerFunc (
@@ -394,8 +411,35 @@ void Controller::storePreferences ()
 	setPreferenceStringValue (prefs, valueIdPluginPath, model->getValue (valueIdPluginPath));
 	setPreferenceStringValue (prefs, valueIdCMakeGenerators,
 	                          model->getValue (valueIdCMakeGenerators));
+	setPreferenceStringValue (prefs, valueIdCMakeSupportedPlatforms,
+	                          model->getValue (valueIdCMakeSupportedPlatforms));
+
 	setPreferenceStringValue (prefs, valueIdMacOSDeploymentTarget,
 	                          model->getValue (valueIdMacOSDeploymentTarget));
+}
+
+//------------------------------------------------------------------------
+void Controller::fillCmakeSupportedPlatforms (const std::string& currentGenerator)
+{
+	auto cmakeGeneratorsPlatformsValue = model->getValue (valueIdCMakeSupportedPlatforms);
+	assert (cmakeGeneratorsPlatformsValue);
+
+	for (auto& item : cmakeCapabilities.generators)
+	{
+		if (item.name == currentGenerator)
+		{
+			IStringListValue::StringList list;
+			list.emplace_back ("Defaults");
+			for (auto& platform : item.platforms)
+				list.emplace_back (platform);
+
+			cmakeGeneratorsPlatformsValue->dynamicCast<IStringListValue> ()->updateStringList (
+			    list);
+			break;
+		}
+	}
+	// reset to default
+	cmakeGeneratorsPlatformsValue->performEdit (0);
 }
 
 //------------------------------------------------------------------------
@@ -420,6 +464,7 @@ void Controller::onScriptRunning (bool state)
 	    valueIdChoosePluginPath,
 	    valueIdCreateProject,
 	    valueIdCMakeGenerators,
+	    valueIdCMakeSupportedPlatforms,
 	    valueIdMacOSDeploymentTarget,
 	};
 	for (const auto& valueID : valuesToDisable)
@@ -476,10 +521,14 @@ void Controller::gatherCMakeInformation ()
 			{
 				if (auto capabilities = parseCMakeCapabilities (*outputString))
 				{
+					cmakeCapabilities = std::move (*capabilities);
+
 					auto cmakeGeneratorsValue = model->getValue (valueIdCMakeGenerators);
 					assert (cmakeGeneratorsValue);
-					cmakeGeneratorsValue->dynamicCast<IStringListValue> ()->updateStringList (
-					    capabilities->generators);
+					IStringListValue::StringList list;
+					for (auto& item : cmakeCapabilities.generators)
+						list.emplace_back (item.name);
+					cmakeGeneratorsValue->dynamicCast<IStringListValue> ()->updateStringList (list);
 
 					Preferences prefs;
 					if (auto generatorPref = prefs.get (valueIdCMakeGenerators))
@@ -487,12 +536,23 @@ void Controller::gatherCMakeInformation ()
 						auto value =
 						    cmakeGeneratorsValue->getConverter ().stringAsValue (*generatorPref);
 						cmakeGeneratorsValue->performEdit (value);
+
+						fillCmakeSupportedPlatforms (generatorPref->getString ());
+
+						if (auto supportedPlatformPref = prefs.get (valueIdCMakeSupportedPlatforms))
+						{
+							if (auto platforms = model->getValue (valueIdCMakeSupportedPlatforms))
+							{
+								auto value = platforms->getConverter ().stringAsValue (
+								    *supportedPlatformPref);
+								platforms->performEdit (value);
+							}
+						}
 					}
 					else
 					{
 						// we should use some defaults here
 					}
-					cmakeCapabilities = std::move (*capabilities);
 				}
 				else
 				{
@@ -584,7 +644,7 @@ void Controller::downloadVSTSDK ()
 	alert.window = IApplication::instance ().getWindows ().front ();
 	alert.headline = "Which SDK to download?";
 	alert.description =
-	    "You can choose between the \"Proprietary Steinberg VST 3\" or the \"Open-source GPLv3\" license (dual-license) depending on how you like to distribute your VST 3 plug-in.";
+	    R"(You can choose between the "Proprietary Steinberg VST 3" or the "Open-source GPLv3" license (dual-license) depending on how you like to distribute your VST 3 plug-in.)";
 	alert.defaultButton = "Commercial";
 	alert.secondButton = "Open Source";
 	alert.thirdButton = "Cancel";
@@ -839,6 +899,14 @@ void Controller::runProjectCMake (const std::string& path)
 		Process::ArgumentList args;
 		args.add ("-G");
 		args.addPath (generator.getString ());
+
+		if (auto platforms = model->getValue (valueIdCMakeSupportedPlatforms))
+		{
+			auto platform = platforms->getConverter ().valueAsString (platforms->getValue ());
+			if (!platform.empty () && platform != "Defaults")
+				args.add ("-A " + platform.getString ());
+		}
+
 		args.add ("-S");
 		args.addPath (path);
 		args.add ("-B");

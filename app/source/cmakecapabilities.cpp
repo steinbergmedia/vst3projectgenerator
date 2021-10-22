@@ -41,22 +41,39 @@ auto parseCMakeCapabilities (const std::string& capabilitesJSON)
 		{
 			if (!gen.HasMember ("name"))
 				return {};
-			auto name = std::string (gen["name"].GetString ());
-			cap.generators.emplace_back (name);
+
+			GeneratorCapabilites genCap;
+			genCap.name = std::string (gen["name"].GetString ());
+
+			if (gen.HasMember ("platformSupport") && gen["platformSupport"].GetBool ())
+			{
+				if (gen.HasMember ("supportedPlatforms"))
+				{
+					for (auto& platform : gen["supportedPlatforms"].GetArray ())
+					{
+						genCap.platforms.emplace_back (std::string (platform.GetString ()));
+					}
+				}
+			}
+
+			cap.generators.emplace_back (genCap);
 			if (gen.HasMember ("extraGenerators"))
 			{
 				for (auto& extraGen : gen["extraGenerators"].GetArray ())
 				{
 					if (!extraGen.IsString ())
 						continue;
-					cap.generators.emplace_back (std::string (extraGen.GetString ()) + " - " +
-					                             name);
+					GeneratorCapabilites extraGenCap;
+					extraGenCap.name =
+					    std::string (extraGen.GetString ()) + " - " + std::string (genCap.name);
+					cap.generators.emplace_back (extraGenCap);
 				}
 			}
 		}
-		std::sort (
-		    cap.generators.begin (), cap.generators.end (),
-		    [] (const auto& lhs, const auto& rhs) { return lhs.getString () > rhs.getString (); });
+		std::sort (cap.generators.begin (), cap.generators.end (),
+		           [] (const auto& lhs, const auto& rhs) {
+			           return lhs.name.getString () > rhs.name.getString ();
+		           });
 	}
 	catch (...)
 	{
