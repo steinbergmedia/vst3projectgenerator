@@ -40,6 +40,7 @@ static constexpr auto valueIdChoosePluginPath = "Choose PlugIn Path";
 static constexpr auto valueIdCreateProject = "Create Project";
 
 static constexpr auto valueIdCreateIDEProject = "Create IDE Project";
+static constexpr auto valueIdCMakeVersion = "CMake Version";
 static constexpr auto valueIdCMakeGenerators = "CMake Generators";
 static constexpr auto valueIdCMakeSupportedPlatforms = "CMake SupportedPlatforms";
 

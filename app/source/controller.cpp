@@ -361,11 +361,15 @@ Controller::Controller ()
 	model->addValue (Value::make (valueIdUseVSTGUI, 1));
 
 	/* Cmake */
+	/* Supported Platforms */
 	model->addValue (Value::makeStringListValue (valueIdCMakeSupportedPlatforms, {"", ""}),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 
+	/* cmake version */
+	model->addValue (Value::makeStringValue (valueIdCMakeVersion, "CMake ?.?.?"));
+
 	// HERE add new values when needed (keep the previous order else the uidesc
-	// could not find itsvalues!)
+	// could not find its values!)
 
 	// sub controllers
 	addCreateViewControllerFunc (
@@ -522,6 +526,16 @@ void Controller::gatherCMakeInformation ()
 				if (auto capabilities = parseCMakeCapabilities (*outputString))
 				{
 					cmakeCapabilities = std::move (*capabilities);
+
+					auto cmakeVersionValue = model->getValue (valueIdCMakeVersion);
+					UTF8String str ("CMake ");
+					str += std::to_string (cmakeCapabilities.versionMajor) + "." +
+					       std::to_string (cmakeCapabilities.versionMinor) + "." +
+					       std::to_string (cmakeCapabilities.versionPatch);
+					cmakeVersionValue->beginEdit ();
+					cmakeVersionValue->dynamicCast<IStringValue> ()->setString (
+					    UTF8String (std::move (str)));
+					cmakeVersionValue->endEdit ();
 
 					auto cmakeGeneratorsValue = model->getValue (valueIdCMakeGenerators);
 					assert (cmakeGeneratorsValue);
