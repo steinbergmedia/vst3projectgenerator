@@ -527,7 +527,14 @@ void Controller::gatherCMakeInformation ()
 					assert (cmakeGeneratorsValue);
 					IStringListValue::StringList list;
 					for (auto& item : cmakeCapabilities.generators)
-						list.emplace_back (item.name);
+					{
+#if WINDOWS
+						if (item.name.getString ().find ("Win64") == std::string::npos &&
+						    item.name.getString ().find ("ARM") == std::string::npos &&
+						    item.name.getString ().find ("IA64") == std::string::npos)
+#endif // WINDOWS
+							list.emplace_back (item.name);
+					}
 					cmakeGeneratorsValue->dynamicCast<IStringListValue> ()->updateStringList (list);
 
 					Preferences prefs;
@@ -896,10 +903,26 @@ void Controller::runProjectCMake (const std::string& path)
 		Value::performSingleEdit (*scriptRunningValue, 1.);
 		auto scriptOutputValue = model->getValue (valueIdScriptOutput);
 
+		auto buildDir = path;
+		buildDir += PlatformPathDelimiter;
+		buildDir += "build";
+
+		// first: delete previous build folder
+		Process::ArgumentList prepareArgs;
+		prepareArgs.add ("-E");
+		prepareArgs.add ("remove_directory");
+		prepareArgs.addPath (buildDir);
+		process->run (prepareArgs,
+		              [process] (Process::CallbackParams& p) mutable { process.reset (); });
+
+		// now build the cmake command
 		Process::ArgumentList args;
+
+		// Generator Name
 		args.add ("-G");
 		args.addPath (generator.getString ());
 
+		// Platform Name
 		if (auto platforms = model->getValue (valueIdCMakeSupportedPlatforms))
 		{
 			auto platform = platforms->getConverter ().valueAsString (platforms->getValue ());
@@ -907,12 +930,12 @@ void Controller::runProjectCMake (const std::string& path)
 				args.add ("-A " + platform.getString ());
 		}
 
+		// Path to Source
 		args.add ("-S");
 		args.addPath (path);
+
+		// Path to Build
 		args.add ("-B");
-		auto buildDir = path;
-		buildDir += PlatformPathDelimiter;
-		buildDir += "build";
 		args.addPath (buildDir);
 
 		if (auto pluginUseVSTGUI = model->getValue (valueIdUseVSTGUI)->getValue () != 0)
