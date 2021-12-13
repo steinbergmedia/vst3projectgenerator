@@ -122,20 +122,20 @@ std::shared_ptr<Process> Process::create (const std::string& path)
 //------------------------------------------------------------------------
 bool Process::run (const ArgumentList& arguments, CallbackFunction&& callback)
 {
-	NSMutableArray<NSString*>* args = [NSMutableArray new];
-	for (const auto& arg : arguments.args)
-	{
-		[args addObject:[NSString stringWithUTF8String:arg.data ()]];
-	}
-	pImpl->delegate.task.arguments = args;
-
-#if DEBUG
-	NSLog (@"%@", [args description]);
-#endif
-
-	[pImpl->delegate setCallback:std::move (callback)];
 	@try
 	{
+		NSMutableArray<NSString*>* args = [NSMutableArray new];
+		for (const auto& arg : arguments.args)
+		{
+			[args addObject:[NSString stringWithUTF8String:arg.data ()]];
+		}
+		pImpl->delegate.task.arguments = args;
+
+#if DEBUG
+		NSLog (@"%@", [args description]);
+#endif
+
+		[pImpl->delegate setCallback:std::move (callback)];
 		[pImpl->delegate.task launch];
 	}
 	@catch (NSException* exception)
