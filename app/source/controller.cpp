@@ -962,22 +962,26 @@ void Controller::runProjectCMake (const std::string& path)
 			Value::performStringAppendValueEdit (*scriptOutputValue, UTF8String (a) + " ");
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n");
 
-		auto result = process->run (args, [this, scriptRunningValue, scriptOutputValue, buildDir,
-		                                   process] (Process::CallbackParams& p) mutable {
-			if (!p.buffer.empty ())
-			{
-				Value::performStringAppendValueEdit (
-				    *scriptOutputValue, std::string (p.buffer.data (), p.buffer.size ()));
-			}
-			if (p.isEOF)
-			{
-				assert (scriptRunningValue);
-				Value::performSingleEdit (*scriptRunningValue, 0.);
-				if (p.resultCode == 0)
-					openCMakeGeneratedProject (buildDir);
-				process.reset ();
-			}
-		});
+		bool result = false;
+		if ((process = Process::create (cmakePathStr.getString ())))
+		{
+			result = process->run (args, [this, scriptRunningValue, scriptOutputValue, buildDir,
+			                              process] (Process::CallbackParams& p) mutable {
+				if (!p.buffer.empty ())
+				{
+					Value::performStringAppendValueEdit (
+					    *scriptOutputValue, std::string (p.buffer.data (), p.buffer.size ()));
+				}
+				if (p.isEOF)
+				{
+					assert (scriptRunningValue);
+					Value::performSingleEdit (*scriptRunningValue, 0.);
+					if (p.resultCode == 0)
+						openCMakeGeneratedProject (buildDir);
+					process.reset ();
+				}
+			});
+		}
 		if (!result)
 		{
 			// TODO: Show error
