@@ -32,12 +32,18 @@ if(SMTG_ADD_VSTGUI)
         PRIVATE
             vstgui_support
     )
-    smtg_target_add_vst3_resource(@SMTG_CMAKE_PROJECT_NAME@ "resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc")
+    smtg_target_add_plugin_resources(@SMTG_CMAKE_PROJECT_NAME@
+        RESOURCES
+            "resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc"
+    )
 endif(SMTG_ADD_VSTGUI)
 # -------------------
 
-smtg_target_add_vst3_snapshot(@SMTG_CMAKE_PROJECT_NAME@ resource/@SMTG_Processor_PLAIN_UUID@_snapshot.png)
-smtg_target_add_vst3_snapshot(@SMTG_CMAKE_PROJECT_NAME@ resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2.0x.png)
+smtg_target_add_plugin_snapshots (@SMTG_CMAKE_PROJECT_NAME@
+    RESOURCES
+        resource/@SMTG_Processor_PLAIN_UUID@_snapshot.png
+        resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2.0x.png
+)
 
 target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
     PRIVATE
