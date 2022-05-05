@@ -56,11 +56,7 @@ target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
         sdk
 )
 
-configure_file(${vst3sdk_SOURCE_DIR}/cmake/templates/projectversion.h.in projectversion.h)
-target_include_directories(@SMTG_CMAKE_PROJECT_NAME@
-    PUBLIC
-        "${PROJECT_BINARY_DIR}"
-)
+smtg_target_configure_version_file(@SMTG_CMAKE_PROJECT_NAME@)
 
 if(SMTG_MAC)
     set(CMAKE_OSX_DEPLOYMENT_TARGET @SMTG_MACOS_DEPLOYMENT_TARGET@)
