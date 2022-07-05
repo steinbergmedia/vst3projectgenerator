@@ -1056,6 +1056,8 @@ auto Controller::getEnvPaths () -> StringList
 		std::string el;
 		while (std::getline (input, el, EnvPathSeparator))
 		{
+			if (el.empty())
+				continue;
 			if (*el.rbegin () != PlatformPathDelimiter)
 				el += PlatformPathDelimiter;
 			result.emplace_back (std::move (el));
