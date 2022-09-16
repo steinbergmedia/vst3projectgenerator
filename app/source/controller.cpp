@@ -75,12 +75,14 @@ void showSimpleAlert (const char* headline, const char* description)
 }
 
 //------------------------------------------------------------------------
-size_t makeValidCppName (std::string& str, char replaceChar = '_')
+size_t makeValidCppName (std::string& str, bool allowColon = false, char replaceChar = '_')
 {
 	size_t replaced = 0;
+	char numericEndVal = allowColon ? 0x3B : 0x3A;
 	std::replace_if (str.begin (), str.end (),
 	                 [&] (auto c) {
-		                 auto legal = (c >= 0x30 && c < 0x3A) || (c >= 0x41 && c < 0x5B) ||
+		                 // allowed: 0...9, A...Z and a...z
+		                 auto legal = (c >= 0x30 && c < numericEndVal) || (c >= 0x41 && c < 0x5B) ||
 		                              (c >= 0x61 && c < 0x7B) || c == replaceChar;
 		                 if (!legal)
 			                 replaced++;
@@ -91,12 +93,12 @@ size_t makeValidCppName (std::string& str, char replaceChar = '_')
 }
 
 //------------------------------------------------------------------------
-void makeValidCppValueString (IValue& value)
+void makeValidCppValueString (IValue& value, bool allowColon = false)
 {
 	if (auto strValue = value.dynamicCast<IStringValue> ())
 	{
 		auto str = strValue->getString ().getString ();
-		auto replaced = makeValidCppName (str);
+		auto replaced = makeValidCppName (str, allowColon);
 		if (replaced)
 		{
 			value.beginEdit ();
@@ -262,7 +264,7 @@ Controller::Controller ()
 	model->addValue (
 	    Value::makeStringValue (valueIdVendorNamespace, namespacePref ? *namespacePref : ""),
 	    UIDesc::ValueCalls::onEndEdit ([this] (IValue& val) {
-		    makeValidCppValueString (val);
+		    makeValidCppValueString (val, true);
 		    storePreferences ();
 	    }));
 
@@ -290,7 +292,7 @@ Controller::Controller ()
 	model->addValue (Value::makeStringValue (valueIdPluginFilenamePrefix, ""));
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginClassName, ""),
-	    UIDesc::ValueCalls::onEndEdit ([] (IValue& val) { makeValidCppValueString (val); }));
+	    UIDesc::ValueCalls::onEndEdit ([] (IValue& val) { makeValidCppValueString (val, false); }));
 	model->addValue (Value::makeStringValue (valueIdMacOSDeploymentTarget, "10.12"),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 	model->addValue (
