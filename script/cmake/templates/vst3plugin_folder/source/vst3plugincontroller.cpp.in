@@ -15,7 +15,7 @@ namespace @SMTG_VENDOR_NAMESPACE@ {
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* context)
 {
-	// Here the Plug-in will be instanciated
+	// Here the Plug-in will be instantiated
 
 	//---do not forget to call parent ------
 	tresult result = EditControllerEx1::initialize (context);
@@ -32,7 +32,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* con
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::terminate ()
 {
-	// Here the Plug-in will be de-instanciated, last possibility to remove some memory!
+	// Here the Plug-in will be de-instantiated, last possibility to remove some memory!
 
 	//---do not forget to call parent ------
 	return EditControllerEx1::terminate ();
