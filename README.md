@@ -2,7 +2,7 @@
 
 ## Introduction
 
-With this little application (Win / macOS) you can easily create a new VST 3 plug-in project by simply entering some parameters into a GUI.
+With this little application (Win/macOS) you can easily create a new **VST 3** plug-in project by simply entering some parameters into a GUI.
 
 ## How to clone and build
 
@@ -16,15 +16,16 @@ cmake --build .
 
 ## Project Structure
 
-The VST 3 Project Generator repository contains an app that uses VSTGUI and a cmake script that the app calls.
+The **VST 3 Project Generator** repository contains an app that uses [VSTGUI](https://steinbergmedia.github.io/vst3_dev_portal/pages/What+is+the+VST+3+SDK/VSTGUI.html) and a cmake script that the app calls.
 
 ## Online Documentation
 
-Please visit the [VST 3 Project Generator](https://developer.steinberg.help/display/VST/VST+3+Project+Generator).
+Please visit the [VST 3 Project Generator](https://steinbergmedia.github.io/vst3_dev_portal/pages/What+is+the+VST+3+SDK/Project+Generator.html).
 
 ## Usage guidelines
 
-More details are found at [Usage guidelines](https://developer.steinberg.help/display/VST/Steinberg+VST+usage+guidelines).
+More details are found at [Usage guidelines](https://steinbergmedia.github.io/vst3_dev_portal/pages/VST+3+Licensing/Usage+guidelines.html).
+
 ## License
 
 BSD style
