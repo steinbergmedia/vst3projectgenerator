@@ -1123,7 +1123,7 @@
 							"text-inset": "4, 0",
 							"text-rotation": "0",
 							"text-shadow-offset": "1, 1",
-							"title": "Welcome to the VST3 SDK Project Generator!",
+							"title": "Welcome to the VST 3 SDK Project Generator!",
 							"transparent": "true",
 							"value-precision": "2",
 							"vertical-centered": "false",
