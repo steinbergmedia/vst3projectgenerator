@@ -296,7 +296,7 @@ Controller::Controller ()
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginClassName, ""),
 	    UIDesc::ValueCalls::onEndEdit ([] (IValue& val) { makeValidCppValueString (val, false); }));
-	model->addValue (Value::makeStringValue (valueIdMacOSDeploymentTarget, "10.12"),
+	model->addValue (Value::makeStringValue (valueIdMacOSDeploymentTarget, "10.13"),
 	                 UIDesc::ValueCalls::onEndEdit ([this] (IValue&) { storePreferences (); }));
 	model->addValue (
 	    Value::makeStringValue (valueIdPluginPath, pluginPathPref ? *pluginPathPref : ""),
