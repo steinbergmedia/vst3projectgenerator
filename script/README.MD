@@ -17,8 +17,9 @@ This uses the variables in `vst3projectgenerator/script/cmake/modules/SMTG_Vendo
 ### advanced
 
 Copy and modify the single command below to suit your needs, then run it:
+#### linux / macOS
 ```console
-cmake
+cmake \
     -DSMTG_VENDOR_NAME_CLI="Test Company" \
     -DSMTG_VENDOR_HOMEPAGE_CLI="https://www.testcompany.com" \
     -DSMTG_VENDOR_EMAIL_CLI="tester@testcompany.com" \
@@ -35,5 +36,25 @@ cmake
     -DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON \
     -P GenerateVST3Plugin.cmake
 ```
+#### windows
+```console
+cmake ^
+    -DSMTG_VENDOR_NAME_CLI="Test Company" ^
+    -DSMTG_VENDOR_HOMEPAGE_CLI="https://www.testcompany.com" ^
+    -DSMTG_VENDOR_EMAIL_CLI="tester@testcompany.com" ^
+    -DSMTG_PLUGIN_NAME_CLI="TestPlugin" ^
+    -DSMTG_PREFIX_FOR_FILENAMES_CLI="Test_" ^
+    -DSMTG_PLUGIN_IDENTIFIER_CLI="com.testcompany.vst3.testplugin" ^
+    -DSMTG_CMAKE_PROJECT_NAME_CLI="TestPlugin" ^
+    -DSMTG_VENDOR_NAMESPACE_CLI="TestCompany" ^
+    -DSMTG_PLUGIN_CLASS_NAME_CLI="CTestPlugin" ^
+    -DSMTG_PLUGIN_CATEGORY_CLI="TestCategory" ^
+    -DSMTG_PLUGIN_BUNDLE_NAME_CLI="testpluginbundle" ^
+    -DSMTG_VST3_SDK_SOURCE_DIR_CLI="path_to\vst3sdk" ^
+    -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI="path_to\projects" ^
+    -DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON ^
+    -P GenerateVST3Plugin.cmake
+```
+
 This is the recommended way to manually generate a plugin project as it does not require modifying any file of the vst3projectgenerator.  
-Relative paths may be specified using `../`, spaces need to be escaped: `\ `.
+Relative paths may be specified using `../` or `..\`, spaces need to be escaped: `\ ` or `^ `.
