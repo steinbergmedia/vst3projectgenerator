@@ -11,6 +11,7 @@ A cmake script for generating VST 3 plug-in projects using cmake's script mode.
 ```console
 cmake -P GenerateVST3Plugin.cmake
 ```
+
 This uses the variables in `vst3projectgenerator/script/cmake/modules/SMTG_VendorSpecifics.cmake` and generates the project inside the `vst3projectgenerator/script/output/` directory.  
 
 ### advanced
@@ -30,8 +31,9 @@ cmake
     -DSMTG_PLUGIN_CATEGORY_CLI="TestCategory" \
     -DSMTG_PLUGIN_BUNDLE_NAME_CLI="testpluginbundle" \
     -DSMTG_VST3_SDK_SOURCE_DIR_CLI="path_to/vst3sdk" \
-    -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI="path_to/plugin_projects\ dir" \
+    -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI="path_to/plugin\ projects\ dir" \
     -DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON \
     -P GenerateVST3Plugin.cmake
 ```
-This is the recommended way to generate a plugin project as it does not require modifying any file of the vst3projectgenerator.
+This is the recommended way to manually generate a plugin project as it does not require modifying any file of the vst3projectgenerator.
+Relative paths may be specified using `../`, spaces need to be escaped: `\ `.
