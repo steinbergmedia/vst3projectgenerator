@@ -35,5 +35,5 @@ cmake
     -DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON \
     -P GenerateVST3Plugin.cmake
 ```
-This is the recommended way to manually generate a plugin project as it does not require modifying any file of the vst3projectgenerator.
+This is the recommended way to manually generate a plugin project as it does not require modifying any file of the vst3projectgenerator.  
 Relative paths may be specified using `../`, spaces need to be escaped: `\ `.
