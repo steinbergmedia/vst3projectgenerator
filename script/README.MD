@@ -51,7 +51,7 @@ cmake ^
     -DSMTG_PLUGIN_CATEGORY_CLI="TestCategory" ^
     -DSMTG_PLUGIN_BUNDLE_NAME_CLI="testpluginbundle" ^
     -DSMTG_VST3_SDK_SOURCE_DIR_CLI="path_to\vst3sdk" ^
-    -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI="path_to\projects" ^
+    -DSMTG_GENERATOR_OUTPUT_DIRECTORY_CLI="path_to\plugin^ projects^ dir" ^
     -DSMTG_ENABLE_VSTGUI_SUPPORT_CLI=ON ^
     -P GenerateVST3Plugin.cmake
 ```
