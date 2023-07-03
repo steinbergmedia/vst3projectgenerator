@@ -2,7 +2,8 @@
 
 ## Introduction
 
-With this little application (Win/macOS) you can easily create a new **VST 3** plug-in project by simply entering some parameters into a GUI.
+With this little application you can easily create a new **VST 3** plug-in project by simply entering some parameters into a GUI (Win/macOS).  
+Linux users can generate a new plug-in project by [running the cmake script directly](https://github.com/steinbergmedia/vst3projectgenerator/tree/master/script).
 
 ## How to clone and build
 
