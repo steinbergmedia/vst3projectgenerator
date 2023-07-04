@@ -958,9 +958,9 @@ void Controller::runProjectCMake (const std::string& path)
 		args.addPath (buildDir);
 
 		if (auto pluginUseVSTGUI = model->getValue (valueIdUseVSTGUI)->getValue () != 0)
-			args.add ("-DSMTG_ADD_VSTGUI=ON");
+			args.add ("-DSMTG_ENABLE_VSTGUI_SUPPORT=ON");
 		else
-			args.add ("-DSMTG_ADD_VSTGUI=OFF");
+			args.add ("-DSMTG_ENABLE_VSTGUI_SUPPORT=OFF");
 
 		Value::performStringAppendValueEdit (*scriptOutputValue, "\n" + cmakePathStr + " ");
 		for (const auto& a : args.args)
