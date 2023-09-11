@@ -2,11 +2,11 @@
 
 #include "version_buildnumber.h"
 
-#define MAJOR_VERSION_STR "2022"
-#define MAJOR_VERSION_INT 2022
+#define MAJOR_VERSION_STR "2023"
+#define MAJOR_VERSION_INT 2023
 
-#define SUB_VERSION_STR "11"
-#define SUB_VERSION_INT 11
+#define SUB_VERSION_STR "09"
+#define SUB_VERSION_INT 09
 
 #define RELEASE_NUMBER_STR "1"
 #define RELEASE_NUMBER_INT 1
