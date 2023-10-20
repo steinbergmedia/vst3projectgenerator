@@ -569,9 +569,9 @@ void Controller::gatherCMakeInformation ()
 						{
 							if (auto platforms = model->getValue (valueIdCMakeSupportedPlatforms))
 							{
-								auto value = platforms->getConverter ().stringAsValue (
+								auto v = platforms->getConverter ().stringAsValue (
 								    *supportedPlatformPref);
-								platforms->performEdit (value);
+								platforms->performEdit (v);
 							}
 						}
 					}
