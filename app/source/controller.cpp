@@ -814,6 +814,12 @@ void Controller::createProject ()
 	}
 	auto pluginOutputPathStr = _pluginOutputPathStr.getString ();
 	unixfyPath (pluginOutputPathStr);
+	if (pluginOutputPathStr.find (sdkPathStr) == 0)
+	{
+		showSimpleAlert ("Cannot create Project",
+		                 "Your output directory must be outside of the SDK directory.");
+		return;
+	}
 	if (pluginNameStr.empty ())
 	{
 		showSimpleAlert ("Cannot create Project", "You need to specify a name for your plug-in.");
