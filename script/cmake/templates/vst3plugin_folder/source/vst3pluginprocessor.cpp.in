@@ -116,7 +116,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData&
 						data.numSamples * sizeof (Vst::Sample32));
 
 				// inform the host that this channel is silent
-				data.outputs[i].silenceFlags |= (1 << c);
+				data.outputs[i].silenceFlags |= ((uint64)1 << c);
 			}
 		}
 		// clear the remaining output buffers
@@ -129,7 +129,7 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData&
 						data.numSamples * sizeof (Vst::Sample32));
 			}
 			// inform the host that this bus is silent
-			data.outputs[i].silenceFlags = (1 << data.outputs[i].numChannels) - 1;
+			data.outputs[i].silenceFlags = ((uint64)1 << data.outputs[i].numChannels) - 1;
 		}
 	}
 
