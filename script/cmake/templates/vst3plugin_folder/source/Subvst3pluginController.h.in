@@ -1,0 +1,58 @@
+//------------------------------------------------------------------------
+// Copyright(c) 2024 AWS.
+//------------------------------------------------------------------------
+#pragma once
+
+#include "vstgui/lib/vstguifwd.h"
+#include "public.sdk/source/vst/vstparameters.h"
+#include "vstgui/uidescription/delegationcontroller.h"
+#include "vstgui/plugin-bindings/vst3editor.h"
+
+//------------------------------------------------------------------------
+
+using namespace VSTGUI;
+using namespace Steinberg;
+using namespace Vst;
+
+//------------------------------------------------------------------------
+// SubGainController Declaration
+//------------------------------------------------------------------------
+class SubGainController : public FObject, public DelegationController
+{
+public:
+//------------------------------------------------------------------------
+	SubGainController(VST3Editor* baseController) : DelegationController(baseController)
+		,cGain(nullptr)
+		,lGainValue(nullptr)
+	{
+	};
+	virtual ~SubGainController();
+
+	IControlListener* getControlListener() { return this; }
+
+	void PLUGIN_API update(FUnknown* changedUnknown, int32 message) override;
+	
+	VSTGUI::CView* verifyView(VSTGUI::CView* view, const VSTGUI::UIAttributes& attributes,
+		const VSTGUI::IUIDescription* description) override;
+	void valueChanged(VSTGUI::CControl* pControl) override;
+	void controlBeginEdit(VSTGUI::CControl* pControl) override;
+	void controlEndEdit(VSTGUI::CControl* pControl) override;
+
+	OBJ_METHODS(SubGainController, FObject)
+		//------------------------------------------------------------------------
+
+		
+
+protected:
+
+private:
+//------------------------------------------------------------------------
+	CKnob* cGain;
+	CTextLabel* lGainValue;
+	static bool SubGainController::valueToString(float value, char utf8String[256], CParamDisplay*);
+
+//------------------------------------------------------------------------
+};
+//------------------------------------------------------------------------
+
+

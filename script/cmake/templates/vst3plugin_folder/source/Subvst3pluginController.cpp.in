@@ -1,0 +1,114 @@
+//------------------------------------------------------------------------
+// Copyright(c) 2024 AWS.
+//------------------------------------------------------------------------
+
+#include "SubGainController.h"
+#include "PlugInCids.h"
+#include "public.sdk/source/vst/utility/stringconvert.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+
+
+using namespace VSTGUI;
+using namespace Steinberg;
+using namespace aws;
+
+//------------------------------------------------------------------------
+// SubGainController Implementation
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+SubGainController::~SubGainController()
+{
+	if (cGain) {
+		cGain->unregisterControlListener(this);
+		cGain->forget();
+	    cGain = nullptr;
+
+	}
+	lGainValue = nullptr;
+}
+
+//------------------------------------------------------------------------
+void PLUGIN_API SubGainController::update (FUnknown* changedUnknown, int32 /*message*/)
+{
+
+}
+
+//------------------------------------------------------------------------
+VSTGUI::CView* SubGainController::verifyView (VSTGUI::CView* view,
+                                                 const VSTGUI::UIAttributes& attributes,
+                                                 const VSTGUI::IUIDescription* description)
+{
+	
+	if (auto control = dynamic_cast<CKnob*>(view); control && control->getTag() == kCGainId)
+	{
+		cGain = control;
+		cGain->registerControlListener(this);
+		cGain->remember();
+		cGain->setValue(0.5);
+		cGain->setDirty();
+		//now we set also the parameter value from the Knob control value
+
+	}
+
+	if (auto control = dynamic_cast<CTextLabel*>(view); control && control->getTag() == kLGainValueId)
+	{
+		lGainValue = control;
+		lGainValue->setValueToStringFunction(valueToString);
+		
+		//lGainValue->setPrecision(1);
+		//lGainValue->setText(std::to_string(cGain->getValue() * 100).c_str());
+		lGainValue->setValue(cGain->getValue());
+		lGainValue->valueChanged();
+		lGainValue->setDirty();
+	}
+	
+	return controller->verifyView(view, attributes, description);
+}
+
+//------------------------------------------------------------------------
+void SubGainController::valueChanged (VSTGUI::CControl* pControl)
+{
+	if (!pControl)
+		return controller->valueChanged(pControl);
+
+	//Check GainKnob Change and set it Parameter and to GainLabel
+	if (pControl->getTag() == kCGainId) 
+	{
+
+		lGainValue->setText(std::to_string(cGain->getValue()*100).c_str());
+		lGainValue->setValue(cGain->getValue());
+		lGainValue->valueChanged();
+		lGainValue->setDirty();
+
+		return controller->valueChanged(pControl);
+	}
+
+}
+
+//------------------------------------------------------------------------
+void SubGainController::controlBeginEdit (VSTGUI::CControl* pControl)
+{
+	if (!pControl)
+		return controller->controlBeginEdit(pControl);
+}
+
+//------------------------------------------------------------------------
+void SubGainController::controlEndEdit (VSTGUI::CControl* pControl)
+{
+	if (!pControl)
+		return controller->controlEndEdit(pControl);
+}
+
+//------------------------------------------------------------------------
+bool SubGainController::valueToString(float value, char utf8String[256], CParamDisplay*)
+{
+	auto floatValue = value*100;
+	int intValueRounded = (int)std::floor(floatValue);
+	std::stringstream str;
+	str << intValueRounded;
+	std::strcpy(utf8String, str.str().data());
+	return true;
+}
