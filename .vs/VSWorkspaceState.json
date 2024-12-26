@@ -6,12 +6,8 @@
     ]
   },
   "ExpandedNodes": [
-    "",
-    "\\script\\cmake",
-    "\\script\\cmake\\templates",
-    "\\script\\cmake\\templates\\vst3plugin_folder",
-    "\\script\\cmake\\templates\\vst3plugin_folder\\resource",
-    "\\script\\cmake\\templates\\vst3plugin_folder\\source"
+    ""
   ],
+  "SelectedNode": "\\C:\\Users\\marku\\Documents\\GitHub\\vst3projectgenerator",
   "PreviewInSolutionExplorer": false
 }
