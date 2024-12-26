@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------
-// Copyright(c) 2024 AWS.
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
 //------------------------------------------------------------------------
 #pragma once
 
@@ -15,15 +15,17 @@ using namespace Steinberg;
 using namespace Vst;
 
 //------------------------------------------------------------------------
-// SubGainController Declaration
+// Sub@SMTG_PLUGIN_CLASS_NAME@Controller Declaration
 //------------------------------------------------------------------------
-class SubGainController : public FObject, public DelegationController
+class Sub@SMTG_PLUGIN_CLASS_NAME@Controller : public FObject, public DelegationController
 {
 public:
 //------------------------------------------------------------------------
-	SubGainController(VST3Editor* baseController) : DelegationController(baseController)
+	Sub@SMTG_PLUGIN_CLASS_NAME@Controller(VST3Editor* baseController) : DelegationController(baseController)
+		/** Just an example with an CTextLabel and CKnob Gain Parameter
 		,cGain(nullptr)
 		,lGainValue(nullptr)
+		**/
 	{
 	};
 	virtual ~SubGainController();
@@ -38,7 +40,7 @@ public:
 	void controlBeginEdit(VSTGUI::CControl* pControl) override;
 	void controlEndEdit(VSTGUI::CControl* pControl) override;
 
-	OBJ_METHODS(SubGainController, FObject)
+	OBJ_METHODS(Sub@SMTG_PLUGIN_CLASS_NAME@Controller, FObject)
 		//------------------------------------------------------------------------
 
 		
@@ -47,9 +49,11 @@ protected:
 
 private:
 //------------------------------------------------------------------------
+	/** Just an example with an CTextLabel and CKnob Gain Parameter 
 	CKnob* cGain;
 	CTextLabel* lGainValue;
-	static bool SubGainController::valueToString(float value, char utf8String[256], CParamDisplay*);
+	**/
+	static bool Sub@SMTG_PLUGIN_CLASS_NAME@Controller::normalizedValueToZeroToHundredString(float value, char utf8String[256], CParamDisplay*);
 
 //------------------------------------------------------------------------
 };

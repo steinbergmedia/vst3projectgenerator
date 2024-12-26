@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------
-// Copyright(c) 2024 AWS.
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
 //------------------------------------------------------------------------
 
-#include "SubGainController.h"
+#include "Sub@SMTG_PLUGIN_CLASS_NAME@Controller.h"
 #include "PlugInCids.h"
 #include "public.sdk/source/vst/utility/stringconvert.h"
 #include <iostream>
@@ -12,15 +12,16 @@
 
 using namespace VSTGUI;
 using namespace Steinberg;
-using namespace aws;
+using namespace @SMTG_VENDOR_NAMESPACE@;
 
 //------------------------------------------------------------------------
-// SubGainController Implementation
+// Sub@SMTG_PLUGIN_CLASS_NAME@Controller Implementation
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-SubGainController::~SubGainController()
+Sub@SMTG_PLUGIN_CLASS_NAME@Controller::~Sub@SMTG_PLUGIN_CLASS_NAME@Controller()
 {
+	/** Just an example with an Gain Parameter
 	if (cGain) {
 		cGain->unregisterControlListener(this);
 		cGain->forget();
@@ -28,20 +29,21 @@ SubGainController::~SubGainController()
 
 	}
 	lGainValue = nullptr;
+	**/
 }
 
 //------------------------------------------------------------------------
-void PLUGIN_API SubGainController::update (FUnknown* changedUnknown, int32 /*message*/)
+void PLUGIN_API Sub@SMTG_PLUGIN_CLASS_NAME@Controller::update (FUnknown* changedUnknown, int32 /*message*/)
 {
 
 }
 
 //------------------------------------------------------------------------
-VSTGUI::CView* SubGainController::verifyView (VSTGUI::CView* view,
+VSTGUI::CView* Sub@SMTG_PLUGIN_CLASS_NAME@Controller::verifyView (VSTGUI::CView* view,
                                                  const VSTGUI::UIAttributes& attributes,
                                                  const VSTGUI::IUIDescription* description)
 {
-	
+	/** Just an example with an Gain Parameter
 	if (auto control = dynamic_cast<CKnob*>(view); control && control->getTag() == kCGainId)
 	{
 		cGain = control;
@@ -52,7 +54,9 @@ VSTGUI::CView* SubGainController::verifyView (VSTGUI::CView* view,
 		//now we set also the parameter value from the Knob control value
 
 	}
+	**/
 
+	/** Just an example with an CTextLabel 
 	if (auto control = dynamic_cast<CTextLabel*>(view); control && control->getTag() == kLGainValueId)
 	{
 		lGainValue = control;
@@ -60,20 +64,25 @@ VSTGUI::CView* SubGainController::verifyView (VSTGUI::CView* view,
 		
 		//lGainValue->setPrecision(1);
 		//lGainValue->setText(std::to_string(cGain->getValue() * 100).c_str());
+
 		lGainValue->setValue(cGain->getValue());
 		lGainValue->valueChanged();
 		lGainValue->setDirty();
 	}
+	**/
 	
+	// Always return to base class because we dont wont loose the parameter Binding
 	return controller->verifyView(view, attributes, description);
 }
 
 //------------------------------------------------------------------------
-void SubGainController::valueChanged (VSTGUI::CControl* pControl)
+void Sub@SMTG_PLUGIN_CLASS_NAME@Controller::valueChanged (VSTGUI::CControl* pControl)
 {
+	// Always return to base class because we dont wont loose the parameter Binding
 	if (!pControl)
 		return controller->valueChanged(pControl);
 
+	/** Just an example with an CTextLabel 
 	//Check GainKnob Change and set it Parameter and to GainLabel
 	if (pControl->getTag() == kCGainId) 
 	{
@@ -83,27 +92,37 @@ void SubGainController::valueChanged (VSTGUI::CControl* pControl)
 		lGainValue->valueChanged();
 		lGainValue->setDirty();
 
+		// Always return to base class because we dont wont loose the parameter Binding
 		return controller->valueChanged(pControl);
 	}
+	**/
 
 }
 
 //------------------------------------------------------------------------
-void SubGainController::controlBeginEdit (VSTGUI::CControl* pControl)
+void Sub@SMTG_PLUGIN_CLASS_NAME@Controller::controlBeginEdit (VSTGUI::CControl* pControl)
 {
+	// Always return to base class because we dont wont loose the parameter Binding
 	if (!pControl)
 		return controller->controlBeginEdit(pControl);
 }
 
 //------------------------------------------------------------------------
-void SubGainController::controlEndEdit (VSTGUI::CControl* pControl)
+void Sub@SMTG_PLUGIN_CLASS_NAME@Controller::controlEndEdit (VSTGUI::CControl* pControl)
 {
+	// Always return to base class because we dont wont loose the parameter Binding
 	if (!pControl)
 		return controller->controlEndEdit(pControl);
 }
 
 //------------------------------------------------------------------------
-bool SubGainController::valueToString(float value, char utf8String[256], CParamDisplay*)
+// This Method takes a normalized float Value and convert it to a String
+// because we dont want a 0.0 - 1.0 representation we multiply with 100
+// (From 0.4678904 we got to 46.78904)
+// and round the value to int because we dont need the decimal after multiply
+// (From 46.78904 to 47)
+// This Method can be used to set it to the CTextLabel->setValueToStringFunction(function name)
+bool Sub@SMTG_PLUGIN_CLASS_NAME@Controller::normalizedValueToZeroToHundredString(float value, char utf8String[256], CParamDisplay*)
 {
 	auto floatValue = value*100;
 	int intValueRounded = (int)std::floor(floatValue);
