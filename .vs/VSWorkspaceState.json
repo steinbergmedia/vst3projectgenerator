@@ -1,0 +1,17 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "out\\build\\x64-Debug",
+      "out\\install\\x64-Debug"
+    ]
+  },
+  "ExpandedNodes": [
+    "",
+    "\\script\\cmake",
+    "\\script\\cmake\\templates",
+    "\\script\\cmake\\templates\\vst3plugin_folder",
+    "\\script\\cmake\\templates\\vst3plugin_folder\\resource",
+    "\\script\\cmake\\templates\\vst3plugin_folder\\source"
+  ],
+  "PreviewInSolutionExplorer": false
+}
