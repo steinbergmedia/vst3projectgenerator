@@ -787,6 +787,9 @@ void Controller::createProject ()
 	auto emailStr = getModelValueString (model, valueIdVendorEMail).getString ();
 	auto pluginNameStr = getModelValueString (model, valueIdPluginName).getString ();
 	auto filenamePrefixStr = getModelValueString (model, valueIdPluginFilenamePrefix).getString ();
+	if (filenamePrefixStr.empty()) {
+		filenamePrefixStr = pluginNameStr;
+	}
 	auto pluginBundleIDStr = getModelValueString (model, valueIdPluginBundleID).getString ();
 	auto vendorNamspaceStr = getModelValueString (model, valueIdVendorNamespace).getString ();
 	auto pluginClassNameStr = getModelValueString (model, valueIdPluginClassName).getString ();
