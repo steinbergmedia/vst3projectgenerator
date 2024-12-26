@@ -11,7 +11,7 @@ set(SMTG_PLUGIN_IDENTIFIER "com.mycompany.myplugin.vst3")
 # Source code specifics
 set(SMTG_VENDOR_NAMESPACE "MyCompanyName")
 set(SMTG_PLUGIN_CLASS_NAME "MyPlugin")
-set(SMTG_PREFIX_FOR_FILENAMES "myplugin")
+set(SMTG_PREFIX_FOR_FILENAMES "Myplugin")
 set(SMTG_PLUGIN_BUNDLE_NAME "MyPlugin")
 set(SMTG_PLUGIN_CATEGORY "Fx")
 set(SMTG_MACOS_DEPLOYMENT_TARGET "10.12")
