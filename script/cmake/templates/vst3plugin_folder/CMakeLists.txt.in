@@ -21,12 +21,12 @@ smtg_enable_vst3_sdk()
 
 smtg_add_vst3plugin(@SMTG_CMAKE_PROJECT_NAME@
     source/version.h
-    source/PlugInCids.h
-    source/PlugInProcessor.h
-    source/PlugInProcessor.cpp
-    source/PlugInController.h
-    source/PlugInController.cpp
-    source/PlugInEntry.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@Cids.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@Processor.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@Processor.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@Controller.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@Controller.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@Entry.cpp
     source/Sub@SMTG_PREFIX_FOR_FILENAMES@Controller.cpp
     source/Sub@SMTG_PREFIX_FOR_FILENAMES@Controller.h
 )
