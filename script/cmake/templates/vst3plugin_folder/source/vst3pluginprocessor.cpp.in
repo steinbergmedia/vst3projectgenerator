@@ -128,4 +128,11 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::getState (IBStream* state)
 }
 
 //------------------------------------------------------------------------
+uint32 PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::getProcessContextRequirements ()
+{
+    // add your own required Context Requirements
+    return IProcessContextRequirements::kNeedTempo | IProcessContextRequirements::kNeedTimeSignature;
+}
+
+//------------------------------------------------------------------------
 } // namespace @SMTG_VENDOR_NAMESPACE@
