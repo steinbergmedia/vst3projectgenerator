@@ -837,6 +837,11 @@ void Controller::createProject ()
 		pluginClassNameStr = pluginNameStr;
 		makeValidCppName (pluginClassNameStr);
 	}
+
+	if (filenamePrefixStr.empty()) {
+		filenamePrefixStr = pluginNameStr;
+	}
+
 	auto cmakeProjectName = pluginNameStr;
 	makeValidCppName (cmakeProjectName);
 
