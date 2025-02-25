@@ -857,7 +857,8 @@ void Controller::createProject ()
 		args.add ("-DSMTG_VENDOR_NAME_CLI=\"" + vendorStr + "\"");
 		args.add ("-DSMTG_VENDOR_HOMEPAGE_CLI=\"" + vendorHomePageStr + "\"");
 		args.add ("-DSMTG_VENDOR_EMAIL_CLI=\"" + emailStr + "\"");
-		args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"");
+		if (!filenamePrefixStr.empty ())
+			args.add ("-DSMTG_PREFIX_FOR_FILENAMES_CLI=\"" + filenamePrefixStr + "\"");
 		if (!vendorNamspaceStr.empty ())
 			args.add ("-DSMTG_VENDOR_NAMESPACE_CLI=\"" + vendorNamspaceStr + "\"");
 		if (!pluginClassNameStr.empty ())
