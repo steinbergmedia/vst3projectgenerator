@@ -7,11 +7,21 @@ Linux users can generate a new plug-in project by [running the cmake script dire
 
 ## How to clone and build
 
+### Example with macOS using XCode
 ```Example
 git clone https://github.com/steinbergmedia/vst3projectgenerator.git
 mkdir build
 cd build
 cmake -GXcode ../vst3projectgenerator
+cmake --build .
+```
+
+### Example with Windows using Visual Studio 18 2026
+```Example
+git clone https://github.com/steinbergmedia/vst3projectgenerator.git
+mkdir build
+cd build
+cmake.exe -G "Visual Studio 18 2026" -A x64 ../vst3projectgenerator
 cmake --build .
 ```
 
