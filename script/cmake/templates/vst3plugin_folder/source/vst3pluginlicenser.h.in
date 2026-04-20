@@ -1,0 +1,42 @@
+//------------------------------------------------------------------------
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
+
+#pragma once
+
+
+#include <LicenseSpring\Configuration.h>
+#include <LicenseSpring/EncryptString.h>
+#include <LicenseSpring/LicenseManager.h>
+#include <LicenseSpring/Exceptions.h>
+#include <iostream>
+#include <thread>
+
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+using namespace VSTGUI;
+using namespace LicenseSpring;
+
+// std::shared_ptr<Configuration> pConfiguration = Configuration::Create(
+//         EncryptStr("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"),  // API key
+//         EncryptStr("XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXX-XXX"), // Shared key
+//         EncryptStr("XXXXX"), // Product code
+//         appName, appVersion, options);
+
+
+class LicenseOverlayView : public CViewContainer, public IControlListener 
+{
+public:
+    using ActivationCallback = std::function<void(const std::string&)>;
+
+ 
+
+private:
+    CTextEdit* licenseInput = nullptr;
+    CTextButton* submitButton = nullptr;
+    ActivationCallback onLicenseSubmit;
+};
+
+
+}

@@ -29,22 +29,93 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::initialize (FUnknown* cont
 {
 	// Here the Plug-in will be instantiated
 	
-	//---always initialize the parent-------
-	tresult result = AudioEffect::initialize (context);
-	// if everything Ok, continue
-	if (result != kResultOk)
-	{
-		return result;
-	}
+	/*
+	* The host initiates this then resets with setBusArrangements() if necessary
+	*/
 
-	//--- create Audio IO ------
-	@SMTG_EFFECT_INPUT_AUDIO_BUSSES_CODE_SNIPPET@
-	@SMTG_EFFECT_OUTPUT_AUDIO_BUSSES_CODE_SNIPPET@
+    tresult result = AudioEffect::initialize (context);
+    if (result != kResultOk)
+        return result;
 
-	@SMTG_EFFECT_EVENT_BUSSES_CODE_SNIPPET@
+    // main stereo signal
+    addAudioInput  (STR16("Stereo In"),  Steinberg::Vst::SpeakerArr::kStereo);
+    addAudioOutput (STR16("Stereo Out"), Steinberg::Vst::SpeakerArr::kStereo);
 
 	return kResultOk;
 }
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setBusArrangements (Steinberg::Vst::SpeakerArrangement* inputs, Steinberg::int32 numIns,
+                                                            Steinberg::Vst::SpeakerArrangement* outputs, Steinberg::int32 numOuts)
+
+	/*
+	* This is where we handle setting up example filters and 
+	*/
+{
+
+	// initialize filters Forst
+
+	// parameters for filters
+	int32 sampleRate = processSetup.sampleRate;
+	
+	int32 numChannels = 0;
+    if (numIns > 0)
+        numChannels = Vst::SpeakerArr::getChannelCount(inputs[0]);
+
+
+	// --------------- Build Filters -----------------------------------
+		
+	lowShelfFilter.setup (sampleRate,// sample rate
+						250,         // cutoff frequency
+						5,           // gain
+						1);          // shelf slope
+
+
+
+
+    // Confirm proper format
+    if (numIns == 2 && numOuts == 1) {
+        int32 chin1  = Steinberg::Vst::SpeakerArr::getChannelCount (inputs[0]);
+        int32 chout1 = Steinberg::Vst::SpeakerArr::getChannelCount (outputs[0]);
+
+        // handle case mono in/out/sidechain
+        if (chin1 == 1 && chout1 == 1 ) {
+            // initiate the correct buffers
+            removeAudioBusses();
+            addAudioInput(STR16("Mono In"),  inputs[0]);
+            addAudioOutput(STR16("Mono Out"), outputs[0]);
+            addAudioInput(STR16("Mono Sidechain"), inputs[1], Steinberg::Vst::kAux, 0);
+            return kResultOk;
+        }
+        // handle case stereo in/out mono sidechain
+        if (chin1 == 2 && chout1 == 2) {
+            // initiate the correct buffers
+            removeAudioBusses();
+            addAudioInput(STR16("Mono In"),  inputs[0]);
+            addAudioOutput(STR16("Mono Out"), outputs[0]);
+            return kResultOk;
+        }
+        // handle case stereo in/out/sidechain
+        if(chin1 == 2 && chout1 == 2 ) {
+            // initiate the correct buffers
+            removeAudioBusses();
+            addAudioInput(STR16("Mono In"),  inputs[0]);
+            addAudioOutput(STR16("Mono Out"), outputs[0]);
+            return kResultOk;
+        }
+        // handle case mono in/out stereo sidechain (who tf would ever do this? idk but we gotta make it stupid proof)
+        if(chin1 == 1 && chout1 == 1) {
+            // initiate the correct buffers
+            removeAudioBusses();
+            addAudioInput(STR16("Mono In"),  inputs[0]);
+            addAudioOutput(STR16("Mono Out"), outputs[0]);
+            return kResultOk;
+        }
+    }
+    return kResultFalse;
+}
+
+
 
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::terminate ()
@@ -65,25 +136,48 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setActive (TBool state)
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData& data)
 {
-	//--- First : Read inputs parameter changes-----------
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<< HANGLE PARAM CHANGES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	/*if (data.inputParameterChanges)
+
+	if (data.inputParameterChanges)
 	{
-		int32 numParamsChanged = data.inputParameterChanges->getParameterCount ();
-		for (int32 index = 0; index < numParamsChanged; index++)
+		int32 numParamsChanged = data.inputParameterChanges->getParameterCount();
+		for (int32 index = 0; index < numParamsChanged; ++index)
 		{
-			if (auto* paramQueue = data.inputParameterChanges->getParameterData (index))
+			if (auto* paramQueue = data.inputParameterChanges->getParameterData(index))
 			{
-				Vst::ParamValue value;
-				int32 sampleOffset;
-				int32 numPoints = paramQueue->getPointCount ();
-				switch (paramQueue->getParameterId ())
+				Vst::ParamID id = paramQueue->getParameterId();
+				int32 numPoints = paramQueue->getPointCount();
+
+				if (numPoints > 0)
 				{
+					Vst::ParamValue value;
+					int32 sampleOffset;
+					if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) == kResultTrue)
+					{
+						if        (id == 0) {
+							param0Value = value;
+						} 
+						// else if (id == 1) {
+						// 	param1Value = value;
+						// } 
+	
+					}
 				}
 			}
 		}
-	}*/
+	}
 	
+
+
+	bypassValue = static_cast<float>(param0Value);
+	//param1RuntimeValue = static_cast<float>(param1Value);
+
+
 	//--- Here you have to implement your processing
 
 	if (data.numSamples > 0)
@@ -96,9 +190,51 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::process (Vst::ProcessData&
 		int32 minBus = std::min (data.numInputs, data.numOutputs);
 		for (int32 i = 0; i < minBus; i++)
 		{
+			int32 numSamples = data.numSamples;
 			int32 minChan = std::min (data.inputs[i].numChannels, data.outputs[i].numChannels);
+
+
+			filteredPtrs.resize(minChan);
+			filteredSignal.resize(minChan);
+			for (int ch = 0; ch < minChan; ++ch) {
+				filteredSignal[ch].resize(numSamples);  // allocate space for samples here for filter use
+
+			}
+
+			@SMTG_PLUGIN_CLASS_NAME@Processor::applyFilter(filteredPtrs, filteredSignal, data.inputs[i].channelBuffers32, numSamples, minChan, lowShelfFilter);
+			lowShelfFilter.process(numSamples, filteredPtrs.data());
+
+
 			for (int32 c = 0; c < minChan; c++)
 			{
+
+				float* in  = data.inputs[i].channelBuffers32[c];
+				float* filtered = filteredPtrs[c]; // --- This is a deep of the input signal with filtering. The logic 
+							                       // --- The logic can be moved around, here we copy the filtered input signal
+							                       // --- Could also copy signal after processing, but in the middle is much trickier. 
+												   // ---------- Exercise left for reader --------------------------------------
+
+                float* out = data.outputs[i].channelBuffers32[c];
+
+				for (int32 s = 0; s < data.numSamples; s++)
+                { 
+					// Impliment the bypass here, 0 = off, 1 = on
+
+					if (bypassValue >= 0.5f) { out[s] = in[s]; } else {
+					/*
+					 *	-------- Main Process Logic ----------------
+					 */
+
+
+						// out[s] = 0.5*(in[s] + filtered[s]); // --- Example process logic, mix dry and wet signal 50/50
+
+						out[s] = in[s]; // <------- Comment this off and replace with above -^ to apply the pre processing filter 
+					}
+					
+
+                }	
+
+
 				// do not need to be copied if the buffers are the same
 				if (data.outputs[i].channelBuffers32[c] != data.inputs[i].channelBuffers32[c])
 				{
@@ -159,18 +295,43 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::canProcessSampleSize (int3
 
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::setState (IBStream* state)
+
+
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SETS PARAMS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 {
 	// called when we load a preset, the model has to be reloaded
-	IBStreamer streamer (state, kLittleEndian);
+	IBStreamer streamer(state, kLittleEndian);
+    double val = 0.0;
+
+    if (!streamer.readDouble(val))
+        return kResultFalse;
+    param0Value = val;
+
+	// if (!streamer.readDouble(val))
+    //     return kResultFalse;
+    // param1Value = val;
 	
 	return kResultOk;
 }
 
 //------------------------------------------------------------------------
 tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Processor::getState (IBStream* state)
+
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SETS PARAMS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 {
 	// here we need to save the model
 	IBStreamer streamer (state, kLittleEndian);
+	streamer.writeDouble (param0Value);
+	//streamer.writeDouble (param1Value);
 
 	return kResultOk;
 }

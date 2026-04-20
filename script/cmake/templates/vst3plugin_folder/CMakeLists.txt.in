@@ -10,10 +10,22 @@ if(NOT vst3sdk_SOURCE_DIR)
     message(FATAL_ERROR "Path to VST3 SDK is empty!")
 endif()
 
+
+# ----------------- LicenseSpring free tier online node locking --------------
+set(LICENSESPRING_LIB_PATH "${CMAKE_SOURCE_DIR}/LicenseSpring/bin/x64/dynamic_HardwareKey")
+set(LICENSESPRING_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/LicenseSpring/include")
+
+# ------------------------------- FFTW ----------------------------------------
+set(FFTW_ROOT "${CMAKE_SOURCE_DIR}/FFTW64")
+
+# --------------------------- LicenseSpring -----------------------------------
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(LICENSE_SPRING_LIB "${LICENSESPRING_LIB_PATH}/LicenseSpringD.lib")
+else()
+    set(LICENSE_SPRING_LIB "${LICENSESPRING_LIB_PATH}/LicenseSpring.lib")
+endif()
+
 project(@SMTG_CMAKE_PROJECT_NAME@
-    # This is your plug-in version number. Change it here only.
-    # Version number symbols usable in C++ can be found in
-    # source/version.h and ${PROJECT_BINARY_DIR}/projectversion.h.
     VERSION 1.0.0.0 
     DESCRIPTION "@SMTG_CMAKE_PROJECT_NAME@ VST 3 Plug-in"
 )
@@ -26,14 +38,18 @@ smtg_enable_vst3_sdk()
 smtg_add_vst3plugin(@SMTG_CMAKE_PROJECT_NAME@
     source/version.h
     source/@SMTG_PREFIX_FOR_FILENAMES@cids.h
-    source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
-    source/@SMTG_PREFIX_FOR_FILENAMES@processor.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@licenser.h 
+    source/@SMTG_PREFIX_FOR_FILENAMES@editor.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@editordelegate.h
     source/@SMTG_PREFIX_FOR_FILENAMES@controller.h
     source/@SMTG_PREFIX_FOR_FILENAMES@controller.cpp
-    source/@SMTG_PREFIX_FOR_FILENAMES@entry.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@factory.cpp
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.h
+    source/@SMTG_PREFIX_FOR_FILENAMES@processor.cpp
+
 )
 
-#- VSTGUI Wanted ----
+# VSTGUI support
 if(SMTG_ENABLE_VSTGUI_SUPPORT)
     target_sources(@SMTG_CMAKE_PROJECT_NAME@
         PRIVATE
@@ -47,23 +63,51 @@ if(SMTG_ENABLE_VSTGUI_SUPPORT)
         RESOURCES
             "resource/@SMTG_PREFIX_FOR_FILENAMES@editor.uidesc"
     )
-endif(SMTG_ENABLE_VSTGUI_SUPPORT)
-# -------------------
+endif()
 
+# DSPFilters include
+include_directories(
+    DSPFilters/shared/DSPFilters/include
+)
+
+
+# --------------------------- LicenseSpring -----------------------------------
+target_include_directories(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE "${LICENSESPRING_INCLUDE_PATH}")
+
+# ------------------------------- FFTW ----------------------------------------
+target_include_directories(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE "${FFTW_ROOT}")
+
+# ----------------------------- DSP Filters -----------------------------------
+file(GLOB DSPFILTERS_SOURCES
+    DSPFilters/shared/DSPFilters/source/*.cpp
+#*///stupid .in format issues   
+)
+
+target_sources(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE ${DSPFILTERS_SOURCES})
+
+# Plugin snapshots
 smtg_target_add_plugin_snapshots (@SMTG_CMAKE_PROJECT_NAME@
     RESOURCES
         resource/@SMTG_Processor_PLAIN_UUID@_snapshot.png
         resource/@SMTG_Processor_PLAIN_UUID@_snapshot_2.0x.png
 )
 
+# ---------- LicenseSpring + all required Steinberg libraries ---------------- 
 target_link_libraries(@SMTG_CMAKE_PROJECT_NAME@
     PRIVATE
         sdk
+        "${LICENSE_SPRING_LIB}"
+        sdk
+        base
+        pluginterfaces
 )
+
+
 
 smtg_target_configure_version_file(@SMTG_CMAKE_PROJECT_NAME@)
 
-if(SMTG_MAC)
+# Platform-specific setup
+if(APPLE)
     smtg_target_set_bundle(@SMTG_CMAKE_PROJECT_NAME@
         BUNDLE_IDENTIFIER @SMTG_PLUGIN_IDENTIFIER@
         COMPANY_NAME "@SMTG_VENDOR_NAME@"
@@ -72,7 +116,7 @@ if(SMTG_MAC)
         "/Applications/VST3PluginTestHost.app"
         "--pluginfolder;$(BUILT_PRODUCTS_DIR)"
     )
-elseif(SMTG_WIN)
+elseif(WIN32)
     target_sources(@SMTG_CMAKE_PROJECT_NAME@ PRIVATE 
         resource/win32resource.rc
     )
@@ -84,4 +128,4 @@ elseif(SMTG_WIN)
             "--pluginfolder \"$(OutDir)/\""
         )
     endif()
-endif(SMTG_MAC)
+endif()

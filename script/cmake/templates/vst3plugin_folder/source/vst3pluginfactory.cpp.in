@@ -15,7 +15,7 @@ using namespace Steinberg::Vst;
 using namespace @SMTG_VENDOR_NAMESPACE@;
 
 //------------------------------------------------------------------------
-//  VST Plug-in Entry
+//  VST Plug-in Factory
 //------------------------------------------------------------------------
 
 BEGIN_FACTORY_DEF ("@SMTG_VENDOR_NAME@", 

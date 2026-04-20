@@ -1,0 +1,69 @@
+# Compiled object files
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled static libraries
+*.lib
+*.a
+
+# Compiled dynamic libraries
+*.dll
+*.so
+*.dylib
+
+# Executable files
+*.exe
+*.out
+*.app
+*.elf
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Build directories
+/build/
+/bin/
+/lib/
+/dist/
+/CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+#Linux Specific Files
+/LicenseSpring/
+
+# Generated files
+*.log
+
+# IDE/editor specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# Backup and temporary files
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Test output
+/test-output/
+*.gcda
+*.gcno
+*.gcov
+
+# Valgrind output
+vgcore.*
+
+# Clangd index
+.cache/
+.clangd/

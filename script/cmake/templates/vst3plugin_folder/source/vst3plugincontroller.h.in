@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include "editor.h"
+
 #include "public.sdk/source/vst/vsteditcontroller.h"
+#include "vstgui\lib\controls\icontrollistener.h"
 
 namespace @SMTG_VENDOR_NAMESPACE@ {
 
@@ -34,6 +37,12 @@ public:
 	Steinberg::tresult PLUGIN_API setState (Steinberg::IBStream* state) SMTG_OVERRIDE;
 	Steinberg::tresult PLUGIN_API getState (Steinberg::IBStream* state) SMTG_OVERRIDE;
 
+
+	//--- from Parameter Access -------------------------------------------
+	Steinberg::tresult PLUGIN_API setParamNormalized(Steinberg::Vst::ParamID pID, Steinberg::Vst::ParamValue value) SMTG_OVERRIDE;
+	Steinberg::Vst::ParamValue  PLUGIN_API getParamNormalized(Steinberg::Vst::ParamID pID) SMTG_OVERRIDE;
+
+
  	//---Interface---------
 	DEFINE_INTERFACES
 		// Here you can add more supported VST3 interfaces
@@ -43,6 +52,9 @@ public:
 
 //------------------------------------------------------------------------
 protected:
+
+double param0Value = 0.0; // Bypass Param
+//double param1Value           = 0.0;
 };
 
 //------------------------------------------------------------------------

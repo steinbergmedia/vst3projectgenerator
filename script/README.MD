@@ -4,6 +4,8 @@ A cmake script for generating VST 3 plug-in projects using cmake's script mode.
 
 > See also: <https://cmake.org/cmake/help/v3.16/manual/cmake-language.7.html#scripts>
 
+
+
 ## Usage
 
 ### basic

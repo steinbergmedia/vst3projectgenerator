@@ -1,0 +1,48 @@
+//------------------------------------------------------------------------
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
+
+
+#pragma once
+
+
+
+#include "vstgui\plugin-bindings\vst3editor.h"
+#include "editordelegate.h"
+
+#include <memory>
+
+/*-------------------------------------------------------*\
+ Overrides Editor, mostly to pass into the EditorDelegate
+\*-------------------------------------------------------*/
+
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+class @SMTG_PLUGIN_CLASS_NAME@Editor : public VSTGUI::VST3Editor
+{
+public:
+    @SMTG_PLUGIN_CLASS_NAME@Editor(Steinberg::Vst::EditController* controller)
+    : VST3Editor(controller, "view", "editor.uidesc"),
+      delegate_(std::make_unique<@SMTG_PLUGIN_CLASS_NAME@EditorDelegate>())
+    {
+        auto* delegate = new @SMTG_PLUGIN_CLASS_NAME@EditorDelegate();
+        setDelegate(delegate); 
+    }
+
+    VSTGUI::IVST3EditorDelegate* @SMTG_PLUGIN_CLASS_NAME@Editor::getDelegate() const
+{
+    return delegate_.get();
+}
+
+
+
+protected:
+    VSTGUI::VST3Editor* editor = nullptr;
+private:
+    std::unique_ptr<@SMTG_PLUGIN_CLASS_NAME@EditorDelegate> delegate_;
+};
+
+
+
+}

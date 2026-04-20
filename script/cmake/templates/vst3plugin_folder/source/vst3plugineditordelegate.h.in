@@ -1,0 +1,150 @@
+//------------------------------------------------------------------------
+// @SMTG_SOURCE_COPYRIGHT_HEADER@
+//------------------------------------------------------------------------
+
+#pragma once
+
+#include "vstgui\plugin-bindings\vst3editor.h"
+#include "vstgui\lib\cbitmap.h"
+
+
+#include "@SMTG_PREFIX_FOR_FILENAMES@licenser.h"
+
+/*------------------------------------------------*\
+Low level control over the UI, usually for listeners
+\*------------------------------------------------*/
+
+
+namespace @SMTG_VENDOR_NAMESPACE@ {
+
+
+class @SMTG_PLUGIN_CLASS_NAME@EditorDelegate : public  VSTGUI::VST3EditorDelegate, public VSTGUI::IControlListener
+{
+
+protected:
+
+    /* you can use these bitmaps to override a background or swap between them, add more to create multiple states*/
+
+   // VSTGUI::CBitmap* bitmap1 = createBitmapFromPath(bitmap1PATH);
+   // VSTGUI::CBitmap* bitmap2 = createBitmapFromPath(bitmap2PATH);
+
+    
+    VSTGUI::VST3Editor* editor = nullptr;
+    VSTGUI::ParameterChangeListener* paramChangeListener = nullptr;
+    std::unique_ptr<LicenseOverlayView> licenseOverlay;
+    LicenseSpring::LicenseManager::ptr_t licenseManager;
+    int ctrlID = 696969;                                    // Example control ID to listen to, number just a random choice
+    
+public:
+    
+	int switchstate = 0; // simple switch if the control is 0/1
+	// For example, if your switch parameter is named "SwitchParam"
+	Steinberg::Vst::ParamID switchParamID = ctrlID;
+
+	VSTGUI::CView* createCustomView (VSTGUI::UTF8StringPtr name, const VSTGUI::UIAttributes& attributes,
+							 const VSTGUI::IUIDescription* description, VSTGUI::VST3Editor* editor) override
+	{
+
+        // If online, return nullptr to allow default behavior
+        return nullptr;
+
+	}
+
+/*-----------------------------------------------------*\
+This logic allows you to apply a listener to GUI controls
+\*-----------------------------------------------------*/
+
+
+
+void didOpen(VSTGUI::VST3Editor* editor) override
+{
+    using namespace LicenseSpring;
+
+    this->editor = editor;
+    if (!editor || !editor->getFrame())
+        return;
+
+    auto* frame = editor->getFrame();
+    auto* controller = editor->getController();
+    if (!controller)
+        return;
+
+    // --- Find and register control listener for tag ctrlID ---
+    if (VSTGUI::CControl* switchControl = findControlByTag(frame, ctrlID)) {
+        switchControl->registerControlListener(this);
+    }
+
+    // --- Get param state ---
+    float switchState = 0.f;
+    if (auto* param = controller->getParameterObject(ctrlID)) {
+        switchState = param->getNormalized();
+    }
+
+    // --- Get main view container (assume first view is correct) ---
+    VSTGUI::CView* rootView = frame->getView(0);
+    auto* mainContainer = dynamic_cast<VSTGUI::CViewContainer*>(rootView);
+    if (!mainContainer)
+        return;
+
+}
+
+void willClose(VSTGUI::VST3Editor* editor) override
+{
+	// Undo
+
+}
+void valueChanged(VSTGUI::CControl* pControl) override {
+        if (pControl->getTag() == ctrlID)
+
+        {	/* Code to swap background bitmaps upon listener values*/ 
+
+			// VSTGUI::CViewContainer* myContainer = nullptr;
+			// VSTGUI::CView* view = editor->getFrame()->getView(0);
+            // myContainer = dynamic_cast<VSTGUI::CViewContainer*>(view);
+            // // Get switch value (0.0 = off, 1.0 = on)
+            // float switchstate = pControl->getValue();
+			// if (switchstate <= 0.5) {
+			// 	myContainer->setBackground(bitmap1);
+			// 	myContainer->invalid();
+			// } else if (switchstate > 0.5) {
+			// 	myContainer->setBackground(bitmap2);
+			// 	myContainer->invalid();
+            //         }
+
+	
+		}
+}
+
+
+
+private:
+
+// Helper function to find control by tag using documented VSTGUI methods
+VSTGUI::CControl* findControlByTag(VSTGUI::CViewContainer* container, int32_t tag)
+{
+    if (!container) return nullptr;
+    
+    // Use documented CViewContainer methods: getNbViews() and getView()
+    uint32_t numViews = container->getNbViews();
+    for (uint32_t i = 0; i < numViews; i++) {
+        VSTGUI::CView* view = container->getView(i);
+        
+        // Try to cast to CControl and check tag
+        if (auto control = dynamic_cast<VSTGUI::CControl*>(view)) {
+            if (control->getTag() == tag) {
+                return control;
+            }
+        }
+        
+        // Recursively search child containers
+        if (auto childContainer = dynamic_cast<VSTGUI::CViewContainer*>(view)) {
+            VSTGUI::CControl* result = findControlByTag(childContainer, tag);
+            if (result) return result;
+        }
+    }
+    return nullptr;
+
+
+}
+};
+}

@@ -6,6 +6,8 @@
 
 #include "public.sdk/source/vst/vstaudioeffect.h"
 
+#include "DspFilters/RBJ.h"      // filters
+
 namespace @SMTG_VENDOR_NAMESPACE@ {
 
 //------------------------------------------------------------------------
@@ -31,6 +33,10 @@ public:
 	
 	/** Called at the end before destructor */
 	Steinberg::tresult PLUGIN_API terminate () SMTG_OVERRIDE;
+
+	/** Called to set busses properly and exposes values so no hooks needed */
+	Steinberg::tresult PLUGIN_API setBusArrangements (Steinberg::Vst::SpeakerArrangement* inputs, Steinberg::int32 numIns,
+                                                        Steinberg::Vst::SpeakerArrangement* outputs, Steinberg::int32 numOuts) SMTG_OVERRIDE;
 	
 	/** Switch the Plug-in on/off */
 	Steinberg::tresult PLUGIN_API setActive (Steinberg::TBool state) SMTG_OVERRIDE;
@@ -48,8 +54,56 @@ public:
 	Steinberg::tresult PLUGIN_API setState (Steinberg::IBStream* state) SMTG_OVERRIDE;
 	Steinberg::tresult PLUGIN_API getState (Steinberg::IBStream* state) SMTG_OVERRIDE;
 
+
+	/*-------------------------------------------------------------*\
+	This template allows you to apply DSPFilters to your audio stream
+    \*-------------------------------------------------------------*/
+
+	// helper template filter function
+	template <typename FilterType>
+	void applyFilter(
+		std::vector<float*>& filteredPtrs,
+		std::vector<std::vector<float>>& filteredSignal,
+		float** inputBuffers,
+		int numSamples,
+		int numChannels,
+		FilterType& filter) {
+
+	// Applies given filter to a deep copy of the samples and returns the copy
+
+		for (int ch = 0; ch < numChannels; ++ch) {
+			memcpy(filteredSignal[ch].data(), inputBuffers[ch], numSamples * sizeof(float));
+		}
+		for (int ch = 0; ch < numChannels; ++ch) {
+			filteredPtrs[ch] = filteredSignal[ch].data();
+		}
+
+		filter.process(numSamples, filteredPtrs.data());
+
+	}
+// ------------------- Example filter -----------------------------------
+
+	Dsp::SimpleFilter <Dsp::RBJ::LowShelf, 2>  lowShelfFilter;
+
+
 //------------------------------------------------------------------------
-protected:
+private:
+
+
+	static constexpr float inv_pi = 0.31830988618379067154f; // useful constant
+
+
+	double param0Value           = 0.0;
+	//double param1Value           = 0.0;
+
+	double bypassValue		      = 0.0;
+	//double param1RuntimeValue   = 0.0;
+
+
+	// This is needed for the filters
+
+	std::vector<float*> filteredPtrs;
+	std::vector<std::vector<float>> filteredSignal;
 
 };
 

@@ -4,6 +4,10 @@
 
 #include "@SMTG_PREFIX_FOR_FILENAMES@controller.h"
 #include "@SMTG_PREFIX_FOR_FILENAMES@cids.h"
+
+
+#include "base/source/fstreamer.h"
+#include "public.sdk/source/vst/vstaudioeffect.h"
 @SMTG_INCLUDE_VSTGUI_HEADER_CODE_SNIPPET@
 
 using namespace Steinberg;
@@ -23,8 +27,45 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::initialize (FUnknown* con
 	{
 		return result;
 	}
+	
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< REGISTER PARAMETERS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-	// Here you could register some parameters
+	/*
+	 * <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	 * Follow the Logic to add a parameter, youll see similar linebreaks  
+	 * <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	 */
+
+	 // ORDER ALWAYS MATTERS, EVERY TIME YOU ADD PARAMS TO METHODS, UNLESS YOU KNOW OTHERWISE
+	 // ASSUME YOU SHOULD STICK TO THE ORDER YOU ESTABLISH THEM HERE
+
+
+	// ----------- This is bypass set to ID 0 as standard -----------------
+	parameters.addParameter(
+    STR16("Bypass"),                 // parameter title/name
+    nullptr,                         // units (nullptr if none)
+    2,                               // step count: 2 (Off/On)
+    0.0,                             // default normalized value (0 = Off)
+    Vst::ParameterInfo::kCanAutomate,// flags (can automate) ->    allows host to automate the control
+    0                                // unique parameter ID (uint32)
+	);
+
+	// parameters.addParameter(
+    // STR16("Bypass"),                 
+    // nullptr,                         
+    // 0,                          // 0 step count: continuous     
+    // 0.0,                             
+    // Vst::ParameterInfo::kCanAutomate,
+    // 1                                
+	// );
+
+
+
+
 
 	return result;
 }
@@ -53,6 +94,26 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setState (IBStream* state
 {
 	// Here you get the state of the controller
 
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<< GET PARAM STATE ON INIT<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+	Steinberg::IBStreamer s(state, kLittleEndian); // manage endianess
+	double val = 0.0;
+
+
+	if (!s.readDouble(val))
+        return kResultFalse;
+    param0Value = val;    
+	
+	// if (!s.readDouble(val))
+    //     return kResultFalse;
+    // param1Value = val;  
+
 	return kResultTrue;
 }
 
@@ -61,6 +122,18 @@ tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getState (IBStream* state
 {
 	// Here you are asked to deliver the state of the controller (if needed)
 	// Note: the real state of your plug-in is saved in the processor
+
+
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<< DELIVER PARAM STATE ON INIT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	Steinberg::IBStreamer s(state, kLittleEndian);
+
+	s.writeDouble(param0Value); 
+	//s.writeDouble(param1Value); 
 
 	return kResultTrue;
 }
@@ -71,10 +144,98 @@ IPlugView* PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::createView (FIDString 
 	// Here the Host wants to open your editor (if you have one)
 	if (FIDStringsEqual (name, Vst::ViewType::kEditor))
 	{
+		/*
+
+		// uncomment if you dont want to use the editor override
+
 		@SMTG_CREATE_VSTGUI_EDITOR_CODE_SNIPPET@
+
+		*/
+		
+
+		/*
+			This is what creates the custom editor instance
+		*/
+
+		auto* view = new @SMTG_PLUGIN_CLASS_NAME@Editor(this);
+
+        return view;
 	}
 	return nullptr;
 }
 
 //------------------------------------------------------------------------
+// These are needed for the runtime parameter management, add more per param you expose at runtime
+
+
+tresult PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::setParamNormalized(Steinberg::Vst::ParamID pID, Steinberg::Vst::ParamValue value)
+
+
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<< SETS PARAMETER STATE AT RUNTIME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+	// This is just an example, in reality, the bypass param will have no functionality here
+	// and you should just change the param value below <_
+
+
+{
+	if (pID == 0)  // <---------- This ID ---------------- <_
+	{
+		// clamp, check change, assign, notify
+		if (value < 0.0) value = 0.0;
+		else if (value > 1.0) value = 1.0;
+
+		if (param0Value != value)
+		{
+			param0Value = value;
+			performEdit(pID, param0Value);
+		}
+	}
+
+	// 	if (pID == 1)  
+	// {
+	// 	// clamp, check change, assign, notify
+	// 	if (value < 0.0) value = 0.0;
+	// 	else if (value > 1.0) value = 1.0;
+
+	// 	if (param1Value != value)
+	// 	{
+	// 		param1Value = value;
+	// 		performEdit(pID, param1Value);
+	// 	}
+	// }
+
+    return kResultOk;
+}
+
+//------------------------------------------------------------------------
+Steinberg::Vst::ParamValue PLUGIN_API @SMTG_PLUGIN_CLASS_NAME@Controller::getParamNormalized(Steinberg::Vst::ParamID pID)
+{
+
+
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<< GETS PARAMETER STATE AT RUNTIME <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    switch (pID)
+    {
+
+		// bypass	
+		case 0:
+            return param0Value;
+
+		// case 1:
+		// 	return param1Value;
+
+        default:
+            return EditControllerEx1::getParamNormalized(pID);
+    }
+}
+
+
 } // namespace @SMTG_VENDOR_NAMESPACE@
